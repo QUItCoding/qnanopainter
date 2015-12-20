@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/qnanopainter">
+        <file>data/Roboto-Regular.ttf</file>
+        <file>data/Roboto-Bold.ttf</file>
+        <file>data/Roboto-BoldItalic.ttf</file>
+        <file>data/Roboto-Italic.ttf</file>
+        <file>data/Roboto-Light.ttf</file>
+        <file>data/Roboto-LightItalic.ttf</file>
+        <file>data/Roboto-Thin.ttf</file>
+        <file>data/Roboto-ThinItalic.ttf</file>
+    </qresource>
+</RCC>

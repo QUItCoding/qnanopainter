@@ -1,0 +1,435 @@
+/**********************************************************
+** Copyright (c) 2015 QUIt Coding <info@quitcoding.com>
+**
+** This software is provided 'as-is', without any express or implied
+** warranty.  In no event will the authors be held liable for any damages
+** arising from the use of this software.
+**
+** Permission is granted to anyone to use this software for any purpose,
+** including commercial applications, and to alter it and redistribute it
+** freely, subject to the following restrictions:
+**
+** 1. The origin of this software must not be misrepresented; you must not
+**    claim that you wrote the original software. If you use this software
+**    in a product, an acknowledgment in the product documentation would be
+**    appreciated but is not required.
+** 2. Altered source versions must be plainly marked as such, and must not be
+**    misrepresented as being the original software.
+** 3. This notice may not be removed or altered from any source distribution.
+**
+**********************************************************/
+
+#include "qnanoquickitem.h"
+#include "private/qnanofborenderer.h"
+#include <QSGSimpleTextureNode>
+
+/*!
+    \enum QNanoQuickItem::PixelAlign
+
+    PixelAlign is used to defining if painting or text should be aligned to pixels.
+
+    \value PixelAlignNone (default) Don't do any alignment.
+
+    \value PixelAlignHalf Align to half pixels. This will make painting appear sharp when line width is odd.
+
+    \value PixelAlignFull Align to full pixels. This will make painting appear sharp when line width is even.
+
+    \sa setPixelAlign(), setPixelAlignText()
+*/
+
+/*!
+    \class QNanoQuickItem
+    \brief The QNanoQuickItem creates QtQuick item using QNanoPainter.
+    \inmodule QNanoPainter
+
+    TODO: Write more documentation here.
+*/
+
+/*!
+    \property QNanoQuickItem::fillColor
+    \brief The color to use for filling the item ie. the item background.
+
+    The default color is transparent.
+*/
+
+/*!
+    \property QNanoQuickItem::pixelAlign
+    \brief Set the pixelAlign mode.
+
+    The default value is false.
+*/
+
+/*!
+    \property QNanoQuickItem::pixelAlignText
+    \brief Set the pixelAlign mode of text.
+
+    The default value is false.
+*/
+
+/*!
+    \property QNanoQuickItem::highQualityRendering
+    \brief Set the highQualityRendering mode on.
+
+    The default value is false.
+*/
+
+/*!
+    \property QNanoQuickItem::mouseEventsEnabled
+    \brief This property defines if item should accept mouse events.
+    The default value is \c false.
+*/
+
+/*!
+    \property QNanoQuickItem::mouseHoverEventsEnabled
+    \brief This property defines if item should accept mouse hover events.
+    The default value is \c false.
+
+    This is basically QML property for accessing QQuickItem::acceptHoverEvents()
+*/
+
+/*!
+    \property QNanoQuickItem::acceptedButtons
+    \brief This property holds the mouse buttons that the item reacts to.
+    The default value is \c Qt.LeftButton.
+
+    To accept all buttons use \c Qt.AllButtons.
+*/
+
+/*!
+    \macro void QNANO_PROPERTY(type, variable, getter, setter)
+    \relates QNanoQuickItem
+
+    This helper macro can be used to simplify implementing properties.
+    Creates a Q_PROPERTY, local variable, getter, setter and signal all in one.
+    Setter will also call update().
+    Parameters are property variable \a type, name of private \a variable,
+    name of the \a getter method and  the \a setter method.
+
+    Usage examples:
+
+    QNANO_PROPERTY(float, m_animationValue, animValue, setAnimValue)
+
+    QNANO_PROPERTY(bool, m_showBorder, showBorder, setShowBorder)
+*/
+
+/*!
+    Constructs a QNanoQuickItem with the given \a parent item.
+*/
+
+QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
+  : QQuickFramebufferObject(parent)
+  , m_fillColor(Qt::transparent)
+  , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
+  , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
+  , m_highQualityRendering(false)
+  , m_acceptedMouseButtons(Qt::LeftButton)
+  , m_mouseEnabled(false)
+{
+    // Default to antialiased
+    setAntialiasing(true);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    // New API in Qt 5.6 to mirror FBO
+    setMirrorVertically(true);
+#endif
+
+}
+
+/*!
+    Destroys the QNanoQuickItem.
+*/
+
+QNanoQuickItem::~QNanoQuickItem()
+{
+}
+
+/*!
+    \fn QNanoQuickItemPainter* QNanoQuickItem::createItemPainter() const
+
+    Implement this method to (re)create painter for this item. The
+    painter class should be inherited from QNanoQuickItemPainter.
+    QNanoQuickItem takes the ownership of the created object and
+    deletes it when needed.
+
+    Example code:
+
+    QNanoQuickItemPainter* MyItem::createItemPainter() const
+    {
+        return new MyItemPainter();
+    }
+
+*/
+
+/*!
+    \fn bool QNanoQuickItem::pixelAlign() const
+
+    Returns current pixel align used for painting.
+    By default there is no pixel align, so PixelAlignNone.
+
+    \sa setPixelAlign(), pixelAlignText()
+*/
+
+QNanoQuickItem::PixelAlign QNanoQuickItem::pixelAlign() const
+{
+    return m_pixelAlign;
+}
+
+/*!
+    \fn void QNanoQuickItem::setPixelAlign(QNanoQuickItem::PixelAlign align)
+
+    Set the pixelAlign to \a align. Pixel alignment means that
+    painting is aligned to full or half pixels. When painting with odd
+    line widths (e.g. 1), aligning to PixelAlignHalf makes to drawing sharp.
+    Similarly when painting with even widths (e.g. 2) and PixelAlignFull.
+    Animations when pixelAlign is enabled are obviously less smooth as
+    everyting move in full pixels.
+    By default there is no pixel align, so PixelAlignNone.
+
+    \sa pixelAlign()
+*/
+
+void QNanoQuickItem::setPixelAlign(QNanoQuickItem::PixelAlign align)
+{
+    if (m_pixelAlign == align)
+        return;
+    m_pixelAlign = align;
+    emit pixelAlignChanged();
+    update();
+}
+
+/*!
+    \fn bool QNanoQuickItem::pixelAlignText() const
+
+    Returns true when pixel align for texts is on.
+
+    \sa setPixelAlignText(), pixelAlign()
+*/
+
+QNanoQuickItem::PixelAlign QNanoQuickItem::pixelAlignText() const
+{
+    return m_pixelAlignText;
+}
+
+/*!
+    \fn void QNanoQuickItem::setPixelAlignText(QNanoQuickItem::PixelAlign align)
+
+    Set the pixelAlign of text to \a align. Pixel alignment means that
+    painting of texts is aligned to full pixels. This is especially useful
+    when drawing smaller font sizes and preference is to have them sharp
+    instead of slightly blurry. Animations when pixelAlign is
+    enabled are obviously less smooth as everyting move in full pixels.
+    Note: Currently texts support only one type of alignment so PixelAlignHalf
+    and PixelAlignFull both result to same sharp alignment.
+    By default there is no pixel align, so PixelAlignNone.
+
+    \sa pixelAlignText(), setPixelAlign()
+*/
+
+void QNanoQuickItem::setPixelAlignText(QNanoQuickItem::PixelAlign align)
+{
+    if (m_pixelAlignText == align)
+        return;
+    m_pixelAlignText = align;
+    emit pixelAlignTextChanged();
+    update();
+}
+
+/*!
+    \fn bool QNanoQuickItem::highQualityRendering() const
+
+    Returns true when highQualityRendering is on.
+
+    \sa setHighQualityRendering()
+*/
+
+bool QNanoQuickItem::highQualityRendering() const
+{
+    return m_highQualityRendering;
+}
+
+/*!
+    \fn void QNanoQuickItem::setHighQualityRendering(bool value)
+
+    Set the highQualityRendering to \a value. HighQualityRendering gives
+    a more correct rendering in some corner-cases but isn't normally needed.
+    Enabling it results into higher rendering cost.
+    The default value is false.
+
+    \sa highQualityRendering()
+*/
+
+void QNanoQuickItem::setHighQualityRendering(bool value)
+{
+    if (m_highQualityRendering == value)
+        return;
+    m_highQualityRendering = value;
+    emit highQualityRenderingChanged();
+    update();
+}
+
+/*!
+    \fn QColor QNanoQuickItem::fillColor() const
+
+    Returns the current fill color.
+
+    \sa setFillColor()
+*/
+
+QColor QNanoQuickItem::fillColor() const
+{
+    return m_fillColor;
+}
+
+/*!
+    \fn void QNanoQuickItem::setFillColor (const QColor &color)
+
+    Set the fill color to \a color. This color will be used to draw
+    the background of the item. The default color is transparent.
+
+    \sa fillColor()
+*/
+
+void QNanoQuickItem::setFillColor(const QColor &color)
+{
+    if (m_fillColor == color)
+        return;
+    m_fillColor = color;
+
+    emit fillColorChanged();
+    update();
+}
+
+/*!
+    \fn bool QNanoQuickItem::mouseEventsEnabled() const
+
+    Returns true when mouse events for the item are enabled.
+
+    \sa setMouseEventsEnabled()
+*/
+
+bool QNanoQuickItem::mouseEventsEnabled() const
+{
+    return m_mouseEnabled;
+}
+
+/*!
+    \fn void QNanoQuickItem::setMouseEventsEnabled(bool enabled)
+
+    Enable or disabled receiving mouse events depending on \a enabled.
+    The default value is false, so to receive mouse event they need to be enabled first.
+    Once enabled, QNanoQuickItemPainter::mouseEvent() gets called for all events.
+
+    \sa mouseEventsEnabled()
+*/
+
+void QNanoQuickItem::setMouseEventsEnabled(bool enabled)
+{
+    if (m_mouseEnabled == enabled)
+        return;
+    m_mouseEnabled = enabled;
+    if (m_mouseEnabled) {
+        setAcceptedMouseButtons(m_acceptedMouseButtons);
+    } else {
+        setAcceptedMouseButtons(Qt::NoButton);
+    }
+    emit mouseEventsEnabledChanged();
+}
+
+/*!
+    \fn bool QNanoQuickItem::mouseHoverEventsEnabled() const
+
+    Returns true when mouse hover events for the item are enabled.
+
+    \sa setMouseHoverEventsEnabled()
+*/
+
+bool QNanoQuickItem::mouseHoverEventsEnabled() const
+{
+    return acceptHoverEvents();
+}
+
+/*!
+    \fn void QNanoQuickItem::setMouseHoverEventsEnabled(bool enabled)
+
+    Enable or disabled receiving mouse hover events depending on \a enabled.
+    The default value is false, so to receive mouse hover event they need to be enabled first.
+    Once enabled, QQuickItem hover events (hoverEnterEvent(), hoverMoveEvent() and hoverLeaveEvent())
+    event handles will get called.
+
+    \sa mouseHoverEventsEnabled()
+*/
+
+void QNanoQuickItem::setMouseHoverEventsEnabled(bool enabled)
+{
+    if (acceptHoverEvents() == enabled)
+        return;
+    setAcceptHoverEvents(enabled);
+    emit mouseHoverEventsEnabledChanged();
+}
+
+/*!
+    \fn Qt::MouseButtons QNanoQuickItem::acceptedButtons() const
+
+    Returns currently accepted mouse buttons.
+
+    \sa setAcceptedButtons()
+*/
+
+Qt::MouseButtons QNanoQuickItem::acceptedButtons() const
+{
+    return m_acceptedMouseButtons;
+}
+
+/*!
+    \fn void QNanoQuickItem::setAcceptedButtons(Qt::MouseButtons buttons)
+
+    Set which mouse \a buttons are accepted (meaning listened).
+    The default value is \c Qt::LeftButton.
+
+    \sa acceptedButtons()
+*/
+
+void QNanoQuickItem::setAcceptedButtons(Qt::MouseButtons buttons)
+{
+    if (m_acceptedMouseButtons == buttons)
+        return;
+    m_acceptedMouseButtons = buttons;
+    if (m_mouseEnabled) {
+        setAcceptedMouseButtons(m_acceptedMouseButtons);
+    }
+    emit acceptedButtonsChanged();
+}
+
+/*!
+   \internal
+*/
+
+QQuickFramebufferObject::Renderer *QNanoQuickItem::createRenderer() const
+{
+    QNanoFBORenderer *fborenderer = new QNanoFBORenderer();
+    QNanoQuickItemPainter *itemPainter = createItemPainter();
+    QObject::connect(itemPainter, SIGNAL(update()), this, SLOT(update()));
+    fborenderer->setItemPainter(itemPainter);
+    fborenderer->setWindow(window());
+    return fborenderer;
+}
+
+/*!
+   \internal
+*/
+
+// Flip FBO, see QTBUG-41073
+// With Qt 5.6 this is replaced with setMirrorVertically
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+QSGNode *QNanoQuickItem::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData)
+{
+    if (!node) {
+        node = QQuickFramebufferObject::updatePaintNode(node, nodeData);
+        QSGSimpleTextureNode *n = static_cast<QSGSimpleTextureNode *>(node);
+        if (n)
+            n->setTextureCoordinatesTransform(QSGSimpleTextureNode::MirrorVertically);
+        return node;
+    }
+    return QQuickFramebufferObject::updatePaintNode(node, nodeData);
+}
+#endif
