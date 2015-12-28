@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick gui
+QT += qml quick
 
 SOURCES += main.cpp \
     src/demoqpitem.cpp \

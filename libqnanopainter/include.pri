@@ -4,6 +4,7 @@ INCLUDEPATH += $$PWD/
 
 # Use c++11 features
 CONFIG += c++11
+
 win32  {
     LIBS += libglesv2.lib
     DEFINES += QT_OPENGL_ES_2
