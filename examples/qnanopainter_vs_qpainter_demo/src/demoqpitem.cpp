@@ -81,8 +81,8 @@ void DemoQPItem::paint(QPainter *painter)
 
 void DemoQPItem::drawGraphLine(float x, float y, float w, float h, int items, float t)
 {
-    float samples[items];
-    float sx[items], sy[items];
+    QVarLengthArray<float, 1024> samples(items);
+    QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
     float dx = w/(items-1);
     float dotSize = w/50;
     int i;
@@ -128,8 +128,8 @@ void DemoQPItem::drawGraphLine(float x, float y, float w, float h, int items, fl
 }
 
 void DemoQPItem::drawGraphBars(float x, float y, float w, float h, int items, float t) {
-    float samples[items];
-    float sx[items], sy[items];
+    QVarLengthArray<float, 1024> samples(items);
+    QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
     float dx = w/(items-1);
     float barWidth = dx * 0.8;
     float margin = dx - barWidth;
@@ -170,7 +170,7 @@ void DemoQPItem::drawGraphCircles(float x, float y, float w, float h, int items,
 
     // Setup values
     qreal a1 = 90*16;
-    qreal a0[items];
+    QVarLengthArray<qreal, 1024> a0(items);
     for (i=0; i<items; i++) {
         a0[i] = -360*16*(((float)items-i)/items)*showAnimationProgress;
     }

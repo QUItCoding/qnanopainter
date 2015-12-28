@@ -2,6 +2,7 @@
 #include "demoqnanoitem.h"
 #include <math.h>
 #include <QtMath>
+#include <QVarLengthArray>
 
 DemoQNanoItemPainter::DemoQNanoItemPainter()
     : m_animationTime(0.0)
@@ -79,8 +80,8 @@ void DemoQNanoItemPainter::paint(QNanoPainter *painter)
 
 void DemoQNanoItemPainter::drawGraphLine(float x, float y, float w, float h, int items, float t)
 {
-    float samples[items];
-    float sx[items], sy[items];
+    QVarLengthArray<float, 1024> samples(items);
+    QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
     float dx = w/(items-1);
     float dotSize = w/50;
     int i;
@@ -130,8 +131,9 @@ void DemoQNanoItemPainter::drawGraphLine(float x, float y, float w, float h, int
 }
 
 void DemoQNanoItemPainter::drawGraphBars(float x, float y, float w, float h, int items, float t) {
-    float samples[items];
-    float sx[items], sy[items];
+
+    QVarLengthArray<float, 1024> samples(items);
+    QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
     float dx = w/(items-1);
     float barWidth = dx * 0.8;
     float margin = dx - barWidth;
@@ -176,7 +178,7 @@ void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, 
 
     // Setup values
     qreal a1 = -pi/2;
-    qreal a0[items];
+    QVarLengthArray<qreal, 1024> a0(items);
     for (i=0; i<items; i++) {
         a0[i] = -pi/2 + pi2*(((float)items-i)/items)*showAnimationProgress;
     }
