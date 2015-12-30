@@ -24,7 +24,6 @@
 
 struct QNanoDataElement
 {
-    unsigned char* data;
     int id;
     int width;
     int height;
