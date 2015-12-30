@@ -115,13 +115,6 @@
     \sa setPixelAlign(), setPixelAlignText()
 */
 
-#ifndef QNANO_DATA_BUFFER_SIZE
-    // Define buffer size for font and images in kbytes
-    #define QNANO_DATA_BUFFER_SIZE 8000
-    // NOTE: If buffer is too small for handling all fonts, it cause assert like this:
-    // -> Assertion failed: (0), function stbtt_FindGlyphIndex, file ../../../qnanopainter/qnanopainter/nanovg/stb_truetype.h, line 1106.
-    // So you can increase the cache size if using many different font files.
-#endif
 
 /*!
     Constructs a painter.
@@ -136,7 +129,6 @@ QNanoPainter::QNanoPainter()
     , m_pixelAlign(QNanoPainter::PIXEL_ALIGN_NONE)
     , m_pixelAlignText(QNanoPainter::PIXEL_ALIGN_NONE)
 {
-    m_dataCache.setMaxCost(QNANO_DATA_BUFFER_SIZE);
 }
 
 /*!
@@ -145,6 +137,7 @@ QNanoPainter::QNanoPainter()
 
 QNanoPainter::~QNanoPainter()
 {
+    qDeleteAll(m_dataCache);
 }
 
 // *** State Handling ***

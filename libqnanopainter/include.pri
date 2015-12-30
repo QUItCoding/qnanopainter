@@ -5,6 +5,10 @@ INCLUDEPATH += $$PWD/
 # Use c++11 features
 CONFIG += c++11
 
+win32  {
+    QT_CONFIG += opengles2 angle
+}
+
 # Enable this to get drawind debug information
 #DEFINES += QNANO_DEBUG
 

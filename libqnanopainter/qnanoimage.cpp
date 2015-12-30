@@ -66,7 +66,7 @@ int QNanoImage::getID(NVGcontext* nvg)
 
     if (dataCache->contains(m_filename)) {
         // Image is in cache
-        QNanoDataElement *f = dataCache->object(m_filename);
+        const QNanoDataElement *f = dataCache->value(m_filename);
         m_width = f->width;
         m_height = f->height;
         m_id = f->id;
@@ -80,20 +80,13 @@ int QNanoImage::getID(NVGcontext* nvg)
         } else {
             QByteArray array = file.readAll();
             int length = array.size();
-            f->data = (unsigned char*)&array.constData()[0];
-            m_id = nvgCreateImageMem(nvg, m_flags, f->data, length);
+            unsigned char* data = (unsigned char*)&array.constData()[0];
+            m_id = nvgCreateImageMem(nvg, m_flags, data, length);
             f->id = m_id;
             nvgImageSize(nvg, m_id, &m_width, &m_height);
             f->width = m_width;
             f->height = m_height;
-            int kbsize = length / 1000;
-            dataCache->insert(m_filename, f, kbsize);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-            qInfo() << "Adding image into cache";
-            qInfo() << "Image filename: " << m_filename;
-            qInfo() << "Image size: (" << m_width << " x "<< m_height << ") " << kbsize << "kb";
-            qInfo() << "Data buffer load: " << 100.0*dataCache->totalCost()/dataCache->maxCost() << "%";
-#endif
+            dataCache->insert(m_filename, f);
         }
     }
     return m_id;

@@ -283,41 +283,19 @@ int QNanoFont::getID(NVGcontext* nvg)
         // No font file set, so loading the default font
         setFontId(QNanoFont::DEFAULT_FONT_NORMAL);
     }
-
-    // Font cache should always exist at this point
-    auto *dataCache = &m_parentPainter->m_dataCache;
-    Q_ASSERT(dataCache);
-
-    if (dataCache->contains(m_filename)) {
-        // Font is in cache
-        QNanoDataElement *f = dataCache->object(m_filename);
-        m_id = f->id;
-    } else {
+    m_id = nvgFindFont(nvg,m_filename.toUtf8().constData());
+    if (m_id == -1) {
         // Font is not yet in cache, so load and add it
-        QNanoDataElement *f = new QNanoDataElement();
-
         QFile file(m_filename);
         if (!file.open(QFile::ReadOnly))
         {
             qWarning() << "Could not open font file: " << m_filename;
         } else {
-            QByteArray array = file.readAll();
-            // TODO: To get '\0' at the end, is this correnct all the way?
-            int length = array.size() + 1;
-
-            f->data = new unsigned char[length];
-            memcpy(f->data, array.data(), length);
-            m_id = nvgCreateFontMem(nvg, m_filename.toUtf8().constData(), f->data, length, 1);
+            qint64 length = file.bytesAvailable();
+            char * data = static_cast<char*>(malloc(length));
+            file.read(data,length);
+            m_id = nvgCreateFontMem(nvg, m_filename.toUtf8().constData(), reinterpret_cast<unsigned char*>(data), length, 1);
             file.close();
-            f->id = m_id;
-            int kbsize = length / 1000;
-            dataCache->insert(m_filename, f, kbsize);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-            qInfo() << "Adding font into cache";
-            qInfo() << "Font filename: " << m_filename;
-            qInfo() << "Font size: " << kbsize << "kb";
-            qInfo() << "Data buffer load: " << 100.0*dataCache->totalCost()/dataCache->maxCost() << "%";
-#endif
         }
     }
     return m_id;

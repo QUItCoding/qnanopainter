@@ -2737,19 +2737,23 @@ void nvgFill(NVGcontext* ctx)
 					ctx->cache->bounds, ctx->cache->paths, ctx->cache->npaths);
 	
 #if DEBUG
-    // Count triangles
-    const NVGpath* path;
-    int i;
-    for (i = 0; i < ctx->cache->npaths; i++) {
-		path = &ctx->cache->paths[i];
-		int nfill = path->nfill-2;
-		if (nfill < 0) nfill = 0;
-		int nstroke = path->nstroke-2;
-		if (nstroke < 0) nstroke = 0;
-		ctx->fillTriCount += nfill;
-		ctx->fillTriCount += nstroke;
-		ctx->drawCallCount += 2;
-	}
+    {
+        // Count triangles
+        const NVGpath* path;
+        int i;
+        int nfill;
+        int nstroke;
+        for (i = 0; i < ctx->cache->npaths; i++) {
+            path = &ctx->cache->paths[i];
+            nfill = path->nfill-2;
+            if (nfill < 0) nfill = 0;
+            nstroke = path->nstroke-2;
+            if (nstroke < 0) nstroke = 0;
+            ctx->fillTriCount += nfill;
+            ctx->fillTriCount += nstroke;
+            ctx->drawCallCount += 2;
+        }
+    }
 #endif
 }
 
@@ -2805,14 +2809,16 @@ void nvgStroke(NVGcontext* ctx)
 					  strokeWidth, ctx->cache->paths, ctx->cache->npaths);
 
 #if DEBUG
-	// Count triangles
-    const NVGpath* path;
-    int i;
-    for (i = 0; i < ctx->cache->npaths; i++) {
-		path = &ctx->cache->paths[i];
-		ctx->strokeTriCount += path->nstroke-2;
-		ctx->drawCallCount++;
-	}
+    {
+        // Count triangles
+        const NVGpath* path;
+        int i;
+        for (i = 0; i < ctx->cache->npaths; i++) {
+            path = &ctx->cache->paths[i];
+            ctx->strokeTriCount += path->nstroke-2;
+            ctx->drawCallCount++;
+        }
+    }
 #endif
 }
 
