@@ -17,7 +17,7 @@ public:
 
     // Reimplement
     void synchronize(QNanoQuickItem *item);
-    void paint(QNanoPainter *painter);
+    void paint();
 
 private:
 

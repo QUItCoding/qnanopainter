@@ -27,20 +27,20 @@ void EventItemPainter::synchronize(QNanoQuickItem *item)
     }
 }
 
-void EventItemPainter::paint(QNanoPainter *p)
+void EventItemPainter::paint()
 {
-    p->setGlobalAlpha(m_hoverEnabled && !m_hovered ? 0.5 : 1.0);
+    painter()->setGlobalAlpha(m_hoverEnabled && !m_hovered ? 0.5 : 1.0);
     // Background
-    p->beginPath();
-    p->setFillStyle(0xFF408070);
-    p->setStrokeStyle(0xFFD0D0D0);
-    p->rect(0, 0, width(), height());
-    p->setLineWidth(2);
-    p->fill();
-    p->stroke();
+    painter()->beginPath();
+    painter()->setFillStyle(0xFF408070);
+    painter()->setStrokeStyle(0xFFD0D0D0);
+    painter()->rect(0, 0, width(), height());
+    painter()->setLineWidth(2);
+    painter()->fill();
+    painter()->stroke();
 
     // Draw boxes
-    p->setLineWidth(1);
+    painter()->setLineWidth(1);
     for (int i=0 ; i<m_items.count() ; i++)
     {
         QRectF box = m_items.at(i);
@@ -48,27 +48,27 @@ void EventItemPainter::paint(QNanoPainter *p)
         bool isPressed = (m_pressedItem == i);
         QNanoColor fillColor(isPressed ? 0xFFFF0000 : isActive ? 0xFFFFFFFF : 0xFF000000);
         fillColor.setAlphaF(0.2);
-        p->setFillStyle(fillColor);
-        p->setStrokeStyle(0xFFD0D0D0);
-        p->beginPath();
-        p->rect(box);
-        p->fill();
-        p->stroke();
+        painter()->setFillStyle(fillColor);
+        painter()->setStrokeStyle(0xFFD0D0D0);
+        painter()->beginPath();
+        painter()->rect(box);
+        painter()->fill();
+        painter()->stroke();
         // corner circle
-        p->beginPath();
+        painter()->beginPath();
         bool isResizable = (m_resizableItem == i);
-        p->setFillStyle(isResizable ? 0x80F0F0F0 : 0x00F0F0F0);
-        p->circle(box.x()+box.width(), box.y()+box.height(), m_circleSize);
-        p->stroke();
-        p->fill();
+        painter()->setFillStyle(isResizable ? 0x80F0F0F0 : 0x00F0F0F0);
+        painter()->circle(box.x()+box.width(), box.y()+box.height(), m_circleSize);
+        painter()->stroke();
+        painter()->fill();
         // Item number
-        p->setFillStyle(0xFFE0E0E0);
-        p->setTextAlign(QNanoPainter::ALIGN_CENTER);
-        p->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
+        painter()->setFillStyle(0xFFE0E0E0);
+        painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
+        painter()->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
         QNanoFont font(QNanoFont::DEFAULT_FONT_BOLD);
         font.setPointSize(12);
-        p->setFont(font);
-        p->fillText(QString::number(i+1), box.center());
+        painter()->setFont(font);
+        painter()->fillText(QString::number(i+1), box.center());
     }
 }
 

@@ -34,10 +34,8 @@ void DemoQNanoItemPainter::synchronize(QNanoQuickItem *item)
 }
 
 
-void DemoQNanoItemPainter::paint(QNanoPainter *painter)
+void DemoQNanoItemPainter::paint()
 {
-    m_painter = painter;
-
     qreal w = width();
     qreal h = height();
     qreal t = m_animationTime;
@@ -97,37 +95,37 @@ void DemoQNanoItemPainter::drawGraphLine(float x, float y, float w, float h, int
 
     // Draw graph background area
     QNanoLinearGradient bg(x,y,x,y+h, m_color1, m_color2);
-    m_painter->beginPath();
-    m_painter->moveTo(sx[0], sy[0]);
+    painter()->beginPath();
+    painter()->moveTo(sx[0], sy[0]);
     for (i = 1; i < items; i++)
-        m_painter->bezierTo(sx[i-1]+dx*0.5f,sy[i-1], sx[i]-dx*0.5f,sy[i], sx[i],sy[i]);
-    m_painter->lineTo(x+w, y);
-    m_painter->lineTo(x, y);
-    m_painter->setFillStyle(bg);
-    m_painter->fill();
+        painter()->bezierTo(sx[i-1]+dx*0.5f,sy[i-1], sx[i]-dx*0.5f,sy[i], sx[i],sy[i]);
+    painter()->lineTo(x+w, y);
+    painter()->lineTo(x, y);
+    painter()->setFillStyle(bg);
+    painter()->fill();
 
     // Draw graph line
-    m_painter->beginPath();
-    m_painter->moveTo(sx[0], sy[0]);
+    painter()->beginPath();
+    painter()->moveTo(sx[0], sy[0]);
     for (i = 1; i < items; i++)
-        m_painter->bezierTo(sx[i-1]+dx*0.5f,sy[i-1], sx[i]-dx*0.5f,sy[i], sx[i],sy[i]);
-    m_painter->setStrokeStyle(m_colorGray);
-    m_painter->setLineWidth(dotSize*0.4);
-    m_painter->stroke();
+        painter()->bezierTo(sx[i-1]+dx*0.5f,sy[i-1], sx[i]-dx*0.5f,sy[i], sx[i],sy[i]);
+    painter()->setStrokeStyle(m_colorGray);
+    painter()->setLineWidth(dotSize*0.4);
+    painter()->stroke();
 
     // Draw dot borders
-    m_painter->beginPath();
+    painter()->beginPath();
     for (i = 0; i < items; i++)
-        m_painter->circle(sx[i], sy[i], dotSize);
-    m_painter->setFillStyle(m_colorBlack);
-    m_painter->fill();
+        painter()->circle(sx[i], sy[i], dotSize);
+    painter()->setFillStyle(m_colorBlack);
+    painter()->fill();
 
     // Draw dot content
-    m_painter->beginPath();
+    painter()->beginPath();
     for (i = 0; i < items; i++)
-        m_painter->circle(sx[i], sy[i], dotSize*0.6);
-    m_painter->setFillStyle(m_colorWhite);
-    m_painter->fill();
+        painter()->circle(sx[i], sy[i], dotSize*0.6);
+    painter()->setFillStyle(m_colorWhite);
+    painter()->fill();
 }
 
 void DemoQNanoItemPainter::drawGraphBars(float x, float y, float w, float h, int items, float t) {
@@ -149,17 +147,17 @@ void DemoQNanoItemPainter::drawGraphBars(float x, float y, float w, float h, int
     }
 
     // Draw graph bars
-    m_painter->beginPath();
+    painter()->beginPath();
     for (i = 0; i < items; i++) {
-        m_painter->rect((int)sx[i]+0.5, (int)y+1.5, (int)barWidth, (int)sy[i]);
+        painter()->rect((int)sx[i]+0.5, (int)y+1.5, (int)barWidth, (int)sy[i]);
     }
     qreal lineWidth = 0.5 + w * 0.002;
-    m_painter->setLineWidth(lineWidth);
-    m_painter->setLineJoin(QNanoPainter::JOIN_MITER);
-    m_painter->setFillStyle(m_color3);
-    m_painter->setStrokeStyle(m_colorBlack);
-    m_painter->fill();
-    m_painter->stroke();
+    painter()->setLineWidth(lineWidth);
+    painter()->setLineJoin(QNanoPainter::JOIN_MITER);
+    painter()->setFillStyle(m_color3);
+    painter()->setStrokeStyle(m_colorBlack);
+    painter()->fill();
+    painter()->stroke();
 }
 
 void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, int items, float t)
@@ -183,30 +181,30 @@ void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, 
         a0[i] = -pi/2 + pi2*(((float)items-i)/items)*showAnimationProgress;
     }
 
-    m_painter->setLineWidth(lineWidth);
-    m_painter->setLineJoin(QNanoPainter::JOIN_ROUND);
-    m_painter->setLineCap(QNanoPainter::CAP_ROUND);
+    painter()->setLineWidth(lineWidth);
+    painter()->setLineJoin(QNanoPainter::JOIN_ROUND);
+    painter()->setLineCap(QNanoPainter::CAP_ROUND);
 
     // Draw cicle backgrounds
     qreal r = radius1;
     QNanoColor c_background(215,215,215,50);
-    m_painter->setStrokeStyle(c_background);
+    painter()->setStrokeStyle(c_background);
     for (int i=0 ; i<items ; i++) {
-        m_painter->beginPath();
-        m_painter->circle(cx, cy, r);
-        m_painter->stroke();
+        painter()->beginPath();
+        painter()->circle(cx, cy, r);
+        painter()->stroke();
         r -= (lineWidth + lineMargin);
     }
 
     // Draw circle bars
     r = radius1;
     for (int i=0 ; i<items ; i++) {
-        m_painter->beginPath();
-        m_painter->arc(cx, cy, r, a0[i], a1, QNanoPainter::WINDING_CCW);
+        painter()->beginPath();
+        painter()->arc(cx, cy, r, a0[i], a1, QNanoPainter::WINDING_CCW);
         float s = (float)i/items;
         QNanoColor c(200-150*s, 200-50*s, 100+50*s, 255*showAnimationProgress);
-        m_painter->setStrokeStyle(c);
-        m_painter->stroke();
+        painter()->setStrokeStyle(c);
+        painter()->stroke();
         r -= (lineWidth + lineMargin);
     }
 }
@@ -216,16 +214,16 @@ void DemoQNanoItemPainter::drawIcons(float x, float y, float w, float h, int ite
     // Note: Adjust font size to match QPainter sizing
     qreal fontSize = w/22.0 * 1.32 - 1;
     m_testFont.setPixelSize(fontSize);
-    m_painter->setFont(m_testFont);
-    m_painter->setFillStyle("#FFFFFF");
-    m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
-    m_painter->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
+    painter()->setFont(m_testFont);
+    painter()->setFillStyle("#FFFFFF");
+    painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
+    painter()->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
     qreal size = w/12;
     for (int i=0 ; i<items ; i++) {
         qreal xp = x + (w-size)/items*i;
         qreal yp = y + h*0.5 + h * sinf((i+1) * t * 0.1) * 0.5;
-        m_painter->drawImage(m_circleImage, QRectF(xp, yp, size, size));
-        m_painter->fillText(QString::number(i+1), QRectF(xp, yp+size/2, size, size));
+        painter()->drawImage(m_circleImage, QRectF(xp, yp, size, size));
+        painter()->fillText(QString::number(i+1), QRectF(xp, yp+size/2, size, size));
     }
 }
 
@@ -233,31 +231,31 @@ void DemoQNanoItemPainter::drawRuler(float x, float y, float w, float h, float t
 {
     float posX = x + w*0.05;
     double space = w*0.03 + sinf(t)*w*0.02;
-    m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
-    m_painter->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
+    painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
+    painter()->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
     // Note: Adjust font size to match QPainter sizing
     qreal fontSize = w/35.0 * 1.32 - 1;
     m_testFont.setPixelSize(fontSize);
-    m_painter->setFont(m_testFont);
-    m_painter->setStrokeStyle("#E0E0E0");
-    m_painter->setFillStyle("#E0E0B0");
-    m_painter->beginPath();
+    painter()->setFont(m_testFont);
+    painter()->setStrokeStyle("#E0E0E0");
+    painter()->setFillStyle("#E0E0B0");
+    painter()->beginPath();
     int i = 0;
     while (posX < w) {
-        m_painter->moveTo(posX, y);
+        painter()->moveTo(posX, y);
         float height = h*0.2;
         QPointF textPoint(posX, y+h);
         if (i%10==0) {
             height = h*0.5;
-            m_painter->fillText(QString::number(i), textPoint);
+            painter()->fillText(QString::number(i), textPoint);
         } else if (i%5==0) {
             height = h*0.3;
-            if (space > w*0.02) m_painter->fillText(QString::number(i), textPoint);
+            if (space > w*0.02) painter()->fillText(QString::number(i), textPoint);
         }
-        m_painter->lineTo(posX, y+height);
+        painter()->lineTo(posX, y+height);
         posX += space;
         i++;
     }
-    m_painter->setLineWidth(1.0f);
-    m_painter->stroke();
+    painter()->setLineWidth(1.0f);
+    painter()->stroke();
 }

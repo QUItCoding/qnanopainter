@@ -13,7 +13,7 @@ public:
 
     // Reimplement
     void synchronize(QNanoQuickItem *item);
-    void paint(QNanoPainter *painter);
+    void paint();
 
 private:
     void drawGraphLine(float x, float y, float w, float h, int items, float t);
