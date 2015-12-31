@@ -27,10 +27,8 @@ void GalleryItemPainter::synchronize(QNanoQuickItem *item)
     }
 }
 
-void GalleryItemPainter::paint(QNanoPainter *painter)
+void GalleryItemPainter::paint()
 {
-    Q_UNUSED(painter)
-
     // Draw similarly colored rectangles
     switch (m_viewIndex) {
     case 0:

@@ -39,7 +39,7 @@ public:
     explicit QNanoQuickItemPainter();
     ~QNanoQuickItemPainter();
 
-    virtual void paint(QNanoPainter *painter) = 0;
+    virtual void paint() = 0;
     virtual void synchronize(QNanoQuickItem *item);
     virtual void sizeChanged(float width, float height);
 

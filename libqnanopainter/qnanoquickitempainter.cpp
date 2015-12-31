@@ -273,7 +273,7 @@ void QNanoQuickItemPainter::render()
         if ((m_itemWidth > 0 && m_itemHeight > 0) || m_setupDone) {
             m_setupDone = true;
             prepaint();
-            paint(m_painter);
+            paint();
             postpaint();
         }
     }

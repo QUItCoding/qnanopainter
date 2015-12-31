@@ -9,7 +9,7 @@ public:
     EventItemPainter();
     // Reimplement
     void synchronize(QNanoQuickItem *item);
-    void paint(QNanoPainter *p);
+    void paint();
 
 private:
     QList<QRectF> m_items;
