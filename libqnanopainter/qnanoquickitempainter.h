@@ -29,7 +29,6 @@
 #include "qnanopainter.h"
 #include "qnanoquickitem.h"
 
-struct NVGcontext;
 
 class QNanoQuickItemPainter : public QObject, protected QOpenGLFunctions
 {
@@ -73,7 +72,7 @@ private:
     void setSize(float width, float height);
 
     QNanoQuickItem *m_parentItem;
-    NVGcontext* m_vg;
+
     QNanoPainter *m_painter;
     QColor m_fillColor;
     float m_itemWidth, m_itemHeight;
