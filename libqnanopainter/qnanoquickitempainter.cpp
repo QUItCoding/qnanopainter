@@ -61,11 +61,6 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
 
 QNanoQuickItemPainter::~QNanoQuickItemPainter()
 {
-    if (m_painter) {
-        delete m_painter;
-        m_painter = nullptr;
-    }
-
 }
 
 /*!
@@ -162,12 +157,16 @@ QColor QNanoQuickItemPainter::fillColor() const
    \internal
 */
 
+static QSharedPointer<QNanoPainter> getSharedPainter()
+{
+    static QSharedPointer<QNanoPainter> s_nano = QSharedPointer<QNanoPainter>::create();
+    return s_nano;
+}
+
 // Called by QNanoFBORenderer::setItemPainter, initializes NanoVG & OpenGL
 void QNanoQuickItemPainter::initialize()
 {
-    if (!m_painter) {
-        m_painter = new QNanoPainter();
-    }
+    m_painter = getSharedPainter();
 
     // Initialize QOpenGLFunctions for the context
     initializeOpenGLFunctions();
@@ -215,7 +214,7 @@ void QNanoQuickItemPainter::presynchronize(QQuickFramebufferObject *item)
 
 void QNanoQuickItemPainter::render()
 {
-
+    m_painter->reset(); // reset context data as painter is shared.
     // Update antialiasing if needed
     nvgInternalParams(m_painter->nvgCtx())->edgeAntiAlias = m_antialiasing;
 
@@ -228,7 +227,7 @@ void QNanoQuickItemPainter::render()
     if ((m_itemWidth > 0 && m_itemHeight > 0) || m_setupDone) {
         m_setupDone = true;
         prepaint();
-        paint(m_painter);
+        paint(m_painter.data());
         postpaint();
     }
 }

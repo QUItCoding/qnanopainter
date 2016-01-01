@@ -219,6 +219,11 @@ void QNanoPainter::restore()
 
 void QNanoPainter::reset()
 {
+    m_textAlign = QNanoPainter::ALIGN_LEFT;
+    m_textBaseline = QNanoPainter::BASELINE_ALPHABETIC;
+    m_fontSet = false;
+    m_pixelAlign = QNanoPainter::PIXEL_ALIGN_NONE;
+    m_pixelAlignText = QNanoPainter::PIXEL_ALIGN_NONE;
     nvgReset(nvgCtx());
 }
 
