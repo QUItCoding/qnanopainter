@@ -7,9 +7,9 @@
 GalleryItemPainter::GalleryItemPainter()
     : m_viewIndex(0)
 {
-    m_patternImage = QNanoImage(":/images/pattern1.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
-    m_patternImage2 = QNanoImage(":/images/pattern2.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
-    m_testImage = QNanoImage(":/images/quit_logo2.png");
+    m_patternImage = QNanoImage(":/qnanopainter_features/images/pattern1.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
+    m_patternImage2 = QNanoImage(":/qnanopainter_features/images/pattern2.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
+    m_testImage = QNanoImage(":/qnanopainter_features/images/quit_logo2.png");
 }
 
 GalleryItemPainter::~GalleryItemPainter()
@@ -652,7 +652,7 @@ void GalleryItemPainter::drawTextsFonts() {
     painter()->fillText("DEFAULT_FONT_BOLD_ITALIC", posX, posY);
 
     posY += 2*margin;
-    QNanoFont f2 = QNanoFont(":/fonts/Pacifico.ttf");
+    QNanoFont f2 = QNanoFont(":/qnanopainter_features/fonts/Pacifico.ttf");
     f2.setPixelSize(margin*2);
     painter()->setFont(f2);
     painter()->fillText("This is text with custom font", posX, posY);
@@ -759,7 +759,7 @@ void GalleryItemPainter::drawImages() {
     painter()->fillRect(rect1);
 
     // Draw image at its native resolution
-    QNanoImage image(":/images/quit_logo2.png");
+    QNanoImage image(":/qnanopainter_features/images/quit_logo2.png");
     painter()->drawImage(image, posX, posY);
 
     // Draw just the "coding" part of the image
@@ -771,7 +771,7 @@ void GalleryItemPainter::drawImages() {
     painter()->drawImage(m_testImage, sourceArea, targetArea);
 
     posY += targetArea.height() + height()*0.2;
-    image.setFilename(":/images/face.png");
+    image.setFilename(":/qnanopainter_features/images/face.png");
     QRectF rect(cx-r, posY-r, r*2, r*2);
     QPointF c(rect.x()+rect.width()/2, rect.y()+rect.height()/2);
     painter()->translate(c);

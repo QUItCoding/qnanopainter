@@ -34,33 +34,34 @@ Item {
     }
 
     width: parent.width
-    height: Math.floor(70 * dp)
+    height: mainWindow.topbarHeight
 
-    Rectangle {
+    /*Rectangle {
         anchors.fill: parent
-        color: "#000000"
-        opacity: 0.2
-    }
-    Text {
+        color: "#202020"
+        //opacity: 0.2
+    }*/
+    /*Text {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: titleTextItem.top
         font.pixelSize: 12 * dp
         color: "#909090"
         text: "QNanoPainter Gallery"
-    }
+    }*/
     Text {
         id: titleTextItem
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -8 * dp
         font.pixelSize: 20 * dp
-        color: "#e0e0e0"
+        color: "#f0f0f0"
         text: title
     }
     Row {
         anchors.top: titleTextItem.bottom
-        anchors.topMargin: 8 * dp
+        anchors.topMargin: 4 * dp
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 6 * dp
+        spacing: 4 * dp
         Repeater {
             model: root.itemCount
             Rectangle {

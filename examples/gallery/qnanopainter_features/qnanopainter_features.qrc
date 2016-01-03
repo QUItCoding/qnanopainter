@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/qnanopainter_features">
+        <file>main.qml</file>
+        <file>TopBar.qml</file>
+        <file>images/face.png</file>
+        <file>images/pattern1.png</file>
+        <file>images/pattern2.png</file>
+        <file>images/quit_logo2.png</file>
+        <file>fonts/Pacifico.ttf</file>
+    </qresource>
+</RCC>

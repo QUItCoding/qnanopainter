@@ -14,19 +14,20 @@ Item {
     Rectangle {
         anchors.fill: parent
         border.width: 1
-        border.color: "#f0f0f0"
-        color: !root.isToggle || root.toggled ? "#e0e0e0" : "#808080"
-        opacity: mouseArea.pressed ? 0.8 : 1.0
+        border.color: "#b0b0b0"
+        color: mouseArea.pressed ? "#808080" : "#606060"
+        opacity:  !root.isToggle || root.toggled ? 1.0 : 0.4
     }
 
     Text {
         id: textItem
         anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
         width: root.width - 8
         horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideRight
-        font.pointSize: 14
-        color: "#202020"
+        font.pixelSize: 10 * dp
+        color: "#ffffff"
         opacity: root.toggled || !root.isToggle ? 1.0 : 0.5
     }
 
