@@ -1123,6 +1123,7 @@ void QNanoPainter::fillText(const QString &text, const QRectF &rect)
 const QRectF QNanoPainter::textBoundingBox(const QString &text, float x, float y, float maxWidth)
 {
     _checkAlignPixelsText(&x, &y);
+    _checkFont();
     float bounds[4];
     if (maxWidth < 0) {
         nvgTextBounds(nvgCtx(), x, y, text.toUtf8().constData(), nullptr, bounds);
