@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>FpsItem.qml</file>
+        <file>images/spinner.png</file>
+    </qresource>
+</RCC>
