@@ -26,10 +26,10 @@
 #include <QtQuick/QQuickFramebufferObject>
 #include <QColor>
 #include <QElapsedTimer>
+#include <QSharedPointer>
 #include "qnanopainter.h"
 #include "qnanoquickitem.h"
 
-struct NVGcontext;
 
 class QNanoQuickItemPainter : public QObject, protected QOpenGLFunctions
 {
@@ -44,7 +44,7 @@ public:
     virtual void sizeChanged(float width, float height);
 
     QColor fillColor() const;
-    inline QNanoPainter *painter() const
+    inline QSharedPointer<QNanoPainter> painter() const
     {
         return m_painter;
     }
@@ -73,8 +73,8 @@ private:
     void setSize(float width, float height);
 
     QNanoQuickItem *m_parentItem;
-    NVGcontext* m_vg;
-    QNanoPainter *m_painter;
+
+    QSharedPointer<QNanoPainter> m_painter;
     QColor m_fillColor;
     float m_itemWidth, m_itemHeight;
     double m_devicePixelRatio;

@@ -20,7 +20,22 @@
 **********************************************************/
 
 #include "qnanopainter.h"
+#if defined(Q_OS_IOS)
+#include <OpenGLES/ES2/gl.h>
+#elif defined(Q_OS_MAC)
+#include <OpenGL/gl.h>
+#else
+#include <GLES2/gl2.h>
+#endif
+
+#ifdef QT_OPENGL_ES_2
+#define NANOVG_GLES2_IMPLEMENTATION
+#else
+#define NANOVG_GL2_IMPLEMENTATION
+#endif
+
 #include "nanovg/nanovg.h"
+#include "nanovg/nanovg_gl.h"
 
 /*!
     \class QNanoPainter
@@ -129,6 +144,17 @@ QNanoPainter::QNanoPainter()
     , m_pixelAlign(QNanoPainter::PIXEL_ALIGN_NONE)
     , m_pixelAlignText(QNanoPainter::PIXEL_ALIGN_NONE)
 {
+    // Initialize NanoVG for correct GL version
+    // TODO: Allow to enable/disable NVG_DEBUG, possibly some own general debug define
+#ifdef QT_OPENGL_ES_2
+    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS | NVG_DEBUG);
+#else
+    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS | NVG_DEBUG);
+#endif
+
+    Q_ASSERT_X(m_nvgContext, "QNanoPainter::QNanoPainter", "Could not init nanovg!");
+
+
 }
 
 /*!
@@ -137,6 +163,14 @@ QNanoPainter::QNanoPainter()
 
 QNanoPainter::~QNanoPainter()
 {
+    if (m_nvgContext) {
+#ifdef QT_OPENGL_ES_2
+    nvgDeleteGLES2(m_nvgContext);
+#else
+    nvgDeleteGL2(m_nvgContext);
+#endif
+    }
+
     qDeleteAll(m_dataCache);
 }
 
@@ -185,6 +219,11 @@ void QNanoPainter::restore()
 
 void QNanoPainter::reset()
 {
+    m_textAlign = QNanoPainter::ALIGN_LEFT;
+    m_textBaseline = QNanoPainter::BASELINE_ALPHABETIC;
+    m_fontSet = false;
+    m_pixelAlign = QNanoPainter::PIXEL_ALIGN_NONE;
+    m_pixelAlignText = QNanoPainter::PIXEL_ALIGN_NONE;
     nvgReset(nvgCtx());
 }
 
@@ -1201,6 +1240,18 @@ void QNanoPainter::setPixelAlignText(PixelAlign align)
 double QNanoPainter::devicePixelRatio() const
 {
     return m_devicePixelRatio;
+}
+
+void QNanoPainter::enableHighQualityRendering(bool enable)
+{
+    GLNVGcontext *gl = static_cast<GLNVGcontext*>(nvgInternalParams(nvgCtx())->userPtr);
+    if (gl) {
+        if (enable) {
+            gl->flags |= NVG_STENCIL_STROKES;
+        } else {
+            gl->flags &= ~NVG_STENCIL_STROKES;
+        }
+    }
 }
 
 /*

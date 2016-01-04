@@ -180,7 +180,7 @@ public:
     void setPixelAlign(PixelAlign align);
     void setPixelAlignText(PixelAlign align);
     double devicePixelRatio() const;
-
+    void enableHighQualityRendering(bool enable);
 /* TODO: Update these for better API
 
     // Calculates the glyph x positions of the specified text. If end is specified only the sub-string will be used.
@@ -207,9 +207,6 @@ private:
     friend class QNanoLinearGradient;
     friend class QNanoRadialGradient;
 
-    inline void setNvgCtx(NVGcontext* nvg) {
-        this->m_nvgContext = nvg;
-    }
     inline NVGcontext* nvgCtx() const {
         return m_nvgContext;
     }

@@ -25,23 +25,6 @@
 #include <QDebug>
 #include <QQuickWindow>
 
-#if defined(Q_OS_IOS)
-#include <OpenGLES/ES2/gl.h>
-#elif defined(Q_OS_MAC)
-#include <OpenGL/gl.h>
-#else
-#include <GLES2/gl2.h>
-#endif
-
-#ifdef QT_OPENGL_ES_2
-#define NANOVG_GLES2_IMPLEMENTATION
-#else
-#define NANOVG_GL2_IMPLEMENTATION
-#endif
-
-#include "nanovg/nanovg.h"
-#include "nanovg/nanovg_gl.h"
-
 /*!
     \class QNanoQuickItemPainter
     \brief The QNanoQuickItemPainter handles all painting of a QNanoQuickItem.
@@ -55,8 +38,7 @@
 */
 
 QNanoQuickItemPainter::QNanoQuickItemPainter()
-    : m_vg(nullptr)
-    , m_painter(nullptr)
+    : m_painter(nullptr)
     , m_fillColor(0.0, 0.0, 0.0, 0.0)
     , m_itemWidth(0.0f)
     , m_itemHeight(0.0f)
@@ -79,18 +61,6 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
 
 QNanoQuickItemPainter::~QNanoQuickItemPainter()
 {
-    if (m_painter) {
-        delete m_painter;
-        m_painter = nullptr;
-    }
-
-    if (m_vg) {
-#ifdef QT_OPENGL_ES_2
-    nvgDeleteGLES2(m_vg);
-#else
-    nvgDeleteGL2(m_vg);
-#endif
-    }
 }
 
 /*!
@@ -187,18 +157,16 @@ QColor QNanoQuickItemPainter::fillColor() const
    \internal
 */
 
+static QSharedPointer<QNanoPainter> getSharedPainter()
+{
+    static QSharedPointer<QNanoPainter> s_nano = QSharedPointer<QNanoPainter>::create();
+    return s_nano;
+}
+
 // Called by QNanoFBORenderer::setItemPainter, initializes NanoVG & OpenGL
 void QNanoQuickItemPainter::initialize()
 {
-    // Initialize NanoVG for correct GL version
-    // TODO: Allow to enable/disable NVG_DEBUG, possibly some own general debug define
-#ifdef QT_OPENGL_ES_2
-    m_vg = nvgCreateGLES2(NVG_ANTIALIAS | NVG_DEBUG);
-#else
-    m_vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_DEBUG);
-#endif
-
-    Q_ASSERT_X(m_vg, "initialize", "Could not init nanovg!");
+    m_painter = getSharedPainter();
 
     // Initialize QOpenGLFunctions for the context
     initializeOpenGLFunctions();
@@ -211,17 +179,17 @@ void QNanoQuickItemPainter::prepaint()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
     // Note: Last parameter can be used to render in lower resolution
-    nvgBeginFrame(m_vg, m_itemWidth, m_itemHeight, m_devicePixelRatio);
+    nvgBeginFrame(m_painter->nvgCtx(), m_itemWidth, m_itemHeight, m_devicePixelRatio);
 }
 
 void QNanoQuickItemPainter::postpaint()
 {
 #ifdef QNANO_DEBUG
-    m_drawDebug = nvgDrawDebug(m_vg);
+    m_drawDebug = nvgDrawDebug(m_painter->nvgCtx());
     paintDrawDebug();
 #endif
 
-    nvgEndFrame(m_vg);
+    nvgEndFrame(m_painter->nvgCtx());
 }
 
 void QNanoQuickItemPainter::presynchronize(QQuickFramebufferObject *item)
@@ -234,15 +202,7 @@ void QNanoQuickItemPainter::presynchronize(QQuickFramebufferObject *item)
         m_pixelAlignText = realItem->pixelAlignText();
         m_fillColor = realItem->fillColor();
         m_devicePixelRatio = realItem->window()->devicePixelRatio();
-
-        GLNVGcontext *gl = static_cast<GLNVGcontext*>(nvgInternalParams(m_vg)->userPtr);
-        if (gl) {
-            if (realItem->highQualityRendering()) {
-                gl->flags |= NVG_STENCIL_STROKES;
-            } else {
-                gl->flags &= ~NVG_STENCIL_STROKES;
-            }
-        }
+        m_painter->enableHighQualityRendering(realItem->highQualityRendering());
     }
 
 #ifdef QNANO_DEBUG
@@ -254,28 +214,21 @@ void QNanoQuickItemPainter::presynchronize(QQuickFramebufferObject *item)
 
 void QNanoQuickItemPainter::render()
 {
-    if (m_vg) {
+    m_painter->reset(); // reset context data as painter is shared.
+    // Update antialiasing if needed
+    nvgInternalParams(m_painter->nvgCtx())->edgeAntiAlias = m_antialiasing;
 
-        if (!m_painter) {
-            m_painter = new QNanoPainter();
-            m_painter->setNvgCtx(m_vg);
-        }
+    m_painter->setPixelAlign(static_cast<QNanoPainter::PixelAlign>(m_pixelAlign));
+    m_painter->setPixelAlignText(static_cast<QNanoPainter::PixelAlign>(m_pixelAlignText));
+    m_painter->m_devicePixelRatio = m_devicePixelRatio;
 
-        // Update antialiasing if needed
-        nvgInternalParams(m_vg)->edgeAntiAlias = m_antialiasing;
-
-        m_painter->setPixelAlign(static_cast<QNanoPainter::PixelAlign>(m_pixelAlign));
-        m_painter->setPixelAlignText(static_cast<QNanoPainter::PixelAlign>(m_pixelAlignText));
-        m_painter->m_devicePixelRatio = m_devicePixelRatio;
-
-        // Draw only when item has visible size. This way setup and painting is
-        // not called until size has been properly set.
-        if ((m_itemWidth > 0 && m_itemHeight > 0) || m_setupDone) {
-            m_setupDone = true;
-            prepaint();
-            paint(m_painter);
-            postpaint();
-        }
+    // Draw only when item has visible size. This way setup and painting is
+    // not called until size has been properly set.
+    if ((m_itemWidth > 0 && m_itemHeight > 0) || m_setupDone) {
+        m_setupDone = true;
+        prepaint();
+        paint(m_painter.data());
+        postpaint();
     }
 }
 
