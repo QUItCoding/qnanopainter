@@ -3,6 +3,8 @@
 
 #include "qnanoquickitem.h"
 #include "qnanoquickitempainter.h"
+#include <QPointer>
+#include <QAbstractListModel>
 
 // PieChartPainter contains the painting code
 class PieChartPainter : public QNanoQuickItemPainter
@@ -12,13 +14,6 @@ class PieChartPainter : public QNanoQuickItemPainter
 public:
     PieChartPainter()
     {
-        m_data.push_back(Data(10,QNanoColor::fromQColor(Qt::green)));
-        m_data.push_back(Data(20,QNanoColor::fromQColor(Qt::darkBlue)));
-        m_data.push_back(Data(40,QNanoColor::fromQColor(Qt::magenta)));
-        m_data.push_back(Data(50,QNanoColor::fromQColor(Qt::darkGray)));
-        m_data.push_back(Data(30,QNanoColor::fromQColor(Qt::red)));
-        m_data.push_back(Data(90,QNanoColor::fromQColor(Qt::blue)));
-        m_data.push_back(Data(70,QNanoColor::fromQColor(Qt::darkYellow)));
 
     }
     void synchronize(QNanoQuickItem *item);
@@ -48,10 +43,12 @@ private:
     qreal       m_segmentStrokeWidth;
     qreal       m_percentageInnerCutout;
     QVector<Data>     m_data;
+    qreal       m_totalValue;
 };
 #define PIE_PROPERTY(type,name) QNANO_PROPERTY(type, m_##name, name, set##name)
 
 // PieChart provides the API towards QML
+
 class PieChart : public QNanoQuickItem
 {
     Q_OBJECT
@@ -63,26 +60,50 @@ class PieChart : public QNanoQuickItem
     PIE_PROPERTY(QColor,segmentStrokeColor)
     PIE_PROPERTY(qreal,segmentStrokeWidth)
     PIE_PROPERTY(qreal,percentageInnerCutout)
-public:
-    PieChart(QQuickItem *parent = 0)
-        :  QNanoQuickItem(parent)
-        ,m_segmentShowStroke(true)
-        ,m_animation(false)
-        ,m_animateScale(false)
-        ,m_animateRotate(false)
-        ,m_animationProgress(0)
-        ,m_segmentStrokeColor("#fff")
-        ,m_segmentStrokeWidth(2.0)
-        ,m_percentageInnerCutout(50.0)
-    {
-    }
 
+    Q_PROPERTY(QVariant model READ model WRITE setModel NOTIFY modelChanged)
+
+    QVector<PieChartPainter::Data> m_data;
+    qreal       m_totalValue;
+    QPointer<QAbstractListModel> m_model;
+    QVariant m_dataSource;
+    bool m_dataSourceIsObject : 1;
+
+public:
+    PieChart(QQuickItem *parent = 0);
+    ~PieChart();
     // Reimplement
     QNanoQuickItemPainter *createItemPainter() const
     {
         // Create painter for this item
         return new PieChartPainter();
     }
+
+    QVariant model() const;
+    void setModel(const QVariant &);
+
+    QVector<PieChartPainter::Data> data(qreal * ptotalValue) {
+        *ptotalValue = m_totalValue;
+        return m_data;
+    }
+protected:
+
+    void updateData();
+    void updateTotalValue() {
+        m_totalValue = 0.0;
+        for (auto it = m_data.cbegin(); it != m_data.cend(); ++it) {
+            m_totalValue += it->m_value;
+        }
+
+    }
+
+Q_SIGNALS:
+    void modelChanged();
+
+private Q_SLOTS:
+    void dataChanged(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles );
+
+
 };
 
 #endif // PIECHART
