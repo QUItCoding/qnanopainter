@@ -1,8 +1,6 @@
 #include "piechart.h"
 #include <QtMath>
 
-#include <private/qqmlchangeset_p.h>
-
 void PieChartPainter::synchronize(QNanoQuickItem *item)
 {
     // Setting values here synchronized
