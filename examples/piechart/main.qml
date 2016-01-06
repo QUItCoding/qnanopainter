@@ -3,13 +3,14 @@ import QtQuick.Window 2.2
 import PieChart 1.0
 import "."
 Window {
+    id: root
     property real dp: Screen.pixelDensity * 25.4/160
     // This will be 1 on most platforms, 2 on iOS double retina, 3 on iPhone6 plus
     property int dPRatio: Screen.devicePixelRatio
 
     visible: true
-    width: 800
-    height: 480
+    width: Screen.primaryOrientation === Qt.LandscapeOrientation ? 800:480
+    height: Screen.primaryOrientation === Qt.LandscapeOrientation ? 480:800
     color: "#404040"
 
     Text {
@@ -161,16 +162,17 @@ Window {
             value: 9
         }
     }
-
-    Grid {
+    Flickable {
         anchors.top: textItem.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-
-        columns: 10
+        contentWidth: grid.width; contentHeight: grid.height
+    Grid {
+        id: grid
+        columns: width / 80
         spacing: 0
-
+        width: root.width
         PieChart {
             model: pieModel1
             width:(parent.width - 2*parent.spacing)/parent.columns
@@ -1576,7 +1578,7 @@ Window {
             }
         }
     }
-
+    }
     FpsItem {
         id: fpsItem
     }
