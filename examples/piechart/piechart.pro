@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick qml-private
+QT += qml quick
 
 SOURCES += main.cpp \
             piechart.cpp
