@@ -7,7 +7,6 @@
 // HelloItemPainter contains the painting code
 class HelloItemPainter : public QNanoQuickItemPainter
 {
-    Q_OBJECT
 
 public:
     HelloItemPainter()

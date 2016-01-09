@@ -29,7 +29,6 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES +=  \
-    $$PWD/private/qnanofborenderer.cpp \
     $$PWD/qnanoquickitem.cpp \
     $$PWD/qnanoquickitempainter.cpp \
     $$PWD/qnanopainter.cpp \
@@ -42,7 +41,6 @@ SOURCES +=  \
     $$PWD/qnanoboxgradient.cpp
 
 HEADERS +=  \
-    $$PWD/private/qnanofborenderer.h \
     $$PWD/private/qnanobrush.h \
     $$PWD/qnanoquickitem.h \
     $$PWD/qnanoquickitempainter.h \
