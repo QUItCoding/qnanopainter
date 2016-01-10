@@ -123,7 +123,7 @@ void PieChart::setModel(const QVariant &m)
         return;
 
     if (m_model) {
-        disconnect(m_model, &QAbstractListModel::dataChanged,
+        disconnect(m_model.data(), &QAbstractListModel::dataChanged,
                 this, &PieChart::dataChanged);
     }
     m_dataSource = model;
@@ -134,7 +134,7 @@ void PieChart::setModel(const QVariant &m)
         m_model = alm;
     }
     if (m_model) {
-        connect(m_model, &QAbstractListModel::dataChanged,
+        connect(m_model.data(), &QAbstractListModel::dataChanged,
                 this, &PieChart::dataChanged);
         updateData();
     }
