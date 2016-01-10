@@ -5,8 +5,9 @@
 
 int main(int argc, char *argv[])
 {
+#ifdef  QT_OPENGL_ES_2 
     QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
-
+#endif
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;

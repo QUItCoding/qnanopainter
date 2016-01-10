@@ -20,13 +20,9 @@
 **********************************************************/
 
 #include "qnanopainter.h"
-#if defined(Q_OS_IOS)
-#include <OpenGLES/ES2/gl.h>
-#elif defined(Q_OS_MAC)
-#include <OpenGL/gl.h>
-#else
-#include <GLES2/gl2.h>
-#endif
+
+#define GL_GLEXT_PROTOTYPES
+#include <QtOpenGL>
 
 #ifdef QT_OPENGL_ES_2
 #define NANOVG_GLES2_IMPLEMENTATION
