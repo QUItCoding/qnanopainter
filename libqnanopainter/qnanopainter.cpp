@@ -20,12 +20,29 @@
 **********************************************************/
 
 #include "qnanopainter.h"
+
+#if defined(QNANO_QT_GL_INCLUDE)
+// Let the Qt include OpenGL headers
+
+#define GL_GLEXT_PROTOTYPES
+#include <QtGui/qopengl.h>
+
+#else
+// Manually include OpenGL headers
+
 #if defined(Q_OS_IOS)
 #include <OpenGLES/ES2/gl.h>
-#elif defined(Q_OS_MAC)
+#elif defined(Q_OS_ANDROID)
+#include <GLES2/gl2.h>
+#elif defined(Q_OS_OSX)
 #include <OpenGL/gl.h>
+#elif defined(Q_OS_LINUX)
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
 #else
 #include <GLES2/gl2.h>
+#endif
+
 #endif
 
 #ifdef QT_OPENGL_ES_2

@@ -12,6 +12,9 @@ win32  {
 # Enable this to get drawind debug information
 #DEFINES += QNANO_DEBUG
 
+# Enable this to let Qt include OpenGL headers
+DEFINES += QNANO_QT_GL_INCLUDE
+
 # Configure the amount of logging in release build
 CONFIG(release, debug|release) {
     message("QNanoPainter Relase build")

@@ -5,7 +5,9 @@
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_OS_WIN
     QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+#endif
 
     QGuiApplication app(argc, argv);
 
