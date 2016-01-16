@@ -10,7 +10,6 @@
 
 class GalleryItemPainter : public QNanoQuickItemPainter
 {
-    Q_OBJECT
 public:
     explicit GalleryItemPainter();
     ~GalleryItemPainter();

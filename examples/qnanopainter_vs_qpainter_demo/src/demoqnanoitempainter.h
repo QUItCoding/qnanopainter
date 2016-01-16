@@ -6,7 +6,6 @@
 
 class DemoQNanoItemPainter : public QNanoQuickItemPainter
 {
-    Q_OBJECT
 
 public:
     explicit DemoQNanoItemPainter();

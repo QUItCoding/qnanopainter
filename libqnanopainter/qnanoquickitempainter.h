@@ -30,14 +30,14 @@
 #include "qnanopainter.h"
 #include "qnanoquickitem.h"
 
+class QQuickWindow;
 
-class QNanoQuickItemPainter : public QObject, protected QOpenGLFunctions
+class QNanoQuickItemPainter : public QQuickFramebufferObject::Renderer, protected QOpenGLFunctions
 {
-    Q_OBJECT
 
 public:
     explicit QNanoQuickItemPainter();
-    ~QNanoQuickItemPainter();
+    virtual ~QNanoQuickItemPainter();
 
     virtual void paint(QNanoPainter *painter) = 0;
     virtual void synchronize(QNanoQuickItem *item);
@@ -57,22 +57,29 @@ public:
         return m_itemHeight;
     }
 
-Q_SIGNALS:
-    void update();
+protected:
+    // Re-implemented from QQuickFramebufferObject::Renderer
+
+    // Creates initial FBO.
+    // Gets also called whenever item size changes if textureFollowsItemSize = true
+    QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) Q_DECL_OVERRIDE;
+
+    // Gets called when FBO should be rendered into.
+    void render() Q_DECL_OVERRIDE;
+
+    // Gets called as a result of QQuickFramebufferObject::update().
+    void synchronize(QQuickFramebufferObject * item) Q_DECL_OVERRIDE;
+
 
 private:
-    friend class QNanoFBORenderer;
 
     // These are internal
     void initialize();
     void prepaint();
     void postpaint();
-    // These get called from QNanoFBORenderer
-    void presynchronize(QQuickFramebufferObject *item);
-    void render();
     void setSize(float width, float height);
 
-    QNanoQuickItem *m_parentItem;
+    QQuickWindow *m_window;
 
     QSharedPointer<QNanoPainter> m_painter;
     QColor m_fillColor;

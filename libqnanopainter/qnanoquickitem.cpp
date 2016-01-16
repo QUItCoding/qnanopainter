@@ -20,8 +20,10 @@
 **********************************************************/
 
 #include "qnanoquickitem.h"
-#include "private/qnanofborenderer.h"
+#include "qnanoquickitempainter.h"
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
 #include <QSGSimpleTextureNode>
+#endif
 
 /*!
     \enum QNanoQuickItem::PixelAlign
@@ -406,12 +408,7 @@ void QNanoQuickItem::setAcceptedButtons(Qt::MouseButtons buttons)
 
 QQuickFramebufferObject::Renderer *QNanoQuickItem::createRenderer() const
 {
-    QNanoFBORenderer *fborenderer = new QNanoFBORenderer();
-    QNanoQuickItemPainter *itemPainter = createItemPainter();
-    QObject::connect(itemPainter, SIGNAL(update()), this, SLOT(update()));
-    fborenderer->setItemPainter(itemPainter);
-    fborenderer->setWindow(window());
-    return fborenderer;
+    return createItemPainter();
 }
 
 /*!
