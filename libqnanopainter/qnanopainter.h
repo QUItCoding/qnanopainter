@@ -186,6 +186,7 @@ public:
     // ***** Static methods *****
 
     static float mmToPx(float mm);
+    static float ptToPx(float pt);
 
 
 /* TODO: Update these for better API

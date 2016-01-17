@@ -272,7 +272,7 @@ void QNanoQuickItemPainter::paintDrawDebug()
         m_debugCounter = 0;
         m_debugUpdateTimer.start();
     }
-    float fontSize = qMin((double)QNanoFont::ptToPx(14), width()*0.05);
+    float fontSize = qMin((double)QNanoPainter::ptToPx(14), width()*0.05);
     int debugHeight = fontSize*2;
     int debugY = height() - debugHeight;
     m_painter->reset();

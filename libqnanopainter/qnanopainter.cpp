@@ -1297,6 +1297,24 @@ float QNanoPainter::mmToPx(float mm)
     return ldp * mm / 25.4;
 }
 
+/*!
+    \fn float QNanoPainter::ptToPx(float pt)
+
+    Static helper method to convert points \a pt into pixels.
+*/
+
+float QNanoPainter::ptToPx(float pt)
+{
+    qreal ldp = 72.0;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (screen) {
+        ldp = screen->physicalDotsPerInch();
+    } else {
+        qWarning() << "QScreen required for ptToPx";
+    }
+    return pt * (ldp/72.0);
+}
+
 /*
 int QNanoPainter::textGlyphPositions(float x, float y, const char* string, const char* end, NVGglyphPosition* positions, int maxPositions)
 {
