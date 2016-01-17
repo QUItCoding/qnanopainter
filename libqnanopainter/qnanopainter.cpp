@@ -1263,6 +1263,7 @@ double QNanoPainter::devicePixelRatio() const
 
 void QNanoPainter::enableHighQualityRendering(bool enable)
 {
+
     GLNVGcontext *gl = static_cast<GLNVGcontext*>(nvgInternalParams(nvgCtx())->userPtr);
     if (gl) {
         if (enable) {
@@ -1271,6 +1272,9 @@ void QNanoPainter::enableHighQualityRendering(bool enable)
             gl->flags &= ~NVG_STENCIL_STROKES;
         }
     }
+
+    // Re-create shader
+    glnvg__renderCreate(gl);
 }
 
 // ***** Static methods *****

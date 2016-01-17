@@ -52,6 +52,7 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
     , m_itemHeight(0.0f)
     , m_devicePixelRatio(1.0f)
     , m_antialiasing(true)
+    , m_highQualityRendering(false)
     , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
     , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
     , m_setupDone(false)
@@ -193,7 +194,11 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     m_pixelAlignText = realItem->pixelAlignText();
     m_fillColor = realItem->fillColor();
     m_devicePixelRatio = realItem->window()->devicePixelRatio();
-    m_painter->enableHighQualityRendering(realItem->highQualityRendering());
+    bool hqr = realItem->highQualityRendering();
+    if (hqr != m_highQualityRendering) {
+        m_highQualityRendering = hqr;
+        m_painter->enableHighQualityRendering(hqr);
+    }
 
 #ifdef QNANO_DEBUG
     m_debugTimer.start();

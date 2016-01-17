@@ -86,6 +86,7 @@ private:
     float m_itemWidth, m_itemHeight;
     double m_devicePixelRatio;
     bool m_antialiasing;
+    bool m_highQualityRendering;
     QNanoQuickItem::PixelAlign m_pixelAlign;
     QNanoQuickItem::PixelAlign m_pixelAlignText;
     bool m_setupDone;
