@@ -498,6 +498,22 @@ static int glnvg__renderCreate(void* uptr)
 	GLNVGcontext* gl = (GLNVGcontext*)uptr;
 	int align = 4;
 
+    // Cleanup if re-calling this function
+	if (gl->shader.frag != 0) {
+		glnvg__deleteShader(&gl->shader);
+
+#if NANOVG_GL3
+#if NANOVG_GL_USE_UNIFORMBUFFER
+		if (gl->fragBuf != 0)
+			glDeleteBuffers(1, &gl->fragBuf);
+#endif
+		if (gl->vertArr != 0)
+			glDeleteVertexArrays(1, &gl->vertArr);
+#endif
+		if (gl->vertBuf != 0)
+			glDeleteBuffers(1, &gl->vertBuf);
+    }
+
 	// TODO: mediump float may not be enough for GLES2 in iOS.
 	// see the following discussion: https://github.com/memononen/nanovg/issues/46
 	static const char* shaderHeader =
