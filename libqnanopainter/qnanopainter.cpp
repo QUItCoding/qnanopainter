@@ -53,6 +53,8 @@
 
 #include "nanovg/nanovg.h"
 #include "nanovg/nanovg_gl.h"
+#include <QScreen>
+#include <QGuiApplication>
 
 /*!
     \class QNanoPainter
@@ -1271,6 +1273,30 @@ void QNanoPainter::enableHighQualityRendering(bool enable)
     }
 }
 
+// ***** Static methods *****
+
+/*!
+    \fn float QNanoPainter::mmToPx(float mm)
+
+    Static helper method to convert millimeters \a mm into pixels.
+    This allows doing resolution independent drawing, for example to set
+    the line width to 2mm use:
+
+    painter->setLineWidth(QNanoPainter::mmToPx(2));
+*/
+
+float QNanoPainter::mmToPx(float mm)
+{
+    qreal ldp = 72.0;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (screen) {
+        ldp = screen->physicalDotsPerInch();
+    } else {
+        qWarning() << "QScreen required for pxToMm";
+    }
+    return ldp * mm / 25.4;
+}
+
 /*
 int QNanoPainter::textGlyphPositions(float x, float y, const char* string, const char* end, NVGglyphPosition* positions, int maxPositions)
 {
@@ -1287,6 +1313,8 @@ int QNanoPainter::textBreakLines(const char* string, const char* end, float brea
     return nvgTextBreakLines(nvgCtx(), string, end, breakRowWidth, rows, maxRows);
 }
 */
+
+// ***** Private *****
 
 /*!
    \internal

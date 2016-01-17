@@ -176,11 +176,18 @@ public:
     const QRectF textBoundingBox(const QString &text, float x, float y, float maxWidth = -1);
 
     // *** Other ***
+
     void setAntialias(float antialias);
     void setPixelAlign(PixelAlign align);
     void setPixelAlignText(PixelAlign align);
     double devicePixelRatio() const;
     void enableHighQualityRendering(bool enable);
+
+    // ***** Static methods *****
+
+    static float mmToPx(float mm);
+
+
 /* TODO: Update these for better API
 
     // Calculates the glyph x positions of the specified text. If end is specified only the sub-string will be used.
