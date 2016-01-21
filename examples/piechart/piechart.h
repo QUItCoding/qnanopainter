@@ -9,8 +9,6 @@
 // PieChartPainter contains the painting code
 class PieChartPainter : public QNanoQuickItemPainter
 {
-    Q_OBJECT
-
 public:
     PieChartPainter()
     {

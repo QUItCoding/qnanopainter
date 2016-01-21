@@ -12,6 +12,9 @@ win32  {
 # Enable this to get drawind debug information
 #DEFINES += QNANO_DEBUG
 
+# Enable this to let Qt include OpenGL headers
+DEFINES += QNANO_QT_GL_INCLUDE
+
 # Configure the amount of logging in release build
 CONFIG(release, debug|release) {
     message("QNanoPainter Relase build")
@@ -29,7 +32,6 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES +=  \
-    $$PWD/private/qnanofborenderer.cpp \
     $$PWD/qnanoquickitem.cpp \
     $$PWD/qnanoquickitempainter.cpp \
     $$PWD/qnanopainter.cpp \
@@ -42,7 +44,6 @@ SOURCES +=  \
     $$PWD/qnanoboxgradient.cpp
 
 HEADERS +=  \
-    $$PWD/private/qnanofborenderer.h \
     $$PWD/private/qnanobrush.h \
     $$PWD/qnanoquickitem.h \
     $$PWD/qnanoquickitempainter.h \

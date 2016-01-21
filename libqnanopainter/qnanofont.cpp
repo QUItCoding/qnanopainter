@@ -23,8 +23,6 @@
 #include "nanovg/nanovg.h"
 #include <QFile>
 #include <QDebug>
-#include <QScreen>
-#include <QGuiApplication>
 #include "qnanopainter.h"
 
 /*!
@@ -202,7 +200,7 @@ void QNanoFont::setPixelSize(float size)
 
 void QNanoFont::setPointSize(float size)
 {
-    m_size = QNanoFont::ptToPx(size);
+    m_size = QNanoPainter::ptToPx(size);
     m_fontPropertiesChanged = true;
 }
 
@@ -246,26 +244,6 @@ void QNanoFont::setLineHeight(float lineHeight)
 {
     m_lineHeight = lineHeight;
     m_fontPropertiesChanged = true;
-}
-
-// ***** Static methods *****
-
-/*!
-    \fn float QNanoFont::ptToPx(float pt)
-
-    Static helper method to convert points \a pt into pixels.
-*/
-
-float QNanoFont::ptToPx(float pt)
-{
-    qreal ldp = 1.0;
-    QScreen *screen = QGuiApplication::screens().at(0);
-    if (screen) {
-        ldp = screen->physicalDotsPerInch();
-    } else {
-        qWarning() << "QScreen required for ptToPx";
-    }
-    return pt * (ldp/72.0);
 }
 
 // ***** Private *****

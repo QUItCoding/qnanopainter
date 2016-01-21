@@ -20,12 +20,29 @@
 **********************************************************/
 
 #include "qnanopainter.h"
+
+#if defined(QNANO_QT_GL_INCLUDE)
+// Let the Qt include OpenGL headers
+
+#define GL_GLEXT_PROTOTYPES
+#include <QtGui/qopengl.h>
+
+#else
+// Manually include OpenGL headers
+
 #if defined(Q_OS_IOS)
 #include <OpenGLES/ES2/gl.h>
-#elif defined(Q_OS_MAC)
+#elif defined(Q_OS_ANDROID)
+#include <GLES2/gl2.h>
+#elif defined(Q_OS_OSX)
 #include <OpenGL/gl.h>
+#elif defined(Q_OS_LINUX)
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
 #else
 #include <GLES2/gl2.h>
+#endif
+
 #endif
 
 #ifdef QT_OPENGL_ES_2
@@ -36,6 +53,8 @@
 
 #include "nanovg/nanovg.h"
 #include "nanovg/nanovg_gl.h"
+#include <QScreen>
+#include <QGuiApplication>
 
 /*!
     \class QNanoPainter
@@ -1244,6 +1263,7 @@ double QNanoPainter::devicePixelRatio() const
 
 void QNanoPainter::enableHighQualityRendering(bool enable)
 {
+
     GLNVGcontext *gl = static_cast<GLNVGcontext*>(nvgInternalParams(nvgCtx())->userPtr);
     if (gl) {
         if (enable) {
@@ -1252,6 +1272,51 @@ void QNanoPainter::enableHighQualityRendering(bool enable)
             gl->flags &= ~NVG_STENCIL_STROKES;
         }
     }
+
+    // Re-create shader
+    glnvg__renderCreate(gl);
+}
+
+// ***** Static methods *****
+
+/*!
+    \fn float QNanoPainter::mmToPx(float mm)
+
+    Static helper method to convert millimeters \a mm into pixels.
+    This allows doing resolution independent drawing, for example to set
+    the line width to 2mm use:
+
+    painter->setLineWidth(QNanoPainter::mmToPx(2));
+*/
+
+float QNanoPainter::mmToPx(float mm)
+{
+    qreal ldp = 72.0;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (screen) {
+        ldp = screen->physicalDotsPerInch();
+    } else {
+        qWarning() << "QScreen required for pxToMm";
+    }
+    return ldp * mm / 25.4;
+}
+
+/*!
+    \fn float QNanoPainter::ptToPx(float pt)
+
+    Static helper method to convert points \a pt into pixels.
+*/
+
+float QNanoPainter::ptToPx(float pt)
+{
+    qreal ldp = 72.0;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (screen) {
+        ldp = screen->physicalDotsPerInch();
+    } else {
+        qWarning() << "QScreen required for ptToPx";
+    }
+    return pt * (ldp/72.0);
 }
 
 /*
@@ -1270,6 +1335,8 @@ int QNanoPainter::textBreakLines(const char* string, const char* end, float brea
     return nvgTextBreakLines(nvgCtx(), string, end, breakRowWidth, rows, maxRows);
 }
 */
+
+// ***** Private *****
 
 /*!
    \internal

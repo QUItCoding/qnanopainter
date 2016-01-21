@@ -150,10 +150,10 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width - 40 * dp
                 title: "Test rendering count"
-                texts: ["1", "2", "3", "4", "5", "6", "7", "8"]
+                texts: ["1", "2", "4", "8", "16", "32", "64", "128"]
                 selectedIndex: 0
                 onSelectedIndexChanged: {
-                    mainWindow.testCount = selectedIndex+1;
+                    mainWindow.testCount = testCountSelector.texts[selectedIndex];
                 }
             }
         }

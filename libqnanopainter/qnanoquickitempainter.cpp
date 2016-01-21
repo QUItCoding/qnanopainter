@@ -24,6 +24,7 @@
 
 #include <QDebug>
 #include <QQuickWindow>
+#include <QOpenGLFramebufferObjectFormat>
 
 /*!
     \class QNanoQuickItemPainter
@@ -33,17 +34,25 @@
     TODO: Write more documentation here.
 */
 
+static QSharedPointer<QNanoPainter> getSharedPainter()
+{
+    static QSharedPointer<QNanoPainter> s_nano = QSharedPointer<QNanoPainter>::create();
+    return s_nano;
+}
+
 /*!
     Constructs a QNanoQuickItemPainter.
 */
 
 QNanoQuickItemPainter::QNanoQuickItemPainter()
-    : m_painter(nullptr)
+    : m_window(nullptr)
+    , m_painter(getSharedPainter())
     , m_fillColor(0.0, 0.0, 0.0, 0.0)
     , m_itemWidth(0.0f)
     , m_itemHeight(0.0f)
     , m_devicePixelRatio(1.0f)
     , m_antialiasing(true)
+    , m_highQualityRendering(false)
     , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
     , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
     , m_setupDone(false)
@@ -53,6 +62,8 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
     , m_debugMsElapsed("0.000")
 #endif
 {
+    // Initialize QOpenGLFunctions for the context
+    initializeOpenGLFunctions();
 }
 
 /*!
@@ -157,19 +168,43 @@ QColor QNanoQuickItemPainter::fillColor() const
    \internal
 */
 
-static QSharedPointer<QNanoPainter> getSharedPainter()
+QOpenGLFramebufferObject *QNanoQuickItemPainter::createFramebufferObject(const QSize &size)
 {
-    static QSharedPointer<QNanoPainter> s_nano = QSharedPointer<QNanoPainter>::create();
-    return s_nano;
+    QOpenGLFramebufferObjectFormat format;
+    format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+    return new QOpenGLFramebufferObject(size, format);
 }
 
-// Called by QNanoFBORenderer::setItemPainter, initializes NanoVG & OpenGL
-void QNanoQuickItemPainter::initialize()
+void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
 {
-    m_painter = getSharedPainter();
+    if (!item)
+        return;
+    m_window = item->window();
+    // If size has changed, update
+    if (static_cast<int>(width()) != static_cast<int>(item->width()) || static_cast<int>(height()) != static_cast<int>(item->height())) {
+        setSize(item->width(), item->height());
+        sizeChanged(item->width(), item->height());
+        // Note: invalidated automatically when size changes if textureFollowsItemSize is true
+        //invalidateFramebufferObject();
+    }
+    QNanoQuickItem *realItem = static_cast<QNanoQuickItem*>(item);
 
-    // Initialize QOpenGLFunctions for the context
-    initializeOpenGLFunctions();
+    m_antialiasing = realItem->antialiasing();
+    m_pixelAlign = realItem->pixelAlign();
+    m_pixelAlignText = realItem->pixelAlignText();
+    m_fillColor = realItem->fillColor();
+    m_devicePixelRatio = realItem->window()->devicePixelRatio();
+    bool hqr = realItem->highQualityRendering();
+    if (hqr != m_highQualityRendering) {
+        m_highQualityRendering = hqr;
+        m_painter->enableHighQualityRendering(hqr);
+    }
+
+#ifdef QNANO_DEBUG
+    m_debugTimer.start();
+#endif
+
+    synchronize(realItem);
 }
 
 // Initializations to OpenGL and vg context before paint()
@@ -192,28 +227,9 @@ void QNanoQuickItemPainter::postpaint()
     nvgEndFrame(m_painter->nvgCtx());
 }
 
-void QNanoQuickItemPainter::presynchronize(QQuickFramebufferObject *item)
-{
-    QNanoQuickItem *realItem = static_cast<QNanoQuickItem*>(item);
-
-    if (realItem) {
-        m_antialiasing = realItem->antialiasing();
-        m_pixelAlign = realItem->pixelAlign();
-        m_pixelAlignText = realItem->pixelAlignText();
-        m_fillColor = realItem->fillColor();
-        m_devicePixelRatio = realItem->window()->devicePixelRatio();
-        m_painter->enableHighQualityRendering(realItem->highQualityRendering());
-    }
-
-#ifdef QNANO_DEBUG
-    m_debugTimer.start();
-#endif
-
-    synchronize(realItem);
-}
-
 void QNanoQuickItemPainter::render()
 {
+
     m_painter->reset(); // reset context data as painter is shared.
     // Update antialiasing if needed
     nvgInternalParams(m_painter->nvgCtx())->edgeAntiAlias = m_antialiasing;
@@ -230,6 +246,11 @@ void QNanoQuickItemPainter::render()
         paint(m_painter.data());
         postpaint();
     }
+    // Reset the GL state for Qt side
+    if (m_window) {
+        m_window->resetOpenGLState();
+    }
+
 }
 
 void QNanoQuickItemPainter::setSize(float width, float height)
@@ -256,7 +277,7 @@ void QNanoQuickItemPainter::paintDrawDebug()
         m_debugCounter = 0;
         m_debugUpdateTimer.start();
     }
-    float fontSize = qMin((double)QNanoFont::ptToPx(14), width()*0.05);
+    float fontSize = qMin((double)QNanoPainter::ptToPx(14), width()*0.05);
     int debugHeight = fontSize*2;
     int debugY = height() - debugHeight;
     m_painter->reset();

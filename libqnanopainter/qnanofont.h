@@ -55,8 +55,6 @@ public:
     void setLetterSpacing(float spacing);
     void setLineHeight(float lineHeight);
 
-    static float ptToPx(float pt);
-
 private:
     friend class QNanoPainter;
 
