@@ -44,9 +44,9 @@ public:
     virtual void sizeChanged(float width, float height);
 
     QColor fillColor() const;
-    inline QSharedPointer<QNanoPainter> painter() const
+    inline QNanoPainter *painter() const
     {
-        return m_painter;
+        return m_painter.data();
     }
     inline float width() const
     {
