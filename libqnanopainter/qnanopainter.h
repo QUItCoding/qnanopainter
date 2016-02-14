@@ -25,6 +25,7 @@
 #include <QRectF>
 #include <QCache>
 #include <QTransform>
+#include <QSharedPointer>
 #include "qnanocolor.h"
 #include "private/qnanobrush.h"
 #include "private/qnanodataelement.h"
@@ -237,7 +238,7 @@ private:
     bool m_fontSet;
     QNanoPainter::PixelAlign m_pixelAlign;
     QNanoPainter::PixelAlign m_pixelAlignText;
-    QNanoFont m_defaultFont;
+    QSharedPointer<QNanoFont> m_defaultFont;
 
 };
 

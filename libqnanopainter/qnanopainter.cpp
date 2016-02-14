@@ -1362,9 +1362,11 @@ void QNanoPainter::enableHighQualityRendering(bool enable)
 void QNanoPainter::_checkFont() {
     // If user hasn't set a font, load the default one
     if (!m_fontSet) {
-        qDebug() << "No font set, using the default font";
-        m_defaultFont = QNanoFont(QNanoFont::DEFAULT_FONT_NORMAL);
-        setFont(m_defaultFont);
+        if (m_defaultFont.isNull()) {
+            qDebug() << "No font set, using the default font";
+            m_defaultFont = QSharedPointer<QNanoFont>::create(QNanoFont::DEFAULT_FONT_NORMAL);
+        }
+        setFont(*m_defaultFont);
     }
 }
 
