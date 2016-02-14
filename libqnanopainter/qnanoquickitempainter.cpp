@@ -158,13 +158,6 @@ QColor QNanoQuickItemPainter::fillColor() const
 }
 
 /*!
-    \fn void QNanoQuickItemPainter::update()
-
-    Calling this schedules a repainting of the item. This means that paint()
-    will get asynchronously called during the next frame.
-*/
-
-/*!
    \internal
 */
 
