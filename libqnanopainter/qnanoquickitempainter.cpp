@@ -201,7 +201,7 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     bool antialiasing = realItem->antialiasing();
     if (antialiasing != m_antialiasing) {
         m_antialiasing = antialiasing;
-        m_painter->setAntialiasing(antialiasing);
+        m_painter->enableAntialiasing(antialiasing);
     }
 
 #ifdef QNANO_DEBUG

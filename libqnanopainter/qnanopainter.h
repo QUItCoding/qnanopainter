@@ -177,12 +177,10 @@ public:
 
     // *** Other ***
 
-    void setAntialiasing(bool enable);
     void setAntialias(float antialias);
     void setPixelAlign(PixelAlign align);
     void setPixelAlignText(PixelAlign align);
     double devicePixelRatio() const;
-    void enableHighQualityRendering(bool enable);
 
     // ***** Static methods *****
 
@@ -219,6 +217,9 @@ private:
     inline NVGcontext* nvgCtx() const {
         return m_nvgContext;
     }
+
+    void enableAntialiasing(bool enable);
+    void enableHighQualityRendering(bool enable);
 
     void _checkFont();
     void _checkAlignPixelsAdjust(float *a, float *b = NULL, float *c = NULL, float *d = NULL);
