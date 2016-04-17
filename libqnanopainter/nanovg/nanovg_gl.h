@@ -59,12 +59,18 @@ enum NVGcreateFlags {
 NVGcontext* nvgCreateGL2(int flags);
 void nvgDeleteGL2(NVGcontext* ctx);
 
+int nvglCreateImageFromHandleGL2(NVGcontext* ctx, GLuint textureId, int w, int h, int flags, GLuint target);
+GLuint nvglImageFromHandleGL2(NVGcontext* ctx, int image);
+
 #endif
 
 #if defined NANOVG_GL3
 
 NVGcontext* nvgCreateGL3(int flags);
 void nvgDeleteGL3(NVGcontext* ctx);
+
+int nvglCreateImageFromHandleGL3(NVGcontext* ctx, GLuint textureId, int w, int h, int flags, GLuint target);
+GLuint nvglImageHandleGL3(NVGcontext* ctx, int image);
 
 #endif
 
@@ -73,6 +79,9 @@ void nvgDeleteGL3(NVGcontext* ctx);
 NVGcontext* nvgCreateGLES2(int flags);
 void nvgDeleteGLES2(NVGcontext* ctx);
 
+int nvglCreateImageFromHandleGLES2(NVGcontext* ctx, GLuint textureId, int w, int h, int flags, GLuint target);
+GLuint nvglImageHandleGLES2(NVGcontext* ctx, int image);
+
 #endif
 
 #if defined NANOVG_GLES3
@@ -80,16 +89,15 @@ void nvgDeleteGLES2(NVGcontext* ctx);
 NVGcontext* nvgCreateGLES3(int flags);
 void nvgDeleteGLES3(NVGcontext* ctx);
 
+int nvglCreateImageFromHandleGLES3(NVGcontext* ctx, GLuint textureId, int w, int h, int flags, GLuint target);
+GLuint nvglImageHandleGLES3(NVGcontext* ctx, int image);
+
 #endif
 
 // These are additional flags on top of NVGimageFlags.
 enum NVGimageFlagsGL {
 	NVG_IMAGE_NODELETE			= 1<<16,	// Do not delete GL texture handle.
 };
-
-int nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, int flags, GLuint target);
-GLuint nvglImageHandle(NVGcontext* ctx, int image);
-
 
 #ifdef __cplusplus
 }
@@ -396,8 +404,8 @@ static int glnvg__deleteTexture(GLNVGcontext* gl, int id)
 
 static void glnvg__dumpShaderError(GLuint shader, const char* name, const char* type)
 {
-	char str[512+1];
-	int len = 0;
+	GLchar str[512+1];
+	GLsizei len = 0;
 	glGetShaderInfoLog(shader, 512, &len, str);
 	if (len > 512) len = 512;
 	str[len] = '\0';
@@ -406,8 +414,8 @@ static void glnvg__dumpShaderError(GLuint shader, const char* name, const char* 
 
 static void glnvg__dumpProgramError(GLuint prog, const char* name)
 {
-	char str[512+1];
-	int len = 0;
+	GLchar str[512+1];
+	GLsizei len = 0;
 	glGetProgramInfoLog(prog, 512, &len, str);
 	if (len > 512) len = 512;
 	str[len] = '\0';
@@ -497,22 +505,6 @@ static int glnvg__renderCreate(void* uptr)
 {
 	GLNVGcontext* gl = (GLNVGcontext*)uptr;
 	int align = 4;
-
-    // Cleanup if re-calling this function
-	if (gl->shader.frag != 0) {
-		glnvg__deleteShader(&gl->shader);
-
-#if NANOVG_GL3
-#if NANOVG_GL_USE_UNIFORMBUFFER
-		if (gl->fragBuf != 0)
-			glDeleteBuffers(1, &gl->fragBuf);
-#endif
-		if (gl->vertArr != 0)
-			glDeleteVertexArrays(1, &gl->vertArr);
-#endif
-		if (gl->vertBuf != 0)
-			glDeleteBuffers(1, &gl->vertBuf);
-    }
 
 	// TODO: mediump float may not be enough for GLES2 in iOS.
 	// see the following discussion: https://github.com/memononen/nanovg/issues/46
@@ -1612,7 +1604,15 @@ void nvgDeleteGLES3(NVGcontext* ctx)
 	nvgDeleteInternal(ctx);
 }
 
-int nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags, GLuint target)
+#if defined NANOVG_GL2
+int nvglCreateImageFromHandleGL2(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags, GLuint target)
+#elif defined NANOVG_GL3
+int nvglCreateImageFromHandleGL3(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags, GLuint target)
+#elif defined NANOVG_GLES2
+int nvglCreateImageFromHandleGLES2(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags, GLuint target)
+#elif defined NANOVG_GLES3
+int nvglCreateImageFromHandleGLES3(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags, GLuint target)
+#endif
 {
 	GLNVGcontext* gl = (GLNVGcontext*)nvgInternalParams(ctx)->userPtr;
 	GLNVGtexture* tex = glnvg__allocTexture(gl);
@@ -1629,7 +1629,15 @@ int nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, i
 	return tex->id;
 }
 
-GLuint nvglImageHandle(NVGcontext* ctx, int image)
+#if defined NANOVG_GL2
+GLuint nvglImageHandleGL2(NVGcontext* ctx, int image)
+#elif defined NANOVG_GL3
+GLuint nvglImageHandleGL3(NVGcontext* ctx, int image)
+#elif defined NANOVG_GLES2
+GLuint nvglImageHandleGLES2(NVGcontext* ctx, int image)
+#elif defined NANOVG_GLES3
+GLuint nvglImageHandleGLES3(NVGcontext* ctx, int image)
+#endif
 {
 	GLNVGcontext* gl = (GLNVGcontext*)nvgInternalParams(ctx)->userPtr;
 	GLNVGtexture* tex = glnvg__findTexture(gl, image);

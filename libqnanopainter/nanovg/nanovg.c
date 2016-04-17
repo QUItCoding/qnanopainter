@@ -16,8 +16,11 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <memory.h>
+
 #include "nanovg.h"
 #define FONTSTASH_IMPLEMENTATION
 #include "fontstash.h"
@@ -78,6 +81,9 @@ struct NVGstate {
 	int lineCap;
 	float alpha;
 	float xform[6];
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    float invxform[6];
+#endif
 	NVGscissor scissor;
 	float fontSize;
 	float letterSpacing;
@@ -409,7 +415,7 @@ void nvgBeginFrame(NVGcontext* ctx, int windowWidth, int windowHeight, float dev
 	nvgReset(ctx);
 
 	nvg__setDevicePixelRatio(ctx, devicePixelRatio);
-	
+
 	ctx->params.renderViewport(ctx->params.userPtr, windowWidth, windowHeight);
 	
 #if DEBUG
@@ -735,9 +741,13 @@ void nvgDrawDisplayList(NVGcontext* ctx, NVGdisplayList* list)
 	
 	if (currentScissor.extent[0] >= 0)
 	{
-		float invStateTx[6];
-		nvgTransformInverse(invStateTx, state->xform);
-		nvgTransformMultiply(currentScissor.xform, invStateTx);
+#if !NVG_TRANSFORM_IN_VERTEX_SHADER
+        float invStateTx[6];
+        nvgTransformInverse(invStateTx, state->xform);
+        nvgTransformMultiply(currentScissor.xform, invStateTx);
+#else
+		nvgTransformMultiply(currentScissor.xform, state->invxform);
+#endif
 	}
 	
 	for (i=0; i<list->ncommands; ++i)
@@ -885,7 +895,7 @@ NVGcolor nvgLerpRGBA(NVGcolor c0, NVGcolor c1, float u)
 	{
 		cint.rgba[i] = c0.rgba[i] * oneminu + c1.rgba[i] * u;
 	}
-	 
+
 	return cint;
 }
 
@@ -1062,7 +1072,9 @@ void nvgReset(NVGcontext* ctx)
 	state->lineJoin = NVG_MITER;
 	state->alpha = 1.0f;
 	nvgTransformIdentity(state->xform);
-
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformIdentity(state->invxform);
+#endif
 	state->scissor.extent[0] = -1.0f;
 	state->scissor.extent[1] = -1.0f;
 
@@ -1110,12 +1122,20 @@ void nvgTransform(NVGcontext* ctx, float a, float b, float c, float d, float e, 
 	NVGstate* state = nvg__getState(ctx);
 	float t[6] = { a, b, c, d, e, f };
 	nvgTransformPremultiply(state->xform, t);
+    
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformInverse(state->invxform, state->xform);
+#endif
 }
 
 void nvgResetTransform(NVGcontext* ctx)
 {
 	NVGstate* state = nvg__getState(ctx);
 	nvgTransformIdentity(state->xform);
+    
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformInverse(state->invxform, state->xform);
+#endif
 }
 
 void nvgTranslate(NVGcontext* ctx, float x, float y)
@@ -1124,6 +1144,10 @@ void nvgTranslate(NVGcontext* ctx, float x, float y)
 	float t[6];
 	nvgTransformTranslate(t, x,y);
 	nvgTransformPremultiply(state->xform, t);
+    
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformInverse(state->invxform, state->xform);
+#endif
 }
 
 void nvgRotate(NVGcontext* ctx, float angle)
@@ -1132,6 +1156,10 @@ void nvgRotate(NVGcontext* ctx, float angle)
 	float t[6];
 	nvgTransformRotate(t, angle);
 	nvgTransformPremultiply(state->xform, t);
+    
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformInverse(state->invxform, state->xform);
+#endif
 }
 
 void nvgSkewX(NVGcontext* ctx, float angle)
@@ -1140,6 +1168,10 @@ void nvgSkewX(NVGcontext* ctx, float angle)
 	float t[6];
 	nvgTransformSkewX(t, angle);
 	nvgTransformPremultiply(state->xform, t);
+    
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformInverse(state->invxform, state->xform);
+#endif
 }
 
 void nvgSkewY(NVGcontext* ctx, float angle)
@@ -1148,6 +1180,10 @@ void nvgSkewY(NVGcontext* ctx, float angle)
 	float t[6];
 	nvgTransformSkewY(t, angle);
 	nvgTransformPremultiply(state->xform, t);
+    
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformInverse(state->invxform, state->xform);
+#endif
 }
 
 void nvgScale(NVGcontext* ctx, float x, float y)
@@ -1156,6 +1192,10 @@ void nvgScale(NVGcontext* ctx, float x, float y)
 	float t[6];
 	nvgTransformScale(t, x,y);
 	nvgTransformPremultiply(state->xform, t);
+    
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvgTransformInverse(state->invxform, state->xform);
+#endif
 }
 
 void nvgCurrentTransform(NVGcontext* ctx, float* xform)
@@ -1430,7 +1470,9 @@ static void nvg__scissorRect(const NVGscissor * scissor, const float * tx, float
 void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
 {
 	NVGstate* state = nvg__getState(ctx);
-	float invxorm[6];
+#if !NVG_TRANSFORM_IN_VERTEX_SHADER
+	float invxform[6];
+#endif
 	float rect[4], r[4];
 	
 	// If no previous scissor has been set, set the scissor as current scissor.
@@ -1439,9 +1481,13 @@ void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
 		return;
 	}
 	
-	nvgTransformInverse(invxorm, state->xform);
-	nvg__scissorRect(&state->scissor, invxorm, r);
-	
+#if NVG_TRANSFORM_IN_VERTEX_SHADER
+    nvg__scissorRect(&state->scissor, state->invxform, r);
+#else
+	nvgTransformInverse(invxform, state->xform);
+	nvg__scissorRect(&state->scissor, invxform, r);
+#endif
+    
 	nvg__isectRects(rect,r[0],r[1], r[2], r[3], x,y,w,h);
 	nvgScissor(ctx, rect[0], rect[1], rect[2], rect[3]);
 }
@@ -1716,7 +1762,7 @@ static void nvg__tesselateBezier(NVGcontext* ctx, float scale,
 {
 	float x12,y12,x23,y23,x34,y34,x123,y123,x234,y234,x1234,y1234;
 	float dx,dy,d2,d3;
-	
+
 	if (level > 10) return;
 
 	x12 = (x1+x2)*0.5f;
@@ -2205,7 +2251,7 @@ static void nvg__calculateJoins(NVGcontext* ctx, float w, int lineJoin, float mi
 
 
 static int nvg__expandStroke(NVGcontext* ctx, float w, int lineCap, int lineJoin, float miterLimit, float scale)
-{	
+{
 	NVGpathCache* cache = ctx->cache;
 	NVGvertex* verts;
 	NVGvertex* dst;
@@ -2483,7 +2529,7 @@ void nvgQuadTo(NVGcontext* ctx, float cx, float cy, float x, float y)
 {
     float x0 = ctx->commandx;
     float y0 = ctx->commandy;
-    float vals[] = { NVG_BEZIERTO, 
+    float vals[] = { NVG_BEZIERTO,
         x0 + 2.0f/3.0f*(cx - x0), y0 + 2.0f/3.0f*(cy - y0),
         x + 2.0f/3.0f*(cx - x), y + 2.0f/3.0f*(cy - y),
         x, y };
@@ -2565,7 +2611,7 @@ void nvgArc(NVGcontext* ctx, float cx, float cy, float r, float a0, float a1, in
 	float px = 0, py = 0, ptanx = 0, ptany = 0;
 	float vals[3 + 5*7 + 100];
 	int i, ndivs, nvals;
-	int move = ctx->ncommands > 0 ? NVG_LINETO : NVG_MOVETO; 
+	int move = ctx->ncommands > 0 ? NVG_LINETO : NVG_MOVETO;
 
 	// Clamp angles
 	da = a1 - a0;
@@ -2704,7 +2750,7 @@ void nvgFill(NVGcontext* ctx)
 	NVGstate* state = nvg__getState(ctx);
 #if	NVG_TRANSFORM_IN_VERTEX_SHADER
     float invscale = 1.0f / nvg__getAverageScale(state->xform);
-    float invxform[6];
+    const float * invxform = state->invxform;
 #else
     float invscale = 1.0f;
 #endif
@@ -2728,7 +2774,6 @@ void nvgFill(NVGcontext* ctx)
 	xform = NVGidentityXform;
 #else
 	//scissor and paint need to be inverse transformed.
-	nvgTransformInverse(invxform, xform);
 	nvgTransformMultiply(scissor.xform, invxform);
 	nvgTransformMultiply(fillPaint.xform, invxform);
 #endif
@@ -2737,23 +2782,23 @@ void nvgFill(NVGcontext* ctx)
 					ctx->cache->bounds, ctx->cache->paths, ctx->cache->npaths);
 	
 #if DEBUG
-    {
-        // Count triangles
-        const NVGpath* path;
-        int i;
-        int nfill;
-        int nstroke;
-        for (i = 0; i < ctx->cache->npaths; i++) {
-            path = &ctx->cache->paths[i];
-            nfill = path->nfill-2;
-            if (nfill < 0) nfill = 0;
-            nstroke = path->nstroke-2;
-            if (nstroke < 0) nstroke = 0;
-            ctx->fillTriCount += nfill;
-            ctx->fillTriCount += nstroke;
-            ctx->drawCallCount += 2;
-        }
-    }
+	{
+		// Count triangles
+		const NVGpath* path;
+		int i;
+		int nfill;
+		int nstroke;
+		for (i = 0; i < ctx->cache->npaths; i++) {
+			path = &ctx->cache->paths[i];
+			nfill = path->nfill-2;
+			if (nfill < 0) nfill = 0;
+			nstroke = path->nstroke-2;
+			if (nstroke < 0) nstroke = 0;
+			ctx->fillTriCount += nfill;
+			ctx->fillTriCount += nstroke;
+			ctx->drawCallCount += 2;
+		}
+	}
 #endif
 }
 
@@ -2763,7 +2808,7 @@ void nvgStroke(NVGcontext* ctx)
 #if	NVG_TRANSFORM_IN_VERTEX_SHADER
     float invscale = 1.0f / nvg__getAverageScale(state->xform);
     float scale = 1.0f;
-    float invxform[6];
+    const float * invxform = state->invxform;
 #else
     float scale = nvg__getAverageScale(state->xform);
     float invscale = 1.0f;
@@ -2800,7 +2845,6 @@ void nvgStroke(NVGcontext* ctx)
 	xform = NVGidentityXform;
 #else
 	//scissor and paint need to be inverse transformed.
-	nvgTransformInverse(invxform, xform);
 	nvgTransformMultiply(scissor.xform, invxform);
 	nvgTransformMultiply(strokePaint.xform, invxform);
 #endif
@@ -2809,16 +2853,16 @@ void nvgStroke(NVGcontext* ctx)
 					  strokeWidth, ctx->cache->paths, ctx->cache->npaths);
 
 #if DEBUG
-    {
-        // Count triangles
-        const NVGpath* path;
-        int i;
-        for (i = 0; i < ctx->cache->npaths; i++) {
-            path = &ctx->cache->paths[i];
-            ctx->strokeTriCount += path->nstroke-2;
-            ctx->drawCallCount++;
-        }
-    }
+	{
+		// Count triangles
+		const NVGpath* path;
+		int i;
+		for (i = 0; i < ctx->cache->npaths; i++) {
+			path = &ctx->cache->paths[i];
+			ctx->strokeTriCount += path->nstroke-2;
+			ctx->drawCallCount++;
+		}
+	}
 #endif
 }
 
@@ -2831,7 +2875,7 @@ static void nvg__renderTrianglesSimple(NVGcontext* ctx, const NVGvertex* verts, 
 	NVGscissor scissor = state->scissor;
 
 #if	NVG_TRANSFORM_IN_VERTEX_SHADER
-	float invxform[6];
+	const float * invxform = state->invxform;
 #endif 
 	// Apply global alpha
 	paint.innerColor.a *= state->alpha;
@@ -2841,7 +2885,6 @@ static void nvg__renderTrianglesSimple(NVGcontext* ctx, const NVGvertex* verts, 
 	xform = NVGidentityXform;
 #else
 	//scissor and paint need to be inverse transformed.
-	nvgTransformInverse(invxform, xform);
 	nvgTransformMultiply(scissor.xform, invxform);
 	nvgTransformMultiply(paint.xform, invxform);
 #endif
@@ -3070,7 +3113,7 @@ static void nvg__renderText(NVGcontext* ctx, NVGvertex* verts, int nverts)
 	NVGpaint paint = state->fill;
 	const float * xform = state->xform;
 #if	NVG_TRANSFORM_IN_VERTEX_SHADER
-	float invxform[6];
+	const float * invxform = state->invxform;
 #endif
 	NVGscissor scissor = state->scissor;
 
@@ -3085,7 +3128,6 @@ static void nvg__renderText(NVGcontext* ctx, NVGvertex* verts, int nverts)
 	xform = NVGidentityXform;
 #else
 	//scissor and paint need to be inverse transformed.
-	nvgTransformInverse(invxform, xform);
 	nvgTransformMultiply(scissor.xform, invxform);
 	nvgTransformMultiply(paint.xform, invxform);
 #endif
@@ -3164,7 +3206,7 @@ float nvgText(NVGcontext* ctx, float x, float y, const char* string, const char*
 		}
 	}
 
-	// TODO: add back-end bit to do this just once per frame. 
+	// TODO: add back-end bit to do this just once per frame.
 	nvg__flushTextTexture(ctx);
 
 	nvg__renderText(ctx, verts, nverts);
@@ -3369,19 +3411,21 @@ int nvgTextBreakLines(NVGcontext* ctx, const char* string, const char* end, floa
 				}
 			} else {
 				float nextWidth = iter.nextx - rowStartX;
-
-				// track last non-white space character
+                
+                // track last end of a word
+                if ((ptype == NVG_CHAR && type == NVG_SPACE) || (ptype == NVG_HYPHEN && type == NVG_CHAR)) {
+                    breakEnd = iter.str;
+                    breakWidth = rowWidth;
+                    breakMaxX = rowMaxX;
+                }
+				
+                // track last non-white space character
 				if (type == NVG_CHAR || type == NVG_HYPHEN) {
 					rowEnd = iter.next;
 					rowWidth = iter.nextx - rowStartX;
 					rowMaxX = q.x1 - rowStartX;
 				}
-				// track last end of a word
-				if ((ptype == NVG_CHAR && type == NVG_SPACE) || (ptype == NVG_HYPHEN && type == NVG_CHAR)) {
-                    breakEnd = iter.str;
-					breakWidth = rowWidth;
-					breakMaxX = rowMaxX;
-				}
+				
 				// track last beginning of a word
 				if ((ptype == NVG_SPACE || ptype == NVG_HYPHEN) && type == NVG_CHAR) {
 					wordStart = iter.str;
@@ -3576,7 +3620,7 @@ void nvgTextMetrics(NVGcontext* ctx, float* ascender, float* descender, float* l
 		*lineh *= invscale;
 }
 
-// ### Added
+// ### QNanoPainter - added
 void nvgSetAntialias(NVGcontext* ctx, float antialias)
 {
     antialias = nvg__clampf(antialias, 0.0f, 10.0f);

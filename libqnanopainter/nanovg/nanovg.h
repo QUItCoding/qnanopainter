@@ -589,8 +589,7 @@ void nvgTextMetrics(NVGcontext* ctx, float* ascender, float* descender, float* l
 // Words longer than the max width are slit at nearest character (i.e. no hyphenation).
 int nvgTextBreakLines(NVGcontext* ctx, const char* string, const char* end, float breakRowWidth, NVGtextRow* rows, int maxRows);
 
-
-// ### Added
+// ### QNanoPainter - added
 struct NVGdrawDebug {
     int drawCallCount;
     int fillTriCount;
@@ -599,7 +598,7 @@ struct NVGdrawDebug {
 };
 typedef struct NVGdrawDebug NVGdrawDebug;
 
-// ### Added
+// ### QNanoPainter - added
 void nvgSetAntialias(NVGcontext* ctx, float antialias);
 void nvgSetPixelAlignText(NVGcontext* ctx, int enabled);
 NVGdrawDebug nvgDrawDebug(NVGcontext* ctx);
