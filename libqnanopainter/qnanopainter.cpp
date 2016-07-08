@@ -273,6 +273,15 @@ void QNanoPainter::setStrokeStyle(const QNanoColor &color)
 
 void QNanoPainter::setStrokeStyle(const QNanoBrush &brush)
 {
+    // If brush is QNanoImagePattern set its painter
+    QNanoImagePattern *ip = dynamic_cast<QNanoImagePattern*>(const_cast<QNanoBrush*>(&brush));
+    if (ip && ip->m_image) {
+        ip->m_image->setParentPainter(this);
+    }
+    QNanoBrush* b = const_cast<QNanoBrush*>(&brush);
+    if (b) {
+        b->setParentPainter(this);
+    }
     nvgStrokePaint(nvgCtx(), brush.nvgPaint(nvgCtx()));
 }
 

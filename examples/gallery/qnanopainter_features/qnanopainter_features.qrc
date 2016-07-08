@@ -7,5 +7,6 @@
         <file>images/pattern2.png</file>
         <file>images/quit_logo2.png</file>
         <file>fonts/Pacifico.ttf</file>
+        <file>images/pattern3.png</file>
     </qresource>
 </RCC>
