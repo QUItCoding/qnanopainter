@@ -800,8 +800,8 @@ void GalleryItemPainter::drawTextsAlignments() {
 
 void GalleryItemPainter::drawImages() {
 
-    qreal margin = width()*0.1;
-    qreal posX = margin;
+    qreal margin = height()*0.05;
+    qreal posX = width()*0.1;
     qreal posY = margin;
 
     QRectF rect1(0, 0, width(), height());
@@ -820,12 +820,45 @@ void GalleryItemPainter::drawImages() {
     QRectF targetArea(cx-r, posY, r*2, width()*0.1);
     painter()->drawImage(m_testImage, sourceArea, targetArea);
 
+    // Draw rotating & scaling face
     posY += targetArea.height() + height()*0.2;
     image.setFilename(":/qnanopainter_features/images/face.png");
     QRectF rect(cx-r, posY-r, r*2, r*2);
     QPointF c(rect.x()+rect.width()/2, rect.y()+rect.height()/2);
+    painter()->save();
     painter()->translate(c);
     painter()->rotate(m_animationTime);
     painter()->translate(-c);
     painter()->drawImage(image,rect);
+    painter()->restore();
+
+    // Scaled images with and without mipmapping
+    posY = height() * 0.7;
+    qreal posY2 = posY + (height() * 0.1);
+    QNanoImage imageNoMipmap(":/qnanopainter_features/images/face.png");
+    QNanoImage imageMipmap(":/qnanopainter_features/images/face.png", QNanoImage::GENERATE_MIPMAPS);
+    for (int i=0; i<6; ++i) {
+        qreal size = (i+1) * (width() * 0.036);
+        QRectF rect2(posX, posY, size, size);
+        painter()->drawImage(imageNoMipmap, rect2);
+        QRectF rect3(posX, posY2, size, size);
+        painter()->drawImage(imageMipmap, rect3);
+        posX += size + 2;
+    }
+    QNanoFont font(QNanoFont::DEFAULT_FONT_BOLD);
+    font.setPixelSize(QNanoPainter::mmToPx(4));
+    painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
+    painter()->setTextBaseline(QNanoPainter::BASELINE_TOP);
+    QString offString("MIPMAPS: OFF");
+    QString onString("MIPMAPS: ON");
+    font.setBlur(margin*0.05);
+    painter()->setFont(font);
+    painter()->setFillStyle("#000000");
+    painter()->fillText(offString, cx, posY);
+    painter()->fillText(onString, cx, posY2);
+    font.setBlur(0);
+    painter()->setFillStyle("#ffffff");
+    painter()->setFont(font);
+    painter()->fillText(offString, cx, posY);
+    painter()->fillText(onString, cx, posY2);
 }
