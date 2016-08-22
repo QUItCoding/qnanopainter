@@ -25,6 +25,7 @@
 #include <QRectF>
 #include <QCache>
 #include <QTransform>
+#include <QSharedPointer>
 #include "qnanocolor.h"
 #include "private/qnanobrush.h"
 #include "private/qnanodataelement.h"
@@ -177,12 +178,10 @@ public:
 
     // *** Other ***
 
-    void setAntialiasing(bool enable);
     void setAntialias(float antialias);
     void setPixelAlign(PixelAlign align);
     void setPixelAlignText(PixelAlign align);
     double devicePixelRatio() const;
-    void enableHighQualityRendering(bool enable);
 
     // ***** Static methods *****
 
@@ -220,6 +219,9 @@ private:
         return m_nvgContext;
     }
 
+    void enableAntialiasing(bool enable);
+    void enableHighQualityRendering(bool enable);
+
     void _checkFont();
     void _checkAlignPixelsAdjust(float *a, float *b = NULL, float *c = NULL, float *d = NULL);
     void _checkAlignPixels(float *a, float *b = NULL, float *c = NULL, float *d = NULL);
@@ -236,7 +238,7 @@ private:
     bool m_fontSet;
     QNanoPainter::PixelAlign m_pixelAlign;
     QNanoPainter::PixelAlign m_pixelAlignText;
-    QNanoFont m_defaultFont;
+    QSharedPointer<QNanoFont> m_defaultFont;
 
 };
 

@@ -158,13 +158,6 @@ QColor QNanoQuickItemPainter::fillColor() const
 }
 
 /*!
-    \fn void QNanoQuickItemPainter::update()
-
-    Calling this schedules a repainting of the item. This means that paint()
-    will get asynchronously called during the next frame.
-*/
-
-/*!
    \internal
 */
 
@@ -201,7 +194,7 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     bool antialiasing = realItem->antialiasing();
     if (antialiasing != m_antialiasing) {
         m_antialiasing = antialiasing;
-        m_painter->setAntialiasing(antialiasing);
+        m_painter->enableAntialiasing(antialiasing);
     }
 
 #ifdef QNANO_DEBUG

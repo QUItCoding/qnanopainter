@@ -39,10 +39,6 @@ public:
     explicit QNanoQuickItemPainter();
     virtual ~QNanoQuickItemPainter();
 
-    virtual void paint(QNanoPainter *painter) = 0;
-    virtual void synchronize(QNanoQuickItem *item);
-    virtual void sizeChanged(float width, float height);
-
     QColor fillColor() const;
     inline QNanoPainter *painter() const
     {
@@ -58,6 +54,13 @@ public:
     }
 
 protected:
+
+    virtual void paint(QNanoPainter *painter) = 0;
+    virtual void synchronize(QNanoQuickItem *item);
+    virtual void sizeChanged(float width, float height);
+
+private:
+
     // Re-implemented from QQuickFramebufferObject::Renderer
 
     // Creates initial FBO.
@@ -69,9 +72,6 @@ protected:
 
     // Gets called as a result of QQuickFramebufferObject::update().
     void synchronize(QQuickFramebufferObject * item) Q_DECL_OVERRIDE;
-
-
-private:
 
     // These are internal
     void initialize();
