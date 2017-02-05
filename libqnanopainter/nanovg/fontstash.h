@@ -100,10 +100,6 @@ int fonsAddFont(FONScontext* s, const char* name, const char* path);
 int fonsAddFontMem(FONScontext* s, const char* name, unsigned char* data, int ndata, int freeData);
 int fonsGetFontByName(FONScontext* s, const char* name);
 
-// Define font fallback
-void fonsDefineGlyphFallbackRange(FONScontext* s, int font, int fallbackFont,
-						 unsigned int begin, unsigned int end, float scale);
-
 // State handling
 void fonsPushState(FONScontext* s);
 void fonsPopState(FONScontext* s);
@@ -115,9 +111,8 @@ void fonsSetColor(FONScontext* s, unsigned int color);
 void fonsSetSpacing(FONScontext* s, float spacing);
 void fonsSetBlur(FONScontext* s, float blur);
 void fonsSetAlign(FONScontext* s, int align);
-void fonsSetFont(FONScontext* s, int font);
-// ### QNanoPainter - added
 void fonsSetPixelAlignText(FONScontext* s, int enabled);
+void fonsSetFont(FONScontext* s, int font);
 
 // Draw text
 float fonsDrawText(FONScontext* s, float x, float y, const char* string, const char* end);
@@ -199,16 +194,18 @@ int fons__tt_buildGlyphBitmap(FONSttFontImpl *font, int glyph, float size, float
 {
 	FT_Error ftError;
 	FT_GlyphSlot ftGlyph;
+	FT_Fixed advFixed;
 	FONS_NOTUSED(scale);
 
 	ftError = FT_Set_Pixel_Sizes(font->font, 0, (FT_UInt)(size * (float)font->font->units_per_EM / (float)(font->font->ascender - font->font->descender)));
 	if (ftError) return 0;
 	ftError = FT_Load_Glyph(font->font, glyph, FT_LOAD_RENDER);
 	if (ftError) return 0;
-	ftError = FT_Get_Advance(font->font, glyph, FT_LOAD_NO_SCALE, (FT_Fixed*)advance);
+	ftError = FT_Get_Advance(font->font, glyph, FT_LOAD_NO_SCALE, &advFixed);
 	if (ftError) return 0;
 	ftGlyph = font->font->glyph;
-	*lsb = ftGlyph->metrics.horiBearingX;
+	*advance = (int)advFixed;
+	*lsb = (int)ftGlyph->metrics.horiBearingX;
 	*x0 = ftGlyph->bitmap_left;
 	*x1 = *x0 + ftGlyph->bitmap.width;
 	*y0 = -ftGlyph->bitmap_top;
@@ -239,7 +236,7 @@ int fons__tt_getGlyphKernAdvance(FONSttFontImpl *font, int glyph1, int glyph2)
 {
 	FT_Vector ftKerning;
 	FT_Get_Kerning(font->font, glyph1, glyph2, FT_KERNING_DEFAULT, &ftKerning);
-	return ftKerning.x;
+	return (int)((ftKerning.x + 32) >> 6);  // Round up and convert to integer
 }
 
 #else
@@ -330,6 +327,9 @@ int fons__tt_getGlyphKernAdvance(FONSttFontImpl *font, int glyph1, int glyph2)
 #ifndef FONS_MAX_STATES
 #	define FONS_MAX_STATES 20
 #endif
+#ifndef FONS_MAX_FALLBACKS
+#	define FONS_MAX_FALLBACKS 20
+#endif
 
 static unsigned int fons__hashint(unsigned int a)
 {
@@ -363,18 +363,6 @@ struct FONSglyph
 };
 typedef struct FONSglyph FONSglyph;
 
-#ifndef FONS_MAX_FALLBACKS
-#	define FONS_MAX_FALLBACKS 4
-#endif
-
-struct FONSFallback
-{
-	unsigned int begin, end;	//font range (codepoints)
-	int font;					//font to use
-	float scale;				//scale applied to the glyphs
-};
-typedef struct FONSFallback FONSFallback;
-
 struct FONSfont
 {
 	FONSttFontImpl font;
@@ -389,8 +377,7 @@ struct FONSfont
 	int cglyphs;
 	int nglyphs;
 	int lut[FONS_HASH_LUT_SIZE];
-
-	struct FONSFallback fallback[FONS_MAX_FALLBACKS]; 
+	int fallbacks[FONS_MAX_FALLBACKS];
 	int nfallbacks;
 };
 typedef struct FONSfont FONSfont;
@@ -399,11 +386,11 @@ struct FONSstate
 {
 	int font;
 	int align;
+	int pixelAlignText;
 	float size;
 	unsigned int color;
 	float blur;
 	float spacing;
-	int pixelAlignText;
 };
 typedef struct FONSstate FONSstate;
 
@@ -443,6 +430,8 @@ struct FONScontext
 	void* errorUptr;
 };
 
+#ifdef STB_TRUETYPE_IMPLEMENTATION
+
 static void* fons__tmpalloc(size_t size, void* up)
 {
 	unsigned char* ptr;
@@ -467,6 +456,8 @@ static void fons__tmpfree(void* ptr, void* up)
 	(void)up;
 	// empty
 }
+
+#endif // STB_TRUETYPE_IMPLEMENTATION
 
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
@@ -773,6 +764,16 @@ static FONSstate* fons__getState(FONScontext* stash)
 	return &stash->states[stash->nstates-1];
 }
 
+int fonsAddFallbackFont(FONScontext* stash, int base, int fallback)
+{
+	FONSfont* baseFont = stash->fonts[base];
+	if (baseFont->nfallbacks < FONS_MAX_FALLBACKS) {
+		baseFont->fallbacks[baseFont->nfallbacks++] = fallback;
+		return 1;
+	}
+	return 0;
+}
+
 void fonsSetSize(FONScontext* stash, float size)
 {
 	fons__getState(stash)->size = size;
@@ -838,7 +839,7 @@ void fonsClearState(FONScontext* stash)
 	state->font = 0;
 	state->blur = 0;
 	state->spacing = 0;
-	state->pixelAlignText = 0; // false
+	state->pixelAlignText = 1; // true
 	state->align = FONS_ALIGN_LEFT | FONS_ALIGN_BASELINE;
 }
 
@@ -880,7 +881,7 @@ error:
 int fonsAddFont(FONScontext* stash, const char* name, const char* path)
 {
 	FILE* fp = 0;
-	int dataSize = 0;
+	int dataSize = 0, readed;
 	unsigned char* data = NULL;
 
 	// Read in the font data.
@@ -891,9 +892,10 @@ int fonsAddFont(FONScontext* stash, const char* name, const char* path)
 	fseek(fp,0,SEEK_SET);
 	data = (unsigned char*)malloc(dataSize);
 	if (data == NULL) goto error;
-	fread(data, 1, dataSize, fp);
+	readed = fread(data, 1, dataSize, fp);
 	fclose(fp);
 	fp = 0;
+	if (readed != dataSize) goto error;
 
 	return fonsAddFontMem(stash, name, data, dataSize, 1);
 
@@ -956,19 +958,6 @@ int fonsGetFontByName(FONScontext* s, const char* name)
 	return FONS_INVALID;
 }
 
-void fonsDefineGlyphFallbackRange(FONScontext* s, int baseFont, int fallbackFont,
-						 unsigned int begin, unsigned int end, float scale)
-{
-	FONSfont* base = s->fonts[baseFont];
-	if (base->nfallbacks < FONS_MAX_FALLBACKS)
-	{
-		FONSFallback * f = &base->fallback[base->nfallbacks++];
-		f->font = fallbackFont;
-		f->begin = begin;
-		f->end = end;
-		f->scale = scale; 
-	}
-}
 
 static FONSglyph* fons__allocGlyph(FONSfont* font)
 {
@@ -1058,8 +1047,7 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	int pad, added;
 	unsigned char* bdst;
 	unsigned char* dst;
-
-	struct FONSttFontImpl * impl = &font->font;
+	FONSfont* renderFont = font;
 
 	if (isize < 2) return NULL;
 	if (iblur > 20) iblur = 20;
@@ -1078,21 +1066,23 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	}
 
 	// Could not find glyph, create it.
-		
-	// check if there is a font fallback registered for this codepoint
-	for (i=0; i<font->nfallbacks; ++i)
-	{
-		struct FONSFallback * f = &font->fallback[i];
-		if (codepoint >= f->begin && codepoint <= f->end)
-		{
-			impl = &stash->fonts[f->font]->font;
-			size *= f->scale;
+	g = fons__tt_getGlyphIndex(&font->font, codepoint);
+	// Try to find the glyph in fallback fonts.
+	if (g == 0) {
+		for (i = 0; i < font->nfallbacks; ++i) {
+			FONSfont* fallbackFont = stash->fonts[font->fallbacks[i]];
+			int fallbackIndex = fons__tt_getGlyphIndex(&fallbackFont->font, codepoint);
+			if (fallbackIndex != 0) {
+				g = fallbackIndex;
+				renderFont = fallbackFont;
+				break;
+			}
 		}
+		// It is possible that we did not find a fallback glyph.
+		// In that case the glyph index 'g' is 0, and we'll proceed below and cache empty glyph.
 	}
-
-	scale = fons__tt_getPixelHeightScale(impl, size);
-	g = fons__tt_getGlyphIndex(impl, codepoint);
-	fons__tt_buildGlyphBitmap(impl, g, size, scale, &advance, &lsb, &x0, &y0, &x1, &y1);
+	scale = fons__tt_getPixelHeightScale(&renderFont->font, size);
+	fons__tt_buildGlyphBitmap(&renderFont->font, g, size, scale, &advance, &lsb, &x0, &y0, &x1, &y1);
 	gw = x1-x0 + pad*2;
 	gh = y1-y0 + pad*2;
 
@@ -1126,7 +1116,7 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 
 	// Rasterize
 	dst = &stash->texData[(glyph->x0+pad) + (glyph->y0+pad) * stash->params.width];
-	fons__tt_renderGlyphBitmap(impl, dst, gw-pad*2,gh-pad*2, stash->params.width, scale,scale, g);
+	fons__tt_renderGlyphBitmap(&renderFont->font, dst, gw-pad*2,gh-pad*2, stash->params.width, scale,scale, g);
 
 	// Make sure there is one pixel empty border.
 	dst = &stash->texData[glyph->x0 + glyph->y0 * stash->params.width];
@@ -1188,12 +1178,13 @@ static void fons__getQuad(FONScontext* stash, FONSfont* font,
 
 	if (stash->params.flags & FONS_ZERO_TOPLEFT) {
 		if (pixelAlignText) {
-			rx = (float)(int)(*x + xoff);
-			ry = (float)(int)(*y + yoff);
+			rx = (float)(int)(*x + 0.5f + xoff);
+			ry = (float)(int)(*y + 0.5f + yoff);
 		} else {
 			rx = (*x + xoff);
 			ry = (*y + yoff);
 		}
+
 		q->x0 = rx;
 		q->y0 = ry;
 		q->x1 = rx + x1 - x0;
@@ -1205,12 +1196,13 @@ static void fons__getQuad(FONScontext* stash, FONSfont* font,
 		q->t1 = y1 * stash->ith;
 	} else {
 		if (pixelAlignText) {
-			rx = (float)(int)(*x + xoff);
-			ry = (float)(int)(*y - yoff);
+			rx = (float)(int)(*x + 0.5f + xoff);
+			ry = (float)(int)(*y + 0.5f - yoff);
 		} else {
 			rx = (*x + xoff);
 			ry = (*y - yoff);
 		}
+
 		q->x0 = rx;
 		q->y0 = ry;
 		q->x1 = rx + x1 - x0;
