@@ -162,11 +162,11 @@ QNanoPainter::QNanoPainter()
     , m_fontSet(false)
 {
     // Initialize NanoVG for correct GL version
-    // TODO: Allow to enable/disable NVG_DEBUG, possibly some own general debug define
+    // NOTE: Add also NVG_DEBUG when want to check possible OpenGL errors.
 #ifdef QT_OPENGL_ES_2
-    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS | NVG_DEBUG);
+    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS);
 #else
-    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS | NVG_DEBUG);
+    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS);
 #endif
 
     Q_ASSERT_X(m_nvgContext, "QNanoPainter::QNanoPainter", "Could not init nanovg!");
