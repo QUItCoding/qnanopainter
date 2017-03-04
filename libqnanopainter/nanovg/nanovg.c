@@ -364,6 +364,11 @@ void nvgDeleteInternal(NVGcontext* ctx)
 
 void nvgBeginFrame(NVGcontext* ctx, int windowWidth, int windowHeight, float devicePixelRatio)
 {
+	nvgBeginFrameAt(ctx, 0, 0, windowWidth, windowHeight, devicePixelRatio);
+}
+
+void nvgBeginFrameAt(NVGcontext* ctx, int windowX, int windowY, int windowWidth, int windowHeight, float devicePixelRatio)
+{
 /*	printf("Tris: draws:%d  fill:%d  stroke:%d  text:%d  TOT:%d\n",
 		ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
 		ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/
@@ -374,7 +379,7 @@ void nvgBeginFrame(NVGcontext* ctx, int windowWidth, int windowHeight, float dev
 
 	nvg__setDevicePixelRatio(ctx, devicePixelRatio);
 
-	ctx->params.renderViewport(ctx->params.userPtr, windowWidth, windowHeight, devicePixelRatio);
+	ctx->params.renderViewport(ctx->params.userPtr, windowX, windowY, windowWidth, windowHeight, devicePixelRatio);
 
 	ctx->drawCallCount = 0;
 	ctx->fillTriCount = 0;
@@ -390,7 +395,7 @@ void nvgCancelFrame(NVGcontext* ctx)
 void nvgEndFrame(NVGcontext* ctx)
 {
 	NVGstate* state = nvg__getState(ctx);
-	ctx->params.renderFlush(ctx->params.userPtr, state->compositeOperation);
+	ctx->params.renderFlush(ctx->params.userPtr);
 	if (ctx->fontImageIdx != 0) {
 		int fontImage = ctx->fontImages[ctx->fontImageIdx];
 		int i, j, iw, ih;
@@ -2228,7 +2233,7 @@ void nvgFill(NVGcontext* ctx)
 	fillPaint.innerColor.a *= state->alpha;
 	fillPaint.outerColor.a *= state->alpha;
 
-	ctx->params.renderFill(ctx->params.userPtr, &fillPaint, &state->scissor, ctx->fringeWidth,
+	ctx->params.renderFill(ctx->params.userPtr, &fillPaint, state->compositeOperation, &state->scissor, ctx->fringeWidth,
 						   ctx->cache->bounds, ctx->cache->paths, ctx->cache->npaths);
 
 	// Count triangles
@@ -2269,7 +2274,7 @@ void nvgStroke(NVGcontext* ctx)
 	else
 		nvg__expandStroke(ctx, strokeWidth*0.5f, state->lineCap, state->lineJoin, state->miterLimit);
 
-	ctx->params.renderStroke(ctx->params.userPtr, &strokePaint, &state->scissor, ctx->fringeWidth,
+	ctx->params.renderStroke(ctx->params.userPtr, &strokePaint, state->compositeOperation, &state->scissor, ctx->fringeWidth,
 							 strokeWidth, ctx->cache->paths, ctx->cache->npaths);
 
 	// Count triangles
@@ -2422,7 +2427,7 @@ static void nvg__renderText(NVGcontext* ctx, NVGvertex* verts, int nverts)
 	paint.innerColor.a *= state->alpha;
 	paint.outerColor.a *= state->alpha;
 
-	ctx->params.renderTriangles(ctx->params.userPtr, &paint, &state->scissor, verts, nverts);
+	ctx->params.renderTriangles(ctx->params.userPtr, &paint, state->compositeOperation, &state->scissor, verts, nverts);
 
 	ctx->drawCallCount++;
 	ctx->textTriCount += nverts/3;

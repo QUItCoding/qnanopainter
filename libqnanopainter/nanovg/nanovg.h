@@ -162,6 +162,11 @@ enum NVGimageFlags {
 // devicePixelRatio to: frameBufferWidth / windowWidth.
 void nvgBeginFrame(NVGcontext* ctx, int windowWidth, int windowHeight, float devicePixelRatio);
 
+// Begin drawing a new frame
+// Same as nvgBeginFrame() except instead of drawing from point (0,0),
+// allows drawing from point (windowX, windowY)
+void nvgBeginFrameAt(NVGcontext* ctx, int windowX, int windowY, int windowWidth, int windowHeight, float devicePixelRatio);
+
 // Cancels drawing the current frame.
 void nvgCancelFrame(NVGcontext* ctx);
 
@@ -667,12 +672,12 @@ struct NVGparams {
 	int (*renderDeleteTexture)(void* uptr, int image);
 	int (*renderUpdateTexture)(void* uptr, int image, int x, int y, int w, int h, const unsigned char* data);
 	int (*renderGetTextureSize)(void* uptr, int image, int* w, int* h);
-	void (*renderViewport)(void* uptr, int width, int height, float devicePixelRatio);
+	void (*renderViewport)(void* uptr, int x, int y, int width, int height, float devicePixelRatio);
 	void (*renderCancel)(void* uptr);
-	void (*renderFlush)(void* uptr, NVGcompositeOperationState compositeOperation);
-	void (*renderFill)(void* uptr, NVGpaint* paint, NVGscissor* scissor, float fringe, const float* bounds, const NVGpath* paths, int npaths);
-	void (*renderStroke)(void* uptr, NVGpaint* paint, NVGscissor* scissor, float fringe, float strokeWidth, const NVGpath* paths, int npaths);
-	void (*renderTriangles)(void* uptr, NVGpaint* paint, NVGscissor* scissor, const NVGvertex* verts, int nverts);
+	void (*renderFlush)(void* uptr);
+	void (*renderFill)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, float fringe, const float* bounds, const NVGpath* paths, int npaths);
+	void (*renderStroke)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, float fringe, float strokeWidth, const NVGpath* paths, int npaths);
+	void (*renderTriangles)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, const NVGvertex* verts, int nverts);
 	void (*renderDelete)(void* uptr);
 };
 typedef struct NVGparams NVGparams;
