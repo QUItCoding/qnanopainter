@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QQuickWindow>
 #include <QOpenGLFramebufferObjectFormat>
+#include <QtMath>
 
 /*!
     \class QNanoQuickItemPainter
@@ -48,9 +49,8 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
     : m_window(nullptr)
     , m_painter(getSharedPainter())
     , m_fillColor(0.0, 0.0, 0.0, 0.0)
-    , m_itemWidth(0.0f)
-    , m_itemHeight(0.0f)
-    , m_devicePixelRatio(1.0f)
+    , m_viewWidth(0)
+    , m_viewHeight(0)
     , m_antialiasing(true)
     , m_highQualityRendering(false)
     , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
@@ -161,31 +161,58 @@ QColor QNanoQuickItemPainter::fillColor() const
    \internal
 */
 
+#ifndef QNANO_USE_RENDERNODE
 QOpenGLFramebufferObject *QNanoQuickItemPainter::createFramebufferObject(const QSize &size)
 {
     QOpenGLFramebufferObjectFormat format;
     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
     return new QOpenGLFramebufferObject(size, format);
 }
+#endif
 
+#ifdef QNANO_USE_RENDERNODE
+void QNanoQuickItemPainter::synchronizePainter(QNanoQuickItem * item)
+#else
 void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
+#endif
 {
     if (!item)
         return;
+
     m_window = item->window();
+    QNanoQuickItem *realItem = static_cast<QNanoQuickItem*>(item);
+    if (!realItem)
+        return;
+
+    QPointF origoPoint = realItem->mapToScene(QPointF(0, 0));
+    m_itemData.x = origoPoint.x();
+    m_itemData.y = origoPoint.y();
+    m_itemData.width = realItem->width();
+    m_itemData.height = realItem->height();
+#ifdef QNANO_USE_RENDERNODE
+    if ((m_viewWidth != m_window->width()) || (m_viewHeight != m_window->height())) {
+        setViewSize(m_window->width(), m_window->height());
+        sizeChanged(m_window->width(), m_window->height());
+    }
+    m_itemData.transformOrigin = realItem->transformOrigin();
+    m_itemData.rotation = realItem->rotation();
+    m_itemData.scale = realItem->scale();
+    m_itemData.opacity = this->inheritedOpacity();
+    m_itemData.clip = realItem->clip();
+#else
     // If size has changed, update
     if (static_cast<int>(width()) != static_cast<int>(item->width()) || static_cast<int>(height()) != static_cast<int>(item->height())) {
-        setSize(item->width(), item->height());
+        setViewSize(item->width(), item->height());
         sizeChanged(item->width(), item->height());
         // Note: invalidated automatically when size changes if textureFollowsItemSize is true
         //invalidateFramebufferObject();
     }
-    QNanoQuickItem *realItem = static_cast<QNanoQuickItem*>(item);
+#endif
 
     m_pixelAlign = realItem->pixelAlign();
     m_pixelAlignText = realItem->pixelAlignText();
     m_fillColor = realItem->fillColor();
-    m_devicePixelRatio = realItem->window()->devicePixelRatio();
+    m_itemData.devicePixelRatio = realItem->window()->devicePixelRatio();
     bool hqr = realItem->highQualityRendering();
     if (hqr != m_highQualityRendering) {
         m_highQualityRendering = hqr;
@@ -204,14 +231,51 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     synchronize(realItem);
 }
 
+void QNanoQuickItemPainter::paint(QNanoPainter *painter)
+{
+    Q_UNUSED(painter);
+}
+
 // Initializations to OpenGL and vg context before paint()
 void QNanoQuickItemPainter::prepaint()
 {
+#ifndef QNANO_USE_RENDERNODE
     glClearColor(m_fillColor.redF(), m_fillColor.greenF(), m_fillColor.blueF(), m_fillColor.alphaF());
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-
+#endif
     // Note: Last parameter can be used to render in lower resolution
-    nvgBeginFrame(m_painter->nvgCtx(), m_itemWidth, m_itemHeight, m_devicePixelRatio);
+#ifdef QNANO_USE_RENDERNODE
+    nvgBeginFrameAt(m_painter->nvgCtx(), m_itemData.x, m_itemData.y, m_viewWidth, m_viewHeight, m_itemData.devicePixelRatio);
+#else
+    nvgBeginFrame(m_painter->nvgCtx(), m_itemData.width, m_itemData.height, m_itemData.devicePixelRatio);
+#endif
+
+#ifdef QNANO_USE_RENDERNODE
+
+    // Clipping from items tree
+    auto cList = clipList();
+    if (cList) {
+        QRectF clipRect = cList->clipRect();
+        nvgScissor(m_painter->nvgCtx(), clipRect.x(), clipRect.y(), clipRect.width(), clipRect.height());
+    }
+
+    nvgGlobalAlpha(m_painter->nvgCtx(), m_itemData.opacity);
+    nvgRotate(m_painter->nvgCtx(), qDegreesToRadians(m_itemData.rotation));
+    nvgScale(m_painter->nvgCtx(), m_itemData.scale, m_itemData.scale);
+    if (m_itemData.clip) {
+          // Clipping of this item
+          // Note: NanoVG clipping is single rectangular area, so both items tree clipping
+          // and item clipping with different rotations can't be on at the same time.
+          nvgScissor(m_painter->nvgCtx(), 0, 0, m_itemData.width, m_itemData.height);
+    }
+    if (m_fillColor.alpha() > 0) {
+        // Background with QSGRenderNode
+        m_painter->setFillStyle(QNanoColor::fromQColor(m_fillColor));
+        m_painter->fillRect(0, 0, width(), height());
+        m_painter->setFillStyle(QNanoColor::fromQColor(Qt::transparent));
+    }
+
+#endif
 }
 
 void QNanoQuickItemPainter::postpaint()
@@ -224,17 +288,22 @@ void QNanoQuickItemPainter::postpaint()
     nvgEndFrame(m_painter->nvgCtx());
 }
 
-void QNanoQuickItemPainter::render()
-{
 
+#ifdef QNANO_USE_RENDERNODE
+void QNanoQuickItemPainter::render(const RenderState *)
+#else
+void QNanoQuickItemPainter::render()
+#endif
+{
     m_painter->reset(); // reset context data as painter is shared.
+
     m_painter->setPixelAlign(static_cast<QNanoPainter::PixelAlign>(m_pixelAlign));
     m_painter->setPixelAlignText(static_cast<QNanoPainter::PixelAlign>(m_pixelAlignText));
-    m_painter->m_devicePixelRatio = m_devicePixelRatio;
+    m_painter->m_devicePixelRatio = m_itemData.devicePixelRatio;
 
     // Draw only when item has visible size. This way setup and painting is
     // not called until size has been properly set.
-    if ((m_itemWidth > 0 && m_itemHeight > 0) || m_setupDone) {
+    if ((m_itemData.width > 0 && m_itemData.height > 0) || m_setupDone) {
         m_setupDone = true;
         prepaint();
         paint(m_painter.data());
@@ -247,10 +316,46 @@ void QNanoQuickItemPainter::render()
 
 }
 
-void QNanoQuickItemPainter::setSize(float width, float height)
+void QNanoQuickItemPainter::setViewSize(int width, int height)
 {
-    m_itemWidth = width;
-    m_itemHeight = height;
+    m_viewWidth = width;
+    m_viewHeight = height;
+}
+
+QPointF QNanoQuickItemPainter::itemTransformOrigin() const
+{
+    double w = m_itemData.width;
+    double h = m_itemData.height;
+    switch (m_itemData.transformOrigin) {
+    case QQuickItem::TopLeft:
+        return QPointF(0,0);
+        break;
+    case QQuickItem::Top:
+        return QPointF(w/2,0);
+        break;
+    case QQuickItem::TopRight:
+        return QPointF(w,0);
+        break;
+    case QQuickItem::Left:
+        return QPointF(0,h/2);
+        break;
+    default:
+    case QQuickItem::Center:
+        return QPointF(w/2,h/2);
+        break;
+    case QQuickItem::Right:
+        return QPointF(w,h/2);
+        break;
+    case QQuickItem::BottomLeft:
+        return QPointF(0,h);
+        break;
+    case QQuickItem::Bottom:
+        return QPointF(w/2,h);
+        break;
+    case QQuickItem::BottomRight:
+        return QPointF(w,h);
+        break;
+    }
 }
 
 #ifdef QNANO_DEBUG

@@ -119,7 +119,11 @@
 */
 
 QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
+#ifdef QNANO_USE_RENDERNODE
+  : QQuickItem(parent)
+#else
   : QQuickFramebufferObject(parent)
+#endif
   , m_fillColor(Qt::transparent)
   , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
   , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
@@ -127,12 +131,18 @@ QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
   , m_acceptedMouseButtons(Qt::LeftButton)
   , m_mouseEnabled(false)
 {
+#ifdef QNANO_USE_RENDERNODE
+    setFlag(ItemHasContents, true);
+    connect(this, SIGNAL(scaleChanged()), this, SLOT(update()));
+#endif
     // Default to antialiased
     setAntialiasing(true);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+#ifndef QNANO_USE_RENDERNODE
     // New API in Qt 5.6 to mirror FBO
     setMirrorVertically(true);
+#endif
 #endif
 
 }
@@ -406,18 +416,40 @@ void QNanoQuickItem::setAcceptedButtons(Qt::MouseButtons buttons)
    \internal
 */
 
+#ifndef QNANO_USE_RENDERNODE
 QQuickFramebufferObject::Renderer *QNanoQuickItem::createRenderer() const
 {
     return createItemPainter();
 }
+#endif
 
 /*!
    \internal
 */
 
+#ifdef QNANO_USE_RENDERNODE
+QSGNode *QNanoQuickItem::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData)
+{
+    Q_UNUSED(nodeData)
+    QNanoQuickItemPainter *n = static_cast<QNanoQuickItemPainter *>(node);
+    if (!n) {
+        n = createItemPainter();
+    }
+    n->synchronizePainter(this);
+    n->markDirty(QSGNode::DirtyMaterial);
+    return n;
+}
+
+void QNanoQuickItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
+{
+    // When item opacity, rotation etc. change call update to synchronize properties with painter
+    update();
+    QQuickItem::itemChange(change, value);
+}
+
 // Flip FBO, see QTBUG-41073
 // With Qt 5.6 this is replaced with setMirrorVertically
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+#elif QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
 QSGNode *QNanoQuickItem::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData)
 {
     if (!node) {
