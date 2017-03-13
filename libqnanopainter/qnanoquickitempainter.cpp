@@ -189,7 +189,6 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     }
     QNanoQuickItem *realItem = static_cast<QNanoQuickItem*>(item);
 
-    m_antialiasing = realItem->antialiasing();
     m_pixelAlign = realItem->pixelAlign();
     m_pixelAlignText = realItem->pixelAlignText();
     m_fillColor = realItem->fillColor();
@@ -198,6 +197,11 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     if (hqr != m_highQualityRendering) {
         m_highQualityRendering = hqr;
         m_painter->enableHighQualityRendering(hqr);
+    }
+    bool antialiasing = realItem->antialiasing();
+    if (antialiasing != m_antialiasing) {
+        m_antialiasing = antialiasing;
+        m_painter->setAntialiasing(antialiasing);
     }
 
 #ifdef QNANO_DEBUG
@@ -231,9 +235,6 @@ void QNanoQuickItemPainter::render()
 {
 
     m_painter->reset(); // reset context data as painter is shared.
-    // Update antialiasing if needed
-    nvgInternalParams(m_painter->nvgCtx())->edgeAntiAlias = m_antialiasing;
-
     m_painter->setPixelAlign(static_cast<QNanoPainter::PixelAlign>(m_pixelAlign));
     m_painter->setPixelAlignText(static_cast<QNanoPainter::PixelAlign>(m_pixelAlignText));
     m_painter->m_devicePixelRatio = m_devicePixelRatio;

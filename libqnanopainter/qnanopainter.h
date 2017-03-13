@@ -177,6 +177,7 @@ public:
 
     // *** Other ***
 
+    void setAntialiasing(bool enable);
     void setAntialias(float antialias);
     void setPixelAlign(PixelAlign align);
     void setPixelAlignText(PixelAlign align);

@@ -23,6 +23,10 @@ Window {
             name: "Mouse Event Boxes"
             path: "mouse_events"
         }
+        ListElement {
+            name: "Freehand Painting"
+            path: "painting"
+        }
     }
 
     ListView {
