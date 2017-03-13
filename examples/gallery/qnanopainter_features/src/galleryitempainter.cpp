@@ -9,6 +9,7 @@ GalleryItemPainter::GalleryItemPainter()
 {
     m_patternImage = QNanoImage(":/qnanopainter_features/images/pattern1.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
     m_patternImage2 = QNanoImage(":/qnanopainter_features/images/pattern2.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
+    m_patternImage3 = QNanoImage(":/qnanopainter_features/images/pattern3.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
     m_testImage = QNanoImage(":/qnanopainter_features/images/quit_logo2.png");
 }
 
@@ -40,6 +41,7 @@ void GalleryItemPainter::paint(QNanoPainter *painter)
         drawRectsWithRadialGradient();
         drawRectsWithBoxGradient();
         drawRectsWithImagePattern();
+        drawRectsWithBrushStroke();
         break;
     case 1:
         drawPaths();
@@ -277,6 +279,54 @@ void GalleryItemPainter::drawRectsWithImagePattern() {
     g3.setImageSize(w*0.1 + m_animationSine * w*0.2, w*0.15 + m_animationSine * w*0.3);
     painter()->setFillStyle(g3);
     painter()->fillRect(rect3);
+}
+
+void GalleryItemPainter::drawRectsWithBrushStroke() {
+    int rects = 3;
+    qreal margin = width()*0.02;
+    qreal border = margin + margin * m_animationSine;
+    qreal w = width() / (rects+2) - margin;
+    qreal w2 = w - border;
+    qreal posX = w + margin + border/2;
+    qreal posY = 6*(w+margin) + border/2;
+
+    QRectF rect1(posX,posY,w2,w2);
+    painter()->setLineWidth(border);
+    painter()->setFillStyle(QNanoImagePattern(m_patternImage3));
+    QNanoLinearGradient g1(posX, posY, posX+w2, posY+w2);
+    g1.setStartColor("#ffffff");
+    g1.setEndColor("#000000");
+    painter()->setStrokeStyle(g1);
+    painter()->beginPath();
+    painter()->roundedRect(rect1, border);
+    painter()->fill();
+    painter()->stroke();
+    posX += w + margin;
+
+    QRectF rect2(posX,posY,w2,w2);
+    g1.setStartPosition(posX, posY);
+    g1.setEndPosition(posX+w2, posY+w2);
+    painter()->setFillStyle(g1);
+    painter()->setStrokeStyle(QNanoImagePattern(m_patternImage3));
+    painter()->beginPath();
+    painter()->roundedRect(rect2, border);
+    painter()->fill();
+    painter()->stroke();
+    posX += w + margin;
+
+    QRectF rect3(posX,posY,w2,w2);
+    QNanoRadialGradient g2(posX+w2/4, posY+w2/4, w2);
+    g2.setStartColor("#900000ff");
+    g2.setEndColor("#90ff0000");
+    painter()->setStrokeStyle(g2);
+    QNanoImagePattern p1 = QNanoImagePattern(m_patternImage3);
+    p1.setImageSize(16, 16);
+    p1.setStartPosition(m_animationTime*40, 0);
+    painter()->setFillStyle(p1);
+    painter()->beginPath();
+    painter()->roundedRect(rect3, border);
+    painter()->fill();
+    painter()->stroke();
 }
 
 void GalleryItemPainter::drawRect(float x, float y, float w, float h) {
@@ -750,8 +800,8 @@ void GalleryItemPainter::drawTextsAlignments() {
 
 void GalleryItemPainter::drawImages() {
 
-    qreal margin = width()*0.1;
-    qreal posX = margin;
+    qreal margin = height()*0.05;
+    qreal posX = width()*0.1;
     qreal posY = margin;
 
     QRectF rect1(0, 0, width(), height());
@@ -770,12 +820,49 @@ void GalleryItemPainter::drawImages() {
     QRectF targetArea(cx-r, posY, r*2, width()*0.1);
     painter()->drawImage(m_testImage, sourceArea, targetArea);
 
+    // Draw rotating & scaling face
     posY += targetArea.height() + height()*0.2;
     image.setFilename(":/qnanopainter_features/images/face.png");
     QRectF rect(cx-r, posY-r, r*2, r*2);
     QPointF c(rect.x()+rect.width()/2, rect.y()+rect.height()/2);
+    painter()->save();
     painter()->translate(c);
     painter()->rotate(m_animationTime);
     painter()->translate(-c);
     painter()->drawImage(image,rect);
+    painter()->restore();
+
+    // Scaled images with and without mipmapping
+    posY = height() * 0.7;
+    qreal posY2 = posY + (height() * 0.1);
+    bool useNearest = (m_animationSine > 0.5);
+    QNanoImage imageNoMipmap(":/qnanopainter_features/images/face.png");
+    QNanoImage imageNoMipmapNearest(":/qnanopainter_features/images/face.png", QNanoImage::NEAREST);
+    QNanoImage imageMipmap(":/qnanopainter_features/images/face.png", QNanoImage::GENERATE_MIPMAPS);
+    QNanoImage imageMipmapNearest(":/qnanopainter_features/images/face.png", QNanoImage::GENERATE_MIPMAPS | QNanoImage::NEAREST);
+    for (int i=0; i<6; ++i) {
+        qreal size = (i+1) * (width() * 0.036);
+        QRectF rect2(posX, posY, size, size);
+        painter()->drawImage(useNearest ? imageNoMipmapNearest : imageNoMipmap, rect2);
+        QRectF rect3(posX, posY2, size, size);
+        painter()->drawImage(useNearest ? imageMipmapNearest : imageMipmap, rect3);
+        posX += size + 2;
+    }
+    QNanoFont font(QNanoFont::DEFAULT_FONT_BOLD);
+    font.setPixelSize(QNanoPainter::mmToPx(4));
+    painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
+    painter()->setTextBaseline(QNanoPainter::BASELINE_TOP);
+    QString scaling = useNearest ? "NEAREST" : "LINEAR";
+    QString offString = QString("MIPMAPS: OFF, TEXTURE: %1").arg(scaling);
+    QString onString = QString("MIPMAPS: ON, TEXTURE: %1").arg(scaling);
+    font.setBlur(margin*0.05);
+    painter()->setFont(font);
+    painter()->setFillStyle("#000000");
+    painter()->fillText(offString, cx, posY);
+    painter()->fillText(onString, cx, posY2);
+    font.setBlur(0);
+    painter()->setFillStyle("#ffffff");
+    painter()->setFont(font);
+    painter()->fillText(offString, cx, posY);
+    painter()->fillText(onString, cx, posY2);
 }

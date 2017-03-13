@@ -34,11 +34,12 @@ class QNanoImage
 public:
 
     enum ImageFlag {
-        GENERATE_MIPMAPS	= 1<<0,     // Generate mipmaps during creation of the image.
-        REPEATX			= 1<<1,		// Repeat image in X direction.
-        REPEATY			= 1<<2,		// Repeat image in Y direction.
-        FLIPY				= 1<<3,		// Flips (inverses) image in Y direction when rendered.
-        PREMULTIPLIED		= 1<<4		// Image data has premultiplied alpha.
+        GENERATE_MIPMAPS   = 1<<0, // Generate mipmaps during creation of the image.
+        REPEATX            = 1<<1, // Repeat image in X direction.
+        REPEATY            = 1<<2, // Repeat image in Y direction.
+        FLIPY              = 1<<3, // Flips (inverses) image in Y direction when rendered.
+        PREMULTIPLIED      = 1<<4, // Image data has premultiplied alpha.
+        NEAREST            = 1<<5, // Image interpolation is Nearest instead Linear
     };
 
     Q_DECLARE_FLAGS(ImageFlags, ImageFlag)

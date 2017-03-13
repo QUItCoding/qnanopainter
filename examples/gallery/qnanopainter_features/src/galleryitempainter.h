@@ -27,6 +27,7 @@ private:
     void drawRectsWithRadialGradient();
     void drawRectsWithBoxGradient();
     void drawRectsWithImagePattern();
+    void drawRectsWithBrushStroke();
 
     // View - Paths
     void drawPaths();
@@ -53,6 +54,7 @@ private:
     QNanoImage m_testImage;
     QNanoImage m_patternImage;
     QNanoImage m_patternImage2;
+    QNanoImage m_patternImage3;
 };
 
 #endif // GALLERYITEMPAINTER_H

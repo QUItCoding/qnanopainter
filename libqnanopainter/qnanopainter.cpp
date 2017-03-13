@@ -160,20 +160,19 @@ QNanoPainter::QNanoPainter()
     , m_textBaseline(QNanoPainter::BASELINE_ALPHABETIC)
     , m_devicePixelRatio(1.0)
     , m_fontSet(false)
-    , m_pixelAlign(QNanoPainter::PIXEL_ALIGN_NONE)
-    , m_pixelAlignText(QNanoPainter::PIXEL_ALIGN_NONE)
 {
     // Initialize NanoVG for correct GL version
-    // TODO: Allow to enable/disable NVG_DEBUG, possibly some own general debug define
+    // NOTE: Add also NVG_DEBUG when want to check possible OpenGL errors.
 #ifdef QT_OPENGL_ES_2
-    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS | NVG_DEBUG);
+    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS);
 #else
-    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS | NVG_DEBUG);
+    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS);
 #endif
 
     Q_ASSERT_X(m_nvgContext, "QNanoPainter::QNanoPainter", "Could not init nanovg!");
 
-
+    setPixelAlign(QNanoPainter::PIXEL_ALIGN_NONE);
+    setPixelAlignText(QNanoPainter::PIXEL_ALIGN_NONE);
 }
 
 /*!
@@ -273,6 +272,15 @@ void QNanoPainter::setStrokeStyle(const QNanoColor &color)
 
 void QNanoPainter::setStrokeStyle(const QNanoBrush &brush)
 {
+    // If brush is QNanoImagePattern set its painter
+    QNanoImagePattern *ip = dynamic_cast<QNanoImagePattern*>(const_cast<QNanoBrush*>(&brush));
+    if (ip && ip->m_image) {
+        ip->m_image->setParentPainter(this);
+    }
+    QNanoBrush* b = const_cast<QNanoBrush*>(&brush);
+    if (b) {
+        b->setParentPainter(this);
+    }
     nvgStrokePaint(nvgCtx(), brush.nvgPaint(nvgCtx()));
 }
 
@@ -1192,35 +1200,6 @@ const QRectF QNanoPainter::textBoundingBox(const QString &text, float x, float y
 }
 
 /*!
-    \fn void QNanoPainter::setAntialiasing(bool enable)
-
-    Set the current antialiasing to \a enable.
-    This disables/enables antialiasing of the whole QNanoQuickItem.
-    This only affects fill and stroke painting, not images or texts.
-    Use this method to fully disable antialiasing to get performance increase
-    compared to setAntialias(0).
-    The default value is true, so antialiasing is enabled.
-*/
-
-void QNanoPainter::setAntialiasing(bool enable)
-{
-    NVGparams *params = nvgInternalParams(nvgCtx());
-    if (params && params->edgeAntiAlias != enable) {
-        params->edgeAntiAlias = enable;
-        GLNVGcontext *gl = static_cast<GLNVGcontext*>(params->userPtr);
-        if (gl) {
-            if (enable) {
-                gl->flags |= NVG_ANTIALIAS;
-            } else {
-                gl->flags &= ~NVG_ANTIALIAS;
-            }
-            // Re-create shader
-            glnvg__renderCreate(gl);
-        }
-    }
-}
-
-/*!
     \fn void QNanoPainter::setAntialias(float antialias)
 
     Set the current antialiasing amount to \a antialias in pixels.
@@ -1270,9 +1249,9 @@ void QNanoPainter::setPixelAlignText(PixelAlign align)
     m_pixelAlignText = align;
     // TODO: Support half pixel alignment?
     if (m_pixelAlignText == PIXEL_ALIGN_NONE) {
-        nvgSetPixelAlignText(nvgCtx(), false);
+        nvgTextAlignToPixels(nvgCtx(), false);
     } else {
-        nvgSetPixelAlignText(nvgCtx(), true);
+        nvgTextAlignToPixels(nvgCtx(), true);
     }
 }
 
@@ -1288,21 +1267,6 @@ void QNanoPainter::setPixelAlignText(PixelAlign align)
 double QNanoPainter::devicePixelRatio() const
 {
     return m_devicePixelRatio;
-}
-
-void QNanoPainter::enableHighQualityRendering(bool enable)
-{
-
-    GLNVGcontext *gl = static_cast<GLNVGcontext*>(nvgInternalParams(nvgCtx())->userPtr);
-    if (gl) {
-        if (enable) {
-            gl->flags |= NVG_STENCIL_STROKES;
-        } else {
-            gl->flags &= ~NVG_STENCIL_STROKES;
-        }
-        // Re-create shader
-        glnvg__renderCreate(gl);
-    }
 }
 
 // ***** Static methods *****
@@ -1370,12 +1334,47 @@ int QNanoPainter::textBreakLines(const char* string, const char* end, float brea
    \internal
 */
 
+void QNanoPainter::enableAntialiasing(bool enable)
+{
+    NVGparams *params = nvgInternalParams(nvgCtx());
+    if (params && params->edgeAntiAlias != enable) {
+        params->edgeAntiAlias = enable;
+        GLNVGcontext *gl = static_cast<GLNVGcontext*>(params->userPtr);
+        if (gl) {
+            if (enable) {
+                gl->flags |= NVG_ANTIALIAS;
+            } else {
+                gl->flags &= ~NVG_ANTIALIAS;
+            }
+            // Re-create shader
+            glnvg__renderCreate(gl);
+        }
+    }
+}
+
+void QNanoPainter::enableHighQualityRendering(bool enable)
+{
+
+    GLNVGcontext *gl = static_cast<GLNVGcontext*>(nvgInternalParams(nvgCtx())->userPtr);
+    if (gl) {
+        if (enable) {
+            gl->flags |= NVG_STENCIL_STROKES;
+        } else {
+            gl->flags &= ~NVG_STENCIL_STROKES;
+        }
+        // Re-create shader
+        glnvg__renderCreate(gl);
+    }
+}
+
 void QNanoPainter::_checkFont() {
     // If user hasn't set a font, load the default one
     if (!m_fontSet) {
-        qDebug() << "No font set, using the default font";
-        m_defaultFont = QNanoFont(QNanoFont::DEFAULT_FONT_NORMAL);
-        setFont(m_defaultFont);
+        if (m_defaultFont.isNull()) {
+            qDebug() << "No font set, using the default font";
+            m_defaultFont = QSharedPointer<QNanoFont>::create(QNanoFont::DEFAULT_FONT_NORMAL);
+        }
+        setFont(*m_defaultFont);
     }
 }
 

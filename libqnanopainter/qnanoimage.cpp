@@ -63,10 +63,11 @@ int QNanoImage::getID(NVGcontext* nvg)
     // Image cache should always exist at this point
     auto *dataCache = &m_parentPainter->m_dataCache;
     Q_ASSERT(dataCache);
-
-    if (dataCache->contains(m_filename)) {
+    QString uniqueKey(m_filename);
+    uniqueKey.append(QString::number(m_flags));
+    if (dataCache->contains(uniqueKey)) {
         // Image is in cache
-        const QNanoDataElement *f = dataCache->value(m_filename);
+        const QNanoDataElement *f = dataCache->value(uniqueKey);
         m_width = f->width;
         m_height = f->height;
         m_id = f->id;
@@ -86,7 +87,7 @@ int QNanoImage::getID(NVGcontext* nvg)
             nvgImageSize(nvg, m_id, &m_width, &m_height);
             f->width = m_width;
             f->height = m_height;
-            dataCache->insert(m_filename, f);
+            dataCache->insert(uniqueKey, f);
         }
     }
     return m_id;

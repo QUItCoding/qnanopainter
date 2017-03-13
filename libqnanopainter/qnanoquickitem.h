@@ -26,7 +26,11 @@
 
 class QNanoQuickItemPainter;
 
+#ifdef QNANO_USE_RENDERNODE
+class QNanoQuickItem : public QQuickItem
+#else
 class QNanoQuickItem : public QQuickFramebufferObject
+#endif
 {
     Q_OBJECT
     Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
@@ -74,11 +78,16 @@ protected:
 
     virtual QNanoQuickItemPainter* createItemPainter() const = 0;
 
+#ifndef QNANO_USE_RENDERNODE
     // Reimplement from QQuickFramebufferObject
-    Renderer *createRenderer() const Q_DECL_OVERRIDE Q_DECL_FINAL;
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+    QQuickFramebufferObject::Renderer *createRenderer() const Q_DECL_OVERRIDE Q_DECL_FINAL;
+#endif
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0)) || defined(QNANO_USE_RENDERNODE)
     // Reimplement from QQuickItem
     QSGNode *updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData) Q_DECL_OVERRIDE Q_DECL_FINAL;
+#endif
+#ifdef QNANO_USE_RENDERNODE
+    void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
 #endif
 
 Q_SIGNALS:
