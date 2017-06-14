@@ -160,20 +160,19 @@ QNanoPainter::QNanoPainter()
     , m_textBaseline(QNanoPainter::BASELINE_ALPHABETIC)
     , m_devicePixelRatio(1.0)
     , m_fontSet(false)
-    , m_pixelAlign(QNanoPainter::PIXEL_ALIGN_NONE)
-    , m_pixelAlignText(QNanoPainter::PIXEL_ALIGN_NONE)
 {
     // Initialize NanoVG for correct GL version
-    // TODO: Allow to enable/disable NVG_DEBUG, possibly some own general debug define
+    // NOTE: Add also NVG_DEBUG when want to check possible OpenGL errors.
 #ifdef QT_OPENGL_ES_2
-    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS | NVG_DEBUG);
+    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS);
 #else
-    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS | NVG_DEBUG);
+    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS);
 #endif
 
     Q_ASSERT_X(m_nvgContext, "QNanoPainter::QNanoPainter", "Could not init nanovg!");
 
-
+    setPixelAlign(QNanoPainter::PIXEL_ALIGN_NONE);
+    setPixelAlignText(QNanoPainter::PIXEL_ALIGN_NONE);
 }
 
 /*!
@@ -1250,9 +1249,9 @@ void QNanoPainter::setPixelAlignText(PixelAlign align)
     m_pixelAlignText = align;
     // TODO: Support half pixel alignment?
     if (m_pixelAlignText == PIXEL_ALIGN_NONE) {
-        nvgSetPixelAlignText(nvgCtx(), false);
+        nvgTextAlignToPixels(nvgCtx(), false);
     } else {
-        nvgSetPixelAlignText(nvgCtx(), true);
+        nvgTextAlignToPixels(nvgCtx(), true);
     }
 }
 

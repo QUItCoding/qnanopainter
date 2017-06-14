@@ -27,13 +27,43 @@
 #include <QColor>
 #include <QElapsedTimer>
 #include <QSharedPointer>
+#ifdef QNANO_USE_RENDERNODE
+#include <QSGRenderNode>
+#endif
 #include "qnanopainter.h"
 #include "qnanoquickitem.h"
 
 class QQuickWindow;
 
+#ifdef QNANO_USE_RENDERNODE
+class QNanoQuickItemPainter : public QSGRenderNode, protected QOpenGLFunctions
+#else
 class QNanoQuickItemPainter : public QQuickFramebufferObject::Renderer, protected QOpenGLFunctions
+#endif
 {
+
+    struct ItemData {
+        double x, y, width, height;
+        double devicePixelRatio;
+        double rotation;
+        double scale;
+        double opacity;
+        QQuickItem::TransformOrigin transformOrigin;
+        bool clip;
+        ItemData()
+        {
+            x = 0.0;
+            y = 0.0;
+            width = 0.0;
+            height = 0.0;
+            devicePixelRatio = 1.0;
+            rotation = 0.0;
+            scale = 1.0;
+            opacity = 1.0;
+            transformOrigin = QQuickItem::Center;
+            clip = false;
+        }
+    };
 
 public:
     explicit QNanoQuickItemPainter();
@@ -46,45 +76,65 @@ public:
     }
     inline float width() const
     {
-        return m_itemWidth;
+        return m_itemData.width;
     }
     inline float height() const
     {
-        return m_itemHeight;
+        return m_itemData.height;
     }
 
 protected:
 
-    virtual void paint(QNanoPainter *painter) = 0;
+#ifdef QNANO_USE_RENDERNODE
+    StateFlags changedStates() const Q_DECL_OVERRIDE
+    {
+         return BlendState;
+    }
+#endif
+
+    virtual void paint(QNanoPainter *painter);
     virtual void synchronize(QNanoQuickItem *item);
     virtual void sizeChanged(float width, float height);
 
 private:
 
+    friend class QNanoQuickItem;
+
     // Re-implemented from QQuickFramebufferObject::Renderer
 
+#ifndef QNANO_USE_RENDERNODE
     // Creates initial FBO.
     // Gets also called whenever item size changes if textureFollowsItemSize = true
     QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) Q_DECL_OVERRIDE;
+#endif
 
     // Gets called when FBO should be rendered into.
+#ifdef QNANO_USE_RENDERNODE
+    void render(const RenderState *) Q_DECL_OVERRIDE;
+#else
     void render() Q_DECL_OVERRIDE;
+#endif
 
+#ifdef QNANO_USE_RENDERNODE
+    void synchronizePainter(QNanoQuickItem * item);
+#else
     // Gets called as a result of QQuickFramebufferObject::update().
     void synchronize(QQuickFramebufferObject * item) Q_DECL_OVERRIDE;
+#endif
 
     // These are internal
     void initialize();
     void prepaint();
     void postpaint();
-    void setSize(float width, float height);
+    void setViewSize(int width, int height);
+    QPointF itemTransformOrigin() const;
 
     QQuickWindow *m_window;
 
     QSharedPointer<QNanoPainter> m_painter;
     QColor m_fillColor;
-    float m_itemWidth, m_itemHeight;
-    double m_devicePixelRatio;
+    int m_viewWidth, m_viewHeight;
+    ItemData m_itemData;
     bool m_antialiasing;
     bool m_highQualityRendering;
     QNanoQuickItem::PixelAlign m_pixelAlign;

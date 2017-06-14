@@ -130,7 +130,7 @@ void DemoQPItem::drawGraphLine(float x, float y, float w, float h, int items, fl
 void DemoQPItem::drawGraphBars(float x, float y, float w, float h, int items, float t) {
     QVarLengthArray<float, 1024> samples(items);
     QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
-    float dx = w/(items-1);
+    float dx = w/items;
     float barWidth = dx * 0.8;
     float margin = dx - barWidth;
     int i;
