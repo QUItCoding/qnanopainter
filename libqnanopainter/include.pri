@@ -7,6 +7,13 @@ CONFIG += c++11
 
 win32  {
     QT_CONFIG += opengles2 angle
+    CONFIG( debug, debug|release ) {
+        # debug
+        LIBS+= -llibGLESV2d
+    } else {
+        # release
+        LIBS+= -llibGLESV2
+    }
 }
 
 # Enable this to get drawind debug information
