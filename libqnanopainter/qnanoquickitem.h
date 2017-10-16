@@ -40,6 +40,8 @@ class QNanoQuickItem : public QQuickFramebufferObject
     Q_PROPERTY(bool mouseEventsEnabled READ mouseEventsEnabled WRITE setMouseEventsEnabled NOTIFY mouseEventsEnabledChanged)
     Q_PROPERTY(bool mouseHoverEventsEnabled READ mouseHoverEventsEnabled WRITE setMouseHoverEventsEnabled NOTIFY mouseHoverEventsEnabledChanged)
     Q_PROPERTY(Qt::MouseButtons acceptedButtons READ acceptedButtons WRITE setAcceptedButtons NOTIFY acceptedButtonsChanged)
+    Q_PROPERTY(int textureWidth READ textureWidth WRITE setTextureWidth NOTIFY textureWidthChanged)
+    Q_PROPERTY(int textureHeight READ textureHeight WRITE setTextureHeight NOTIFY textureHeightChanged)
     Q_ENUMS(PixelAlign)
 
 public:
@@ -74,6 +76,12 @@ public:
     bool mouseHoverEventsEnabled() const;
     void setMouseHoverEventsEnabled(bool enabled);
 
+    int textureWidth() const;
+    void setTextureWidth(int width);
+
+    int textureHeight() const;
+    void setTextureHeight(int height);
+
 protected:
 
     virtual QNanoQuickItemPainter* createItemPainter() const = 0;
@@ -98,14 +106,19 @@ Q_SIGNALS:
     void acceptedButtonsChanged();
     void mouseEventsEnabledChanged();
     void mouseHoverEventsEnabledChanged();
+    void textureWidthChanged();
+    void textureHeightChanged();
 
 private:
+
     QColor m_fillColor;
     QNanoQuickItem::PixelAlign m_pixelAlign;
     QNanoQuickItem::PixelAlign m_pixelAlignText;
     bool m_highQualityRendering;
     Qt::MouseButtons m_acceptedMouseButtons;
     bool m_mouseEnabled;
+    int m_textureWidth;
+    int m_textureHeight;
 };
 
 #define QNANO_PROPERTY(type, variable, getter, setter) \

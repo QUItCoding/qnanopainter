@@ -130,6 +130,8 @@ QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
   , m_highQualityRendering(false)
   , m_acceptedMouseButtons(Qt::LeftButton)
   , m_mouseEnabled(false)
+  , m_textureWidth(-1)
+  , m_textureHeight(-1)
 {
 #ifdef QNANO_USE_RENDERNODE
     setFlag(ItemHasContents, true);
@@ -410,6 +412,72 @@ void QNanoQuickItem::setAcceptedButtons(Qt::MouseButtons buttons)
         setAcceptedMouseButtons(m_acceptedMouseButtons);
     }
     emit acceptedButtonsChanged();
+}
+
+/*!
+    \fn int QNanoQuickItem::textureWidth() const
+
+    Returns width of attached QNanoQuickItemPainter texture.
+    By default width is -1, meaning it follows QNanoQuickItem width.
+*/
+
+int QNanoQuickItem::textureWidth() const
+{
+    return m_textureWidth;
+}
+
+/*!
+    \fn void QNanoQuickItem::setTextureWidth(int width)
+
+    Set width (in pixels) of attached QNanoQuickItemPainter texture.
+    To make it follow QNanoQuickItem width, set to -1 (default).
+
+    Changing the texture size will recreate the FBO which can affect
+    the performance. So if item size is e.g. animated it may be useful
+    to set the texture size manually. Note: When setting texture size
+    manually, usually you should also set textureFollowsItemSize to false.
+*/
+
+void QNanoQuickItem::setTextureWidth(int width)
+{
+    if (m_textureWidth == width)
+        return;
+    m_textureWidth = width;
+    emit textureWidthChanged();
+    update();
+}
+
+/*!
+    \fn int QNanoQuickItem::textureHeight() const
+
+    Returns height of attached QNanoQuickItemPainter texture.
+    By default height is -1, meaning it follows QNanoQuickItem height.
+*/
+
+int QNanoQuickItem::textureHeight() const
+{
+    return m_textureHeight;
+}
+
+/*!
+    \fn void QNanoQuickItem::setTextureHeight(int height)
+
+    Set height (in pixels) of attached QNanoQuickItemPainter texture.
+    To make it follow QNanoQuickItem height, set to -1 (default).
+
+    Changing the texture size will recreate the FBO which can affect
+    the performance. So if item size is e.g. animated it may be useful
+    to set the texture size manually. Note: When setting texture size
+    manually, usually you should also set textureFollowsItemSize to false.
+*/
+
+void QNanoQuickItem::setTextureHeight(int height)
+{
+    if (m_textureHeight == height)
+        return;
+    m_textureHeight = height;
+    emit textureHeightChanged();
+    update();
 }
 
 /*!

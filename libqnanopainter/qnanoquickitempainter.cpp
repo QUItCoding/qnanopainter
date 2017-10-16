@@ -51,6 +51,8 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
     , m_fillColor(0.0, 0.0, 0.0, 0.0)
     , m_viewWidth(0)
     , m_viewHeight(0)
+    , m_textureWidth(-1)
+    , m_textureHeight(-1)
     , m_antialiasing(true)
     , m_highQualityRendering(false)
     , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
@@ -166,7 +168,10 @@ QOpenGLFramebufferObject *QNanoQuickItemPainter::createFramebufferObject(const Q
 {
     QOpenGLFramebufferObjectFormat format;
     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-    return new QOpenGLFramebufferObject(size, format);
+    QSize fboSize(size);
+    if (m_textureWidth > -1) fboSize.setWidth(m_textureWidth*m_itemData.devicePixelRatio);
+    if (m_textureHeight > -1) fboSize.setHeight(m_textureHeight*m_itemData.devicePixelRatio);
+    return new QOpenGLFramebufferObject(fboSize, format);
 }
 #endif
 
@@ -200,10 +205,22 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     m_itemData.opacity = this->inheritedOpacity();
     m_itemData.clip = realItem->clip();
 #else
+    // See if user has adjusted manual texture size
+    int newTextureWidth = realItem->textureWidth();
+    int newTextureHeight = realItem->textureHeight();
+    if ((newTextureWidth != m_textureWidth) || (newTextureHeight != m_textureHeight)) {
+        m_textureWidth = newTextureWidth;
+        m_textureHeight = newTextureHeight;
+        invalidateFramebufferObject();
+    }
+
     // If size has changed, update
-    if (static_cast<int>(width()) != static_cast<int>(item->width()) || static_cast<int>(height()) != static_cast<int>(item->height())) {
-        setViewSize(item->width(), item->height());
-        sizeChanged(item->width(), item->height());
+    int viewWidth = (m_textureWidth > -1) ? m_textureWidth : static_cast<int>(item->width());
+    int viewHeight = (m_textureHeight > -1) ? m_textureHeight : static_cast<int>(item->height());
+
+    if ((static_cast<int>(width()) != viewWidth) || (static_cast<int>(height()) != viewHeight)) {
+        setViewSize(viewWidth, viewHeight);
+        sizeChanged(viewWidth, viewHeight);
         // Note: invalidated automatically when size changes if textureFollowsItemSize is true
         //invalidateFramebufferObject();
     }

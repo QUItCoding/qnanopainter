@@ -134,6 +134,7 @@ private:
     QSharedPointer<QNanoPainter> m_painter;
     QColor m_fillColor;
     int m_viewWidth, m_viewHeight;
+    int m_textureWidth, m_textureHeight;
     ItemData m_itemData;
     bool m_antialiasing;
     bool m_highQualityRendering;
