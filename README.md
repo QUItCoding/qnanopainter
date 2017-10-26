@@ -160,3 +160,5 @@ The library is licensed under [zlib license](LICENSE.txt).
 * Uses Google Fonts [Roboto](http://www.google.com/fonts/specimen/Roboto) (and [Pacifico](http://www.google.com/fonts/specimen/Pacifico) in gallery example).
 * Blog posts:
   * [Introducing QNanoPainter](http://kgronholm.blogspot.fi/2015/10/introducing-qnanopainter.html)
+  * [QNanoPainter with Qt 5.8 (and QSGRenderNode)](http://kgronholm.blogspot.fi/2017/03/qnanopainter-with-qt-58-and.html)
+  * [FitGraph NG UI prototype](http://kgronholm.blogspot.fi/2017/10/fitgraph-ng-ui-prototype.html)
