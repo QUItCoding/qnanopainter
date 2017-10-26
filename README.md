@@ -7,14 +7,8 @@ QNanoPainter uses excellent [NanoVG](https://github.com/memononen/nanovg) as its
 
 ## Screenshots
 
-<img src="doc/images/sc_qnanopainter_1.png" width="24%">
-<img src="doc/images/sc_qnanopainter_2.png" width="24%">
-<img src="doc/images/sc_events_1.png" width="24%">
-<img src="doc/images/sc_helloworld_1.png" width="24%">
-<img src="doc/images/sc_gallery_1.png" width="24%">
-<img src="doc/images/sc_gallery_2.png" width="24%">
-<img src="doc/images/sc_gallery_3.png" width="24%">
-<img src="doc/images/sc_gallery_4.png" width="24%">
+<img src="doc/images/sc_qnanopainter_1.png" width="24%"><img src="doc/images/sc_qnanopainter_2.png" width="24%"><img src="doc/images/sc_events_1.png" width="24%"><img src="doc/images/sc_helloworld_1.png" width="24%">
+<img src="doc/images/sc_gallery_1.png" width="24%"><img src="doc/images/sc_gallery_2.png" width="24%"><img src="doc/images/sc_gallery_3.png" width="24%"><img src="doc/images/sc_gallery_4.png" width="24%">
 
 
 ## Features
