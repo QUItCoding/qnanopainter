@@ -73,12 +73,12 @@ int QNanoImage::getID(NVGcontext* nvg)
         m_id = f->id;
     } else {
         // Image is not yet in cache, so load and add it
-        QNanoDataElement *f = new QNanoDataElement();
         QFile file(m_filename);
         if (!file.open(QFile::ReadOnly))
         {
             qWarning() << "Could not open image file: " << m_filename;
         } else {
+            QNanoDataElement *f = new QNanoDataElement();
             QByteArray array = file.readAll();
             int length = array.size();
             unsigned char* data = (unsigned char*)&array.constData()[0];
