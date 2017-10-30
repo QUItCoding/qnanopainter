@@ -47,7 +47,7 @@ void EventItemPainter::paint(QNanoPainter *p)
         bool isActive = (m_activeItem == i);
         bool isPressed = (m_pressedItem == i);
         QNanoColor fillColor(isPressed ? 0xFFFF0000 : isActive ? 0xFFFFFFFF : 0xFF000000);
-        fillColor.setAlphaF(0.2);
+        fillColor.setAlphaF(0.2f);
         p->setFillStyle(fillColor);
         p->setStrokeStyle(0xFFD0D0D0);
         p->beginPath();

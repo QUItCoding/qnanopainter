@@ -97,10 +97,10 @@ void GalleryItemPainter::drawRectsWithSameColor() {
 
     QNanoColor cf1; // Note: Using default
     QNanoColor cf2;
-    cf2.setRedF(0.8);
-    cf2.setGreenF(0.4);
-    cf2.setBlueF(0.2);
-    cf2.setAlphaF(0.4);
+    cf2.setRedF(0.8f);
+    cf2.setGreenF(0.4f);
+    cf2.setBlueF(0.2f);
+    cf2.setAlphaF(0.f);
     painter()->setStrokeStyle(cf1);
     painter()->setFillStyle(cf2);
     drawRect(posX,posY,w,w);
