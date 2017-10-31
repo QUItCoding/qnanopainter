@@ -1337,7 +1337,7 @@ int QNanoPainter::textBreakLines(const char* string, const char* end, float brea
 void QNanoPainter::enableAntialiasing(bool enable)
 {
     NVGparams *params = nvgInternalParams(nvgCtx());
-    if (params && params->edgeAntiAlias != enable) {
+    if (params && params->edgeAntiAlias != (enable ? 1 : 0)) {
         params->edgeAntiAlias = enable;
         GLNVGcontext *gl = static_cast<GLNVGcontext*>(params->userPtr);
         if (gl) {
