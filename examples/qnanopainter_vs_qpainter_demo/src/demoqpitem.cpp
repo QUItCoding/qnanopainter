@@ -115,16 +115,11 @@ void DemoQPItem::drawGraphLine(float x, float y, float w, float h, int items, fl
             path2.cubicTo(sx[i-1]+dx*0.5f,sy[i-1], sx[i]-dx*0.5f,sy[i], sx[i],sy[i]);
     m_painter->strokePath(path2, QPen(m_colorGray, dotSize*0.4));
 
-    // Draw dot borders
-    m_painter->setBrush(m_colorBlack);
-    m_painter->setPen(Qt::NoPen);
-    for (i = 0; i < items; i++)
-        m_painter->drawEllipse(QPointF(sx[i], sy[i]), dotSize, dotSize);
-
-    // Draw dot content
+    // Draw dots
     m_painter->setBrush(m_colorWhite);
+    m_painter->setPen(QPen(m_colorBlack, dotSize*0.2));
     for (i = 0; i < items; i++)
-        m_painter->drawEllipse(QPointF(sx[i], sy[i]), dotSize*0.6, dotSize*0.6);
+        m_painter->drawEllipse(QPointF(sx[i], sy[i]), dotSize*0.8, dotSize*0.8);
 }
 
 void DemoQPItem::drawGraphBars(float x, float y, float w, float h, int items, float t) {

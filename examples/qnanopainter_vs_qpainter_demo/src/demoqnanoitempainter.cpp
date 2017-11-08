@@ -115,19 +115,15 @@ void DemoQNanoItemPainter::drawGraphLine(float x, float y, float w, float h, int
     m_painter->setLineWidth(dotSize*0.4);
     m_painter->stroke();
 
-    // Draw dot borders
+    // Draw dots
     m_painter->beginPath();
     for (i = 0; i < items; i++)
-        m_painter->circle(sx[i], sy[i], dotSize);
-    m_painter->setFillStyle(m_colorBlack);
-    m_painter->fill();
-
-    // Draw dot content
-    m_painter->beginPath();
-    for (i = 0; i < items; i++)
-        m_painter->circle(sx[i], sy[i], dotSize*0.6);
+        m_painter->circle(sx[i], sy[i], dotSize*0.8);
+    m_painter->setLineWidth(dotSize*0.2);
+    m_painter->setStrokeStyle(m_colorBlack);
     m_painter->setFillStyle(m_colorWhite);
     m_painter->fill();
+    m_painter->stroke();
 }
 
 void DemoQNanoItemPainter::drawGraphBars(float x, float y, float w, float h, int items, float t) {
