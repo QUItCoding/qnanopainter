@@ -210,7 +210,7 @@ void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, 
 void DemoQNanoItemPainter::drawIcons(float x, float y, float w, float h, int items, float t)
 {
     // Note: Adjust font size to match QPainter sizing
-    qreal fontSize = w/22.0 * 1.32 - 1;
+    qreal fontSize = w/22.0 * 1.32;
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setFillStyle("#FFFFFF");
@@ -232,7 +232,7 @@ void DemoQNanoItemPainter::drawRuler(float x, float y, float w, float h, float t
     m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
     m_painter->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
     // Note: Adjust font size to match QPainter sizing
-    qreal fontSize = w/35.0 * 1.32 - 1;
+    qreal fontSize = w/35.0 * 1.32;
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setStrokeStyle("#E0E0E0");
