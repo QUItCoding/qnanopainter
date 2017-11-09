@@ -14,7 +14,8 @@ Window {
     // Multiplier to make tests tougher
     property int testCount: 1
     property bool fullScreen: true
-    property bool useNVGQ: true
+    // 0 = QNanoPainter, 1 = QQuickPaintedItem, 2 = QML Shape
+    property int renderType: 0
     // Resolution-independent dp
     property real dp: Screen.pixelDensity * 25.4/160
     // This will be 1 on most platforms, 2 on iOS double retina, 3 on iPhone6 plus
@@ -54,7 +55,7 @@ Window {
                 enabledTests: mainWindow.enabledTests
                 testCount: mainWindow.testCount
                 animationTime: visible ? mainWindow.animationTime : 0
-                visible: useNVGQ
+                visible: renderType === 0
                 //fillColor: Qt.rgba(0.2, 0.4, 0.5, 1.0)
             }
 
@@ -72,8 +73,37 @@ Window {
                 enabledTests: mainWindow.enabledTests
                 testCount: mainWindow.testCount
                 animationTime: visible ? mainWindow.animationTime : 0
-                visible: !useNVGQ
+                visible: renderType === 1
             }
+            Loader {
+                // Note: Using Loader so that this QML Shape demo is only
+                // enabled when running with Qt >= 5.10
+                id: shapeItemLoader
+                width: parent.width
+                height: visible ? parent.height : 0
+                visible: renderType === 2
+                enabled: gEnableShapeDemo && visible
+                source: enabled  ? "qml/shapeitem/DemoShapeItem.qml" : ""
+                Binding {
+                    target: shapeItemLoader.item
+                    property: "enabledTests"
+                    value: mainWindow.enabledTests
+                    when: shapeItemLoader.status == Loader.Ready
+                }
+                Binding {
+                    target: shapeItemLoader.item
+                    property: "testCount"
+                    value: mainWindow.testCount
+                    when: shapeItemLoader.status == Loader.Ready
+                }
+                Binding {
+                    target: shapeItemLoader.item
+                    property: "animationTime"
+                    value: shapeItemLoader.visible ? mainWindow.animationTime : 0
+                    when: shapeItemLoader.status == Loader.Ready
+                }
+            }
+
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
@@ -95,9 +125,14 @@ Window {
         anchors.verticalCenter: fpsItem.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 60 * dp
-        text: useNVGQ ? "QNanoPainter" : "QPainter"
+        text: renderType === 0 ? "QNanoPainter" : renderType === 1 ?  "QPainter" : "QML Shape"
         onClicked: {
-            useNVGQ = !useNVGQ;
+            var availableDemos = gEnableShapeDemo ? 3 : 2
+            if (renderType < (availableDemos-1)) {
+                renderType++;
+            } else {
+                renderType = 0;
+            }
         }
     }
 

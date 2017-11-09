@@ -14,5 +14,11 @@
         <file>qml/images/circle.png</file>
         <file>qml/fonts/Roboto-Regular.ttf</file>
         <file>qml/SliderSelector.qml</file>
+        <file>qml/shapeitem/DemoShapeItem.qml</file>
+        <file>qml/shapeitem/BarsComponent.qml</file>
+        <file>qml/shapeitem/RulerComponent.qml</file>
+        <file>qml/shapeitem/CirclesComponent.qml</file>
+        <file>qml/shapeitem/LinesComponent.qml</file>
+        <file>qml/shapeitem/IconsComponent.qml</file>
     </qresource>
 </RCC>
