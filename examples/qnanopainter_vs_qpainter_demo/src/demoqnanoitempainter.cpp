@@ -17,7 +17,13 @@ DemoQNanoItemPainter::DemoQNanoItemPainter()
     m_color2 = QNanoColor(255,255,255,150);
     m_color3 = QNanoColor(255,255,255,80);
 
-    m_circleImage = QNanoImage(":/qml/images/circle.png", QNanoImage::GENERATE_MIPMAPS);
+    QNanoImage::ImageFlags imageFlags = 0;
+#ifndef Q_OS_WIN
+    // Windows ANGLE seems to have issues with mipmaps, use those in all other platforms.
+    // See: https://github.com/QUItCoding/qnanopainter/issues/19
+    imageFlags |= QNanoImage::GENERATE_MIPMAPS;
+#endif
+    m_circleImage = QNanoImage(":/qml/images/circle.png", imageFlags);
 
     m_testFont = QNanoFont(":/qml/fonts/Roboto-Regular.ttf");
 }
