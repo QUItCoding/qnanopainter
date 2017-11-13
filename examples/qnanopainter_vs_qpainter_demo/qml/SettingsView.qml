@@ -27,14 +27,14 @@ Item {
         visible: root.isOpen
         Rectangle {
             id: backgroundItem
-            anchors.fill: tabView.currentIndex == 0 ? contentItemTab1 : contentItemTab2
+            anchors.fill: tabView.currentIndex == 0 ? contentItemTab1 : tabView.currentIndex == 1 ? contentItemTab2 : contentItemTab3
             color: "#000000"
             opacity: 0.75
         }
         TabView {
             id: tabView
             anchors.top: parent.top
-            texts: ["TESTS", "ADVANCED"]
+            texts: ["TESTS", "VIEW", "ADVANCED"]
         }
         Column {
             id: contentItemTab1
@@ -83,52 +83,6 @@ Item {
             width: parent.width
             visible: tabView.currentIndex == 1
             Switch {
-                text: "Antialiasing"
-                checked: qnItem.antialiasing
-                onCheckedChanged: {
-                    qnItem.antialiasing = checked;
-                    // Note: QQuickPaintedItem supports setting
-                    // antialiasing only through C++ API, QTBUG-46315
-                    //qpItem.antialiasing = checked;
-                    qpItem.qpAntialiasing = checked;
-                    // Adjust pixelAlign accordingly
-                    // Often it's preferred enabled when antialiasing is disabled
-                    pixelAlignSwitch.checked = !checked;
-                    // Also texts
-                    pixelAlignTextSwitch.checked = !checked;
-                }
-            }
-            Switch {
-                id: pixelAlignSwitch
-                text: "Pixel align paint (QNanoPainter)"
-                checked: qnItem.pixelAlign !== DemoQNanoItem.PixelAlignNone
-                onCheckedChanged: {
-                    qnItem.pixelAlign = checked ? DemoQNanoItem.PixelAlignHalf : DemoQNanoItem.PixelAlignNone;
-                }
-            }
-            Switch {
-                id: pixelAlignTextSwitch
-                text: "Pixel align text (QNanoPainter)"
-                checked: qnItem.pixelAlignText !== DemoQNanoItem.PixelAlignNone
-                onCheckedChanged: {
-                    qnItem.pixelAlignText = checked ? DemoQNanoItem.PixelAlignFull : DemoQNanoItem.PixelAlignNone;
-                }
-            }
-            Switch {
-                text: "High quality rendering (QNanoPainter)"
-                checked: qnItem.highQualityRendering
-                onCheckedChanged: {
-                    qnItem.highQualityRendering = checked;
-                }
-            }
-            Switch {
-                text: "FBO renderTarget (QPainter)"
-                checked: qpItem.qpRenderTargetFBO
-                onCheckedChanged: {
-                    qpItem.qpRenderTargetFBO = checked;
-                }
-            }
-            Switch {
                 text: "Use 256x256px item"
                 checked: false
                 onCheckedChanged: {
@@ -139,21 +93,87 @@ Item {
                 }
             }
             Switch {
-                text: "Animate size"
-                checked: sizeAnimation.running
+                text: "Animate item size"
+                checked: mainWindow.settingAnimateSize
                 onCheckedChanged: {
-                    sizeAnimation.running = checked;
+                    mainWindow.settingAnimateSize = checked;
+                }
+            }
+            SliderSelector {
+                id: itemCountSelector
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width - 40 * dp
+                title: "Item count"
+                texts: ["1", "2", "4", "8", "16", "32", "64", "128"]
+                selectedIndex: 0
+                onSelectedIndexChanged: {
+                    mainWindow.itemCount = itemCountSelector.texts[selectedIndex];
                 }
             }
             SliderSelector {
                 id: testCountSelector
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width - 40 * dp
-                title: "Test rendering count"
+                title: "Rendering count (per item)"
                 texts: ["1", "2", "4", "8", "16", "32", "64", "128"]
                 selectedIndex: 0
                 onSelectedIndexChanged: {
                     mainWindow.testCount = testCountSelector.texts[selectedIndex];
+                }
+            }
+        }
+        Column {
+            id: contentItemTab3
+            anchors.top: tabView.bottom
+            width: parent.width
+            visible: tabView.currentIndex == 2
+            Switch {
+                text: "Antialiasing"
+                checked: mainWindow.settingAntialiasing
+                onCheckedChanged: {
+                    mainWindow.settingAntialiasing = checked;
+                    // Adjust pixelAlign accordingly
+                    // Often it's preferred enabled when antialiasing is disabled
+                    pixelAlignSwitch.checked = !checked;
+                    // Also texts
+                    pixelAlignTextSwitch.checked = !checked;
+                }
+            }
+            Switch {
+                id: pixelAlignSwitch
+                text: "Pixel align paint (QNanoPainter)"
+                checked: mainWindow.settingPixelAlign
+                onCheckedChanged: {
+                    mainWindow.settingPixelAlign = checked;
+                }
+            }
+            Switch {
+                id: pixelAlignTextSwitch
+                text: "Pixel align text (QNanoPainter)"
+                checked: mainWindow.settingPixelAlignText
+                onCheckedChanged: {
+                    mainWindow.settingPixelAlignText = checked;
+                }
+            }
+            Switch {
+                text: "High quality rendering (QNanoPainter)"
+                checked: mainWindow.settingHighQualityRendering
+                onCheckedChanged: {
+                    mainWindow.settingHighQualityRendering = checked;
+                }
+            }
+            Switch {
+                text: "FBO renderTarget (QPainter)"
+                checked: mainWindow.settingFBORendering
+                onCheckedChanged: {
+                    mainWindow.settingFBORendering = checked;
+                }
+            }
+            Switch {
+                text: "VendorExtensionsEnabled (QML Shape)"
+                checked: mainWindow.settingVendorExtensionsEnabled
+                onCheckedChanged: {
+                    mainWindow.settingVendorExtensionsEnabled = checked;
                 }
             }
         }

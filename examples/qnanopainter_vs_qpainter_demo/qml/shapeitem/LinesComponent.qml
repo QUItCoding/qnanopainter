@@ -25,7 +25,8 @@ Item {
         'readonly property real dotSize: root.dotSize;' +
         'readonly property real itemWidth: root.width;' +
         'readonly property real itemHeight: root.height;' +
-        'asynchronous: true;';
+        'asynchronous: true;' +
+        'vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled;';
 
         // Draw graph background area
         newObject += 'ShapePath {' +

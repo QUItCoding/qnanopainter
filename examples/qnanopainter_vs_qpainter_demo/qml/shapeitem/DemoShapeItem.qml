@@ -7,7 +7,7 @@ Item {
     property int testCount: 1
     property int enabledTests: 0
 
-    readonly property bool enableAntialiasing: qnItem.antialiasing
+    readonly property bool enableAntialiasing: mainWindow.settingAntialiasing
 
     // Setup colors
     readonly property color m_colorWhite: Qt.rgba(1, 1, 1, 1)

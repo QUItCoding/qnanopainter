@@ -33,7 +33,9 @@ Item {
         'readonly property real lineSpacing: lineWidth + root.lineMargin;' +
         'readonly property real itemWidth: root.width;' +
         'readonly property real itemHeight: root.height;' +
-        'asynchronous: true;';
+        'asynchronous: true;' +
+        'vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled;';
+
         for (var i=0; i<items; ++i) {
             newObject += 'ShapePath {' +
                     'readonly property real s: ' + i + '/items;' +

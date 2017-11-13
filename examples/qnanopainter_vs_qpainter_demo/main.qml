@@ -11,15 +11,27 @@ Window {
     // Cutting corners a bit and not using enum
     // 1=ruler, 2=circles, 4=lines, 8=bars, 16=icons
     property int enabledTests: 31
-    // Multiplier to make tests tougher
+    // Amount of items (QNanoQuickItemPainter / QQuickPaintedItem / Shape Item) to render
+    property int itemCount: 1
+    // How many times selected tests are rendered per item
     property int testCount: 1
     property bool fullScreen: true
     // 0 = QNanoPainter, 1 = QQuickPaintedItem, 2 = QML Shape
     property int renderType: 0
     // Resolution-independent dp
-    property real dp: Screen.pixelDensity * 25.4/160
+    readonly property real dp: Screen.pixelDensity * 25.4/160
     // This will be 1 on most platforms, 2 on iOS double retina, 3 on iPhone6 plus
     property int dPRatio: Screen.devicePixelRatio
+
+    property bool settingAntialiasing: true
+    property bool settingPixelAlign: false
+    property bool settingPixelAlignText: false
+    property bool settingHighQualityRendering: false
+    property bool settingFBORendering: false
+    property bool settingAnimateSize: false
+    property bool settingVendorExtensionsEnabled: true
+
+    property real itemHeight: graphContainer.height
 
     width: 375
     height: 667
@@ -43,73 +55,90 @@ Window {
         y: mainWindow.fullScreen ? fpsItem.height : (parent.height - height)/2
         x: mainWindow.fullScreen ? 0 : (parent.width - width)/2
 
-        Item {
-            id: sizeAnimatedContainer
-            width: parent.width
-            height: parent.height
+        Repeater {
+            id: itemRepeater
+            model: mainWindow.itemCount
 
-            DemoQNanoItem {
-                id: qnItem
+            Item {
+                id: sizeAnimatedContainer
+                readonly property real itemMargin: (mainWindow.width / 80)
+                readonly property real itemPos: (index * itemMargin)
+                readonly property real itemPosCentered: (index * itemMargin) - (itemRepeater.count/2 * itemMargin)
+                // Move each item slightly to see the item amount
+                x: mainWindow.fullScreen ? itemPos : itemPosCentered
+                y: mainWindow.fullScreen ? itemPos : itemPosCentered
                 width: parent.width
-                height: visible ? parent.height : 0
-                enabledTests: mainWindow.enabledTests
-                testCount: mainWindow.testCount
-                animationTime: visible ? mainWindow.animationTime : 0
-                visible: renderType === 0
-                //fillColor: Qt.rgba(0.2, 0.4, 0.5, 1.0)
-            }
+                height: mainWindow.itemHeight
 
-            DemoQPItem {
-                id: qpItem
-                // QQuickPaintedItem doesn't currently support iOS retina resolutions
-                // So scaling manually is required
-                width: parent.width * dPRatio
-                height: visible ? parent.height * dPRatio : 0
-                scale: 1 / dPRatio
-                transformOrigin: Item.TopLeft
-                // Instead above you can switch to this, then pixel amount of item
-                // will be 1/4 on iOS & OSX
-                //anchors.fill: parent
-                enabledTests: mainWindow.enabledTests
-                testCount: mainWindow.testCount
-                animationTime: visible ? mainWindow.animationTime : 0
-                visible: renderType === 1
-            }
-            Loader {
-                // Note: Using Loader so that this QML Shape demo is only
-                // enabled when running with Qt >= 5.10
-                id: shapeItemLoader
-                width: parent.width
-                height: visible ? parent.height : 0
-                visible: renderType === 2
-                enabled: gEnableShapeDemo && visible
-                source: enabled  ? "qml/shapeitem/DemoShapeItem.qml" : ""
-                Binding {
-                    target: shapeItemLoader.item
-                    property: "enabledTests"
-                    value: mainWindow.enabledTests
-                    when: shapeItemLoader.status == Loader.Ready
+                DemoQNanoItem {
+                    id: qnItem
+                    width: parent.width
+                    height: visible ? parent.height : 0
+                    enabledTests: mainWindow.enabledTests
+                    testCount: mainWindow.testCount
+                    animationTime: visible ? mainWindow.animationTime : 0
+                    visible: renderType === 0
+                    //fillColor: Qt.rgba(0.2, 0.4, 0.5, 1.0)
+                    antialiasing: mainWindow.settingAntialiasing
+                    pixelAlign: mainWindow.settingPixelAlign ? DemoQNanoItem.PixelAlignHalf : DemoQNanoItem.PixelAlignNone
+                    pixelAlignText: mainWindow.settingPixelAlignText ? DemoQNanoItem.PixelAlignFull : DemoQNanoItem.PixelAlignNone
+                    highQualityRendering: mainWindow.settingHighQualityRendering
                 }
-                Binding {
-                    target: shapeItemLoader.item
-                    property: "testCount"
-                    value: mainWindow.testCount
-                    when: shapeItemLoader.status == Loader.Ready
-                }
-                Binding {
-                    target: shapeItemLoader.item
-                    property: "animationTime"
-                    value: shapeItemLoader.visible ? mainWindow.animationTime : 0
-                    when: shapeItemLoader.status == Loader.Ready
-                }
-            }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    animationTimeAnimation.paused = !animationTimeAnimation.paused
+                DemoQPItem {
+                    id: qpItem
+                    // QQuickPaintedItem doesn't currently support iOS retina resolutions
+                    // So scaling manually is required
+                    width: parent.width * dPRatio
+                    height: visible ? parent.height * dPRatio : 0
+                    scale: 1 / dPRatio
+                    transformOrigin: Item.TopLeft
+                    // Instead above you can switch to this, then pixel amount of item
+                    // will be 1/4 on iOS & OSX
+                    //anchors.fill: parent
+                    enabledTests: mainWindow.enabledTests
+                    testCount: mainWindow.testCount
+                    animationTime: visible ? mainWindow.animationTime : 0
+                    visible: renderType === 1
+                    qpAntialiasing: mainWindow.settingAntialiasing
+                    qpRenderTargetFBO: mainWindow.settingFBORendering
+                }
+                Loader {
+                    // Note: Using Loader so that this QML Shape demo is only
+                    // enabled when running with Qt >= 5.10
+                    id: shapeItemLoader
+                    width: parent.width
+                    height: visible ? parent.height : 0
+                    visible: renderType === 2
+                    enabled: gEnableShapeDemo && visible
+                    source: enabled  ? "qml/shapeitem/DemoShapeItem.qml" : ""
+                    Binding {
+                        target: shapeItemLoader.item
+                        property: "enabledTests"
+                        value: mainWindow.enabledTests
+                        when: shapeItemLoader.status == Loader.Ready
+                    }
+                    Binding {
+                        target: shapeItemLoader.item
+                        property: "testCount"
+                        value: mainWindow.testCount
+                        when: shapeItemLoader.status == Loader.Ready
+                    }
+                    Binding {
+                        target: shapeItemLoader.item
+                        property: "animationTime"
+                        value: shapeItemLoader.visible ? mainWindow.animationTime : 0
+                        when: shapeItemLoader.status == Loader.Ready
+                    }
                 }
             }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            animationTimeAnimation.paused = !animationTimeAnimation.paused
         }
     }
 
@@ -139,17 +168,18 @@ Window {
     SequentialAnimation {
         id: sizeAnimation
         loops: Animation.Infinite
+        running: mainWindow.settingAnimateSize
         NumberAnimation  {
-            target: sizeAnimatedContainer
-            property: "height"
+            target: mainWindow
+            property: "itemHeight"
             from: graphContainer.height
             to: graphContainer.height * 0.5
             duration: 1000
             easing.type: Easing.InOutQuad
         }
         NumberAnimation  {
-            target: sizeAnimatedContainer
-            property: "height"
+            target: mainWindow
+            property: "itemHeight"
             from: graphContainer.height * 0.5
             to: graphContainer.height
             duration: 1000

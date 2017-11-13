@@ -10,7 +10,7 @@ Item {
 
     QtObject {
         id: priv
-        property real switchWidth: Math.max(76*dp, textOnItem.paintedWidth + 60*dp)
+        property real switchWidth: Math.max(66*dp, textOnItem.paintedWidth + 50*dp)
         property real barHeight: 19 * dp
         property real knobMovement: switchWidth - knobSize + 2
         property real knobSize: 32 * dp
