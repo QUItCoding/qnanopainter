@@ -87,15 +87,14 @@ Window {
 
                 DemoQPItem {
                     id: qpItem
-                    // QQuickPaintedItem doesn't currently support iOS retina resolutions
-                    // So scaling manually is required
-                    width: parent.width * dPRatio
+                    // QQuickPaintedItem < Qt 5.6 doesn't support iOS retina resolutions (see QTBUG-40489).
+                    // When running with older Qt and OSX/iOS, enable these instead to make drawing sharp.
+                    /*width: parent.width * dPRatio
                     height: visible ? parent.height * dPRatio : 0
                     scale: 1 / dPRatio
-                    transformOrigin: Item.TopLeft
-                    // Instead above you can switch to this, then pixel amount of item
-                    // will be 1/4 on iOS & OSX
-                    //anchors.fill: parent
+                    transformOrigin: Item.TopLeft*/
+                    width: parent.width
+                    height: visible ? parent.height : 0
                     enabledTests: mainWindow.enabledTests
                     testCount: mainWindow.testCount
                     animationTime: visible ? mainWindow.animationTime : 0
