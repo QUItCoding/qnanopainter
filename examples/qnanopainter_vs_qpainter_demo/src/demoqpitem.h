@@ -6,6 +6,8 @@
 #include <QImage>
 #include <QFont>
 
+extern int g_customFontId; // set in main.cpp
+
 class DemoQPItem : public QQuickPaintedItem
 {
     Q_OBJECT

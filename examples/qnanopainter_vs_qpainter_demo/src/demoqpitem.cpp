@@ -24,9 +24,10 @@ DemoQPItem::DemoQPItem(QQuickItem *parent)
     m_circleImage = QImage(":/qml/images/circle.png");
 
     // Load custom font
-    int id = QFontDatabase::addApplicationFont(":/qml/fonts/Roboto-Regular.ttf");
-    QStringList s = QFontDatabase::applicationFontFamilies(id);
-    m_testFont = QFont(s.at(0));
+    QStringList s = QFontDatabase::applicationFontFamilies(g_customFontId);
+    if (!s.isEmpty()) {
+        m_testFont = QFont(s.first());
+    }
 
     // Set antialiasing and render target
     setAntialiasing(m_qpAntialiasing);

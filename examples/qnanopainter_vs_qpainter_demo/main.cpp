@@ -1,8 +1,11 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QFontDatabase>
 #include "src/demoqpitem.h"
 #include "src/demoqnanoitem.h"
+
+int g_customFontId = 0;
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +14,8 @@ int main(int argc, char *argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+
+    g_customFontId = QFontDatabase::addApplicationFont(":/qml/fonts/Roboto-Regular.ttf");
 
     QQmlApplicationEngine engine;
 
