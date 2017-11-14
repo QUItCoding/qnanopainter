@@ -179,15 +179,13 @@ void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, 
     qreal cx = x+w/2;
     qreal cy = y+h/2;
     qreal radius1 = w/2 - lineWidth;
-    qreal pi = 3.1415926;
-    qreal pi2 = pi*2;
     int i;
 
     // Setup values
-    qreal a1 = -pi/2;
+    qreal a1 = -M_PI/2;
     QVarLengthArray<qreal, 1024> a0(items);
     for (i=0; i<items; i++) {
-        a0[i] = -pi/2 + pi2*(((float)items-i)/items)*showAnimationProgress;
+        a0[i] = -M_PI/2 + 2*M_PI*(((float)items-i)/items)*showAnimationProgress;
     }
 
     m_painter->setLineWidth(lineWidth);
