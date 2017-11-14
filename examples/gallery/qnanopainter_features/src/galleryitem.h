@@ -9,12 +9,12 @@ class GalleryItem : public QNanoQuickItem
 {
     Q_OBJECT
     // Alternatively could just use:
-    //QNANO_PROPERTY(qreal, m_animationTime, animationTime, setAnimationTime)
-    //QNANO_PROPERTY(qreal, m_animationSine, animationSine, setAnimationSine)
+    //QNANO_PROPERTY(float, m_animationTime, animationTime, setAnimationTime)
+    //QNANO_PROPERTY(float, m_animationSine, animationSine, setAnimationSine)
     QNANO_PROPERTY(int, m_galleryView, galleryView, setGalleryView)
 
-    Q_PROPERTY(qreal animationTime READ animationTime WRITE setAnimationTime NOTIFY animationTimeChanged)
-    Q_PROPERTY(qreal animationSine READ animationSine WRITE setAnimationSine NOTIFY animationSineChanged)
+    Q_PROPERTY(float animationTime READ animationTime WRITE setAnimationTime NOTIFY animationTimeChanged)
+    Q_PROPERTY(float animationSine READ animationSine WRITE setAnimationSine NOTIFY animationSineChanged)
 
 public:
 
@@ -23,10 +23,10 @@ public:
     // Reimplement
     QNanoQuickItemPainter *createItemPainter() const;
 
-    qreal animationTime() const { return m_animationTime; }
-    qreal animationSine() const { return m_animationSine; }
+    float animationTime() const { return m_animationTime; }
+    float animationSine() const { return m_animationSine; }
 
-    void setAnimationTime(const qreal value) {
+    void setAnimationTime(const float value) {
         if (value == m_animationTime)
             return;
         m_animationTime = value;
@@ -34,7 +34,7 @@ public:
         update();
     }
 
-    void setAnimationSine(const qreal value) {
+    void setAnimationSine(const float value) {
         if (value == m_animationSine)
             return;
         m_animationSine = value;
@@ -47,8 +47,8 @@ Q_SIGNALS:
     void animationSineChanged();
 
 private:
-    qreal m_animationTime;
-    qreal m_animationSine;
+    float m_animationTime;
+    float m_animationSine;
 };
 
 #endif // GALLERYITEM_H

@@ -24,7 +24,7 @@ private:
     float _flowerPos(int i);
 
     QNanoPainter *m_painter;
-    qreal m_animationTime;
+    float m_animationTime;
     int m_enabledTests;
     int m_testCount;
 

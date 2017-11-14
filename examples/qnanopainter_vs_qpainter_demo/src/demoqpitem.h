@@ -11,7 +11,7 @@ extern int g_customFontId; // set in main.cpp
 class DemoQPItem : public QQuickPaintedItem
 {
     Q_OBJECT
-    Q_PROPERTY(qreal animationTime READ animationTime WRITE setAnimationTime NOTIFY animationTimeChanged)
+    Q_PROPERTY(float animationTime READ animationTime WRITE setAnimationTime NOTIFY animationTimeChanged)
     Q_PROPERTY(int enabledTests READ enabledTests WRITE setEnabledTests NOTIFY enabledTestsChanged)
     Q_PROPERTY(int testCount READ testCount WRITE setTestCount NOTIFY testCountChanged)
     Q_PROPERTY(bool qpAntialiasing READ qpAntialiasing WRITE setQpAntialiasing NOTIFY qpAntialiasingChanged)
@@ -21,13 +21,13 @@ public:
     DemoQPItem(QQuickItem *parent = 0);
     void paint(QPainter *painter);
 
-    qreal animationTime() const { return m_animationTime; }
+    float animationTime() const { return m_animationTime; }
     int enabledTests() const { return m_enabledTests; }
     int testCount() const { return m_testCount; }
     bool qpAntialiasing() const { return m_qpAntialiasing; }
     bool qpRenderTargetFBO() const { return m_qpRenderTargetFBO; }
 
-    void setAnimationTime(const qreal value) {
+    void setAnimationTime(const float value) {
         if (value == m_animationTime)
             return;
         m_animationTime = value;
@@ -87,7 +87,7 @@ private:
     void drawFlower(float x, float y, float w, float h, float t);
     float _flowerPos(int i);
 
-    qreal m_animationTime;
+    float m_animationTime;
     int m_enabledTests;
     int m_testCount;
     bool m_qpAntialiasing;

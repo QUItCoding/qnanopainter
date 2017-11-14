@@ -1283,14 +1283,14 @@ double QNanoPainter::devicePixelRatio() const
 
 float QNanoPainter::mmToPx(float mm)
 {
-    qreal ldp = 72.0;
+    float ldp = 72.0f;
     QScreen *screen = QGuiApplication::primaryScreen();
     if (screen) {
         ldp = screen->physicalDotsPerInch();
     } else {
         qWarning() << "QScreen required for pxToMm";
     }
-    return ldp * mm / 25.4;
+    return ldp * mm / 25.4f;
 }
 
 /*!
@@ -1301,14 +1301,14 @@ float QNanoPainter::mmToPx(float mm)
 
 float QNanoPainter::ptToPx(float pt)
 {
-    qreal ldp = 72.0;
+    float ldp = 72.0f;
     QScreen *screen = QGuiApplication::primaryScreen();
     if (screen) {
         ldp = screen->physicalDotsPerInch();
     } else {
         qWarning() << "QScreen required for ptToPx";
     }
-    return pt * (ldp/72.0);
+    return pt * (ldp/72.0f);
 }
 
 /*

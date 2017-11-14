@@ -40,39 +40,39 @@ void DemoQPItem::paint(QPainter *painter)
 {
     m_painter = painter;
 
-    qreal w = boundingRect().width();
-    qreal h = boundingRect().height();
-    qreal t = m_animationTime;
+    float w = boundingRect().width();
+    float h = boundingRect().height();
+    float t = m_animationTime;
 
     // These painting commands are identical with both renderers
     for (int i=0 ; i < m_testCount ; i++) {
         // Paint ruler
         if (m_enabledTests & 1) {
-            drawRuler(0, h*0.02, w, h*0.05, t);
+            drawRuler(0, h*0.02f, w, h*0.05f, t);
         }
         // Paint circles
         if (m_enabledTests & 2) {
-            drawGraphCircles(w*0.15, h*0.1, w*0.7, w*0.7, 10, t*2);
-            drawGraphCircles(w*0.05, h*0.55, w*0.25, w*0.25, 8, t*3);
-            drawGraphCircles(w*0.70, h*0.55, w*0.25, w*0.25, 3, t);
+            drawGraphCircles(w*0.15f, h*0.1f, w*0.7f, w*0.7f, 10, t*2);
+            drawGraphCircles(w*0.05f, h*0.55f, w*0.25f, w*0.25f, 8, t*3);
+            drawGraphCircles(w*0.70f, h*0.55f, w*0.25f, w*0.25f, 3, t);
         }
         // Paint lines
         if (m_enabledTests & 4) {
             drawGraphLine(0, h, w, -h, 4, t);
-            drawGraphLine(0, h, w, -h*0.8, 6,  t+10);
-            drawGraphLine(0, h, w, -h*0.6, 12, t/2);
+            drawGraphLine(0, h, w, -h*0.8f, 6,  t+10);
+            drawGraphLine(0, h, w, -h*0.6f, 12, t/2);
         }
         // Paint bars
         if (m_enabledTests & 8) {
-            drawGraphBars(0, h, w, -h*0.8, 6, t*3);
-            drawGraphBars(0, h, w, -h*0.4, 10, t+2);
-            drawGraphBars(0, h, w, -h*0.3, 20, t*2+2);
-            drawGraphBars(0, h, w, -h*0.2, 40, t*3+2);
+            drawGraphBars(0, h, w, -h*0.8f, 6, t*3);
+            drawGraphBars(0, h, w, -h*0.4f, 10, t+2);
+            drawGraphBars(0, h, w, -h*0.3f, 20, t*2+2);
+            drawGraphBars(0, h, w, -h*0.2f, 40, t*3+2);
         }
         // Paint icons
         int icons = 50;
         if (m_enabledTests & 16) {
-            drawIcons(0, h*0.2, w, h*0.2, icons, t);
+            drawIcons(0, h*0.2f, w, h*0.2f, icons, t);
         }
         // Paint flower
         if (m_enabledTests & 32) {
@@ -80,7 +80,7 @@ void DemoQPItem::paint(QPainter *painter)
         }
 
         // Increase animation time when m_testCount > 1
-        t += 0.3;
+        t += 0.3f;
     }
 }
 
@@ -94,7 +94,7 @@ void DemoQPItem::drawGraphLine(float x, float y, float w, float h, int items, fl
 
     // Generate positions
     for (i = 0; i<items; i++) {
-        samples[i] = 0.5 + sinf((i+1) * t * 0.2) * 0.1;
+        samples[i] = 0.5f + sinf((i+1) * t * 0.2f) * 0.1f;
     }
     for (i = 0; i < items; i++) {
         sx[i] = x+i*dx;
@@ -131,13 +131,13 @@ void DemoQPItem::drawGraphBars(float x, float y, float w, float h, int items, fl
     QVarLengthArray<float, 1024> samples(items);
     QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
     float dx = w/items;
-    float barWidth = dx * 0.8;
+    float barWidth = dx * 0.8f;
     float margin = dx - barWidth;
     int i;
 
     // Generate positions
     for (i = 0; i<items; i++) {
-        samples[i] = 0.5 + sinf(i*0.1+t)*0.5;
+        samples[i] = 0.5f + sinf(i*0.1f+t)*0.5f;
     }
     for (i = 0; i < items; i++) {
         sx[i] = x+i*dx + margin/2;
@@ -146,7 +146,7 @@ void DemoQPItem::drawGraphBars(float x, float y, float w, float h, int items, fl
 
     // Draw graph bars
     m_painter->setBrush(m_color3);
-    qreal lineWidth = 0.5 + w * 0.002;
+    float lineWidth = 0.5f + w * 0.002f;
     QPen pen(m_colorBlack, lineWidth);
     pen.setJoinStyle(Qt::MiterJoin);
     m_painter->setPen(pen);
@@ -158,25 +158,25 @@ void DemoQPItem::drawGraphBars(float x, float y, float w, float h, int items, fl
 
 void DemoQPItem::drawGraphCircles(float x, float y, float w, float h, int items, float t)
 {
-    qreal barWidth = 0.3 * w/items;
-    qreal lineMargin = 0.2 * barWidth;
-    qreal showAnimationProgress = 0.1 + 0.4*sinf(t*0.8)+0.5;
-    qreal lineWidth = barWidth*showAnimationProgress;
+    float barWidth = 0.3f * w/items;
+    float lineMargin = 0.2f * barWidth;
+    float showAnimationProgress = 0.1f + 0.4f*sinf(t*0.8f)+0.5f;
+    float lineWidth = barWidth*showAnimationProgress;
 
-    qreal cx = x+w/2;
-    qreal cy = y+h/2;
-    qreal radius1 = w/2 - lineWidth;
+    float cx = x+w/2;
+    float cy = y+h/2;
+    float radius1 = w/2 - lineWidth;
     int i;
 
     // Setup values
-    qreal a1 = 90*16;
-    QVarLengthArray<qreal, 1024> a0(items);
+    int a1 = 90*16;
+    QVarLengthArray<int, 1024> a0(items);
     for (i=0; i<items; i++) {
         a0[i] = -360*16*(((float)items-i)/items)*showAnimationProgress;
     }
 
     // Draw cicle backgrounds
-    qreal r = radius1;
+    float r = radius1;
     QColor c_background = QColor(215,215,215,50);
     m_painter->setPen(QPen(c_background, lineWidth));
     m_painter->setBrush(Qt::NoBrush);
@@ -187,9 +187,9 @@ void DemoQPItem::drawGraphCircles(float x, float y, float w, float h, int items,
 
     // Draw circle bars
     r = radius1;
-    qreal r2 = radius1;
+    float r2 = radius1;
     QPen pen(c_background, lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-    qreal margin = 0;
+    float margin = 0;
     for (int i=0 ; i<items ; i++) {
         float s = (float)i/items;
         QColor c(200-150*s,200-50*s,100+50*s,255*showAnimationProgress);
@@ -205,15 +205,15 @@ void DemoQPItem::drawGraphCircles(float x, float y, float w, float h, int items,
 
 void DemoQPItem::drawIcons(float x, float y, float w, float h, int items, float t)
 {
-    qreal fontSize = w/22.0;
+    float fontSize = w/22.0f;
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setPen("#FFFFFF");
     m_painter->setBrush(Qt::NoBrush);
-    qreal size = w/12;
+    float size = w/12;
     for (int i=0 ; i<items ; i++) {
-        qreal xp = x + (w-size)/items*i;
-        qreal yp = y + h*0.5 + h * sinf((i+1) * t * 0.1) * 0.5;
+        float xp = x + (w-size)/items*i;
+        float yp = y + h*0.5f + h * sinf((i+1) * t * 0.1f) * 0.5f;
         m_painter->drawImage(QRectF(xp, yp, size, size), m_circleImage);
         m_painter->drawText(QRectF(xp, yp, size, size), Qt::AlignHCenter|Qt::AlignCenter, QString::number(i+1));
     }
@@ -221,9 +221,9 @@ void DemoQPItem::drawIcons(float x, float y, float w, float h, int items, float 
 
 void DemoQPItem::drawRuler(float x, float y, float w, float h, float t)
 {
-    float posX = x + w*0.05;
-    double space = w*0.03 + sinf(t)*w*0.02;
-    m_testFont.setPixelSize(w/35.0);
+    float posX = x + w*0.05f;
+    double space = w*0.03f + sinf(t)*w*0.02f;
+    m_testFont.setPixelSize(w/35.0f);
     m_painter->setFont(m_testFont);
     m_painter->setPen("#E0E0B0");
     m_painter->setBrush(Qt::NoBrush);
@@ -232,15 +232,15 @@ void DemoQPItem::drawRuler(float x, float y, float w, float h, float t)
     QVector<QPointF> pointPairs;
     while (posX < w) {
         pointPairs.append(QPointF(posX, y));
-        float height = h*0.2;
-        float ts = w*0.05;
+        float height = h*0.2f;
+        float ts = w*0.05f;
         QRectF textRect(posX-ts, y+h-ts, ts*2, ts*2);
         if (i%10==0) {
-            height = h*0.5;
+            height = h*0.5f;
             m_painter->drawText(textRect, Qt::AlignHCenter|Qt::AlignCenter, QString::number(i));
         } else if (i%5==0) {
-            height = h*0.3;
-            if (space > w*0.02) m_painter->drawText(textRect, Qt::AlignHCenter|Qt::AlignCenter, QString::number(i));
+            height = h*0.3f;
+            if (space > w*0.02f) m_painter->drawText(textRect, Qt::AlignHCenter|Qt::AlignCenter, QString::number(i));
         }
         pointPairs.append(QPointF(posX, y+height));
         posX += space;
@@ -271,7 +271,7 @@ void DemoQPItem::drawFlower(float x, float y, float w, float h, float t)
 
     m_painter->setPen(QPen(QColor("#40000000"), 4));
     QRadialGradient gradient1(cx, cy, leafSize);
-    QColor startColor((0.5 + sinf(t*2)*0.5)*255, 0, (0.5 + sinf(t+M_PI)*0.5)*255);
+    QColor startColor((0.5f + sinf(t*2)*0.5f)*255, 0, (0.5f + sinf(t+M_PI)*0.5f)*255);
     gradient1.setColorAt(0, startColor);
     gradient1.setColorAt(1, QColor("#ffffff"));
     m_painter->setBrush(gradient1);
@@ -287,7 +287,7 @@ void DemoQPItem::drawFlower(float x, float y, float w, float h, float t)
 
     m_painter->setPen(Qt::NoPen);
     m_painter->setBrush(QColor("#ffffff"));
-    m_painter->drawEllipse(QPointF(cx, cy), 0.1*w, 0.1*w);
+    m_painter->drawEllipse(QPointF(cx, cy), 0.1f*w, 0.1f*w);
     m_painter->restore();
 
 }

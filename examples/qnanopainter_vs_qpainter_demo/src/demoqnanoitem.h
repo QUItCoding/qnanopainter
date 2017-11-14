@@ -8,7 +8,7 @@ class DemoQNanoItem : public QNanoQuickItem
 {
 
     Q_OBJECT
-    Q_PROPERTY(qreal animationTime READ animationTime WRITE setAnimationTime NOTIFY animationTimeChanged)
+    Q_PROPERTY(float animationTime READ animationTime WRITE setAnimationTime NOTIFY animationTimeChanged)
     Q_PROPERTY(int enabledTests READ enabledTests WRITE setEnabledTests NOTIFY enabledTestsChanged)
     Q_PROPERTY(int testCount READ testCount WRITE setTestCount NOTIFY testCountChanged)
 
@@ -18,11 +18,11 @@ public:
     // Reimplement
     QNanoQuickItemPainter *createItemPainter() const;
 
-    qreal animationTime() const { return m_animationTime; }
+    float animationTime() const { return m_animationTime; }
     int enabledTests() const { return m_enabledTests; }
     int testCount() const { return m_testCount; }
 
-    void setAnimationTime(const qreal value) {
+    void setAnimationTime(const float value) {
         if (value == m_animationTime)
             return;
         m_animationTime = value;
@@ -52,7 +52,7 @@ Q_SIGNALS:
     void testCountChanged();
 
 private:
-    qreal m_animationTime;
+    float m_animationTime;
     int m_enabledTests;
     int m_testCount;
 };

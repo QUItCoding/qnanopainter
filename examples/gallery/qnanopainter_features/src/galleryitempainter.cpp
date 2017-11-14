@@ -69,10 +69,10 @@ void GalleryItemPainter::paint(QNanoPainter *painter)
 void GalleryItemPainter::drawRectsWithSameColor() {
 
     int rects = 7;
-    qreal margin = width()*0.02;
-    qreal w = width() / (rects+1) - margin;
-    qreal posX = w/2 + margin;
-    qreal posY = w/2;
+    float margin = width()*0.02f;
+    float w = width() / (rects+1) - margin;
+    float posX = w/2 + margin;
+    float posY = w/2;
 
     painter()->setStrokeStyle(QNanoColor(0,0,0));
     painter()->setFillStyle(QNanoColor(204,102,51,102));
@@ -128,10 +128,10 @@ void GalleryItemPainter::drawRectsWithSameColor() {
 
 void GalleryItemPainter::drawRectsWithMix() {
     int rects = 3;
-    qreal margin = width()*0.02;
-    qreal w = width() / (rects+2) - margin;
-    qreal posX = w + margin;
-    qreal posY = w+margin;
+    float margin = width()*0.02f;
+    float w = width() / (rects+2) - margin;
+    float posX = w + margin;
+    float posY = w+margin;
 
     QNanoColor c1 = QNanoColor::fromMix(QNanoColor(255,0,0,255), QNanoColor(0,0,0,255), m_animationSine);
     QNanoColor c2 = QNanoColor::fromMix(QNanoColor(255,0,0,100), QNanoColor(0,0,0,0), m_animationSine);
@@ -156,10 +156,10 @@ void GalleryItemPainter::drawRectsWithMix() {
 
 void GalleryItemPainter::drawRectsWithLinearGradient() {
     int rects = 3;
-    qreal margin = width()*0.02;
-    qreal w = width() / (rects+2) - margin;
-    qreal posX = w + margin;
-    qreal posY = 2*(w+margin);
+    float margin = width()*0.02f;
+    float w = width() / (rects+2) - margin;
+    float posX = w + margin;
+    float posY = 2*(w+margin);
 
     painter()->setStrokeStyle(QNanoColor(255,255,255));
     QRectF rect1(posX,posY,w,w);
@@ -168,8 +168,8 @@ void GalleryItemPainter::drawRectsWithLinearGradient() {
     posX += w + margin;
 
     QNanoLinearGradient g1(0, 0, 0, 0, QNanoColor(0,255,0,255), QNanoColor(255,0,0,255));
-    g1.setStartPosition(posX + (w*0.4 * m_animationSine), 0);
-    g1.setEndPosition(posX + w - (w*0.4 * m_animationSine), 0);
+    g1.setStartPosition(posX + (w*0.4f * m_animationSine), 0);
+    g1.setEndPosition(posX + w - (w*0.4f * m_animationSine), 0);
 
     painter()->setStrokeStyle(QNanoColor(255,255,255));
     painter()->setFillStyle(g1);
@@ -186,10 +186,10 @@ void GalleryItemPainter::drawRectsWithLinearGradient() {
 
 void GalleryItemPainter::drawRectsWithRadialGradient() {
     int rects = 3;
-    qreal margin = width()*0.02;
-    qreal w = width() / (rects+2) - margin;
-    qreal posX = w + margin;
-    qreal posY = 3*(w+margin);
+    float margin = width()*0.02f;
+    float w = width() / (rects+2) - margin;
+    float posX = w + margin;
+    float posY = 3*(w+margin);
 
     QRectF rect1(posX,posY,w,w);
     painter()->setFillStyle(QNanoRadialGradient(rect1.x(), rect1.y(), rect1.width()));
@@ -219,10 +219,10 @@ void GalleryItemPainter::drawRectsWithRadialGradient() {
 
 void GalleryItemPainter::drawRectsWithBoxGradient() {
     int rects = 3;
-    qreal margin = width()*0.02;
-    qreal w = width() / (rects+2) - margin;
-    qreal posX = w + margin;
-    qreal posY = 4*(w+margin);
+    float margin = width()*0.02f;
+    float w = width() / (rects+2) - margin;
+    float posX = w + margin;
+    float posY = 4*(w+margin);
 
     QRectF rect1(posX,posY,w,w);
     painter()->setFillStyle(QNanoBoxGradient(rect1, w/2));
@@ -252,10 +252,10 @@ void GalleryItemPainter::drawRectsWithBoxGradient() {
 
 void GalleryItemPainter::drawRectsWithImagePattern() {
     int rects = 3;
-    qreal margin = width()*0.02;
-    qreal w = width() / (rects+2) - margin;
-    qreal posX = w + margin;
-    qreal posY = 5*(w+margin);
+    float margin = width()*0.02f;
+    float w = width() / (rects+2) - margin;
+    float posX = w + margin;
+    float posY = 5*(w+margin);
 
     QRectF rect1(posX,posY,w,w);
     painter()->setFillStyle(QNanoImagePattern(m_patternImage2));
@@ -268,7 +268,7 @@ void GalleryItemPainter::drawRectsWithImagePattern() {
     g1.setStartPosition(rect2.x()+w/2, rect2.y()+w/2);
     g1.setImageSize(w/5, w/3);
     g1.setRotation(m_animationTime);
-    g1.setAlpha(0.5 + m_animationSine * 0.5);
+    g1.setAlpha(0.5f + m_animationSine * 0.5f);
     painter()->setFillStyle(g1);
     painter()->fillRect(rect2);
     posX += w + margin;
@@ -276,19 +276,19 @@ void GalleryItemPainter::drawRectsWithImagePattern() {
     QRectF rect3(posX,posY,w,w);
     QNanoImagePattern g3(m_patternImage);
     g3.setStartPosition(rect3.x(), rect3.y());
-    g3.setImageSize(w*0.1 + m_animationSine * w*0.2, w*0.15 + m_animationSine * w*0.3);
+    g3.setImageSize(w*0.1 + m_animationSine * w*0.2f, w*0.15f + m_animationSine * w*0.3f);
     painter()->setFillStyle(g3);
     painter()->fillRect(rect3);
 }
 
 void GalleryItemPainter::drawRectsWithBrushStroke() {
     int rects = 3;
-    qreal margin = width()*0.02;
-    qreal border = margin + margin * m_animationSine;
-    qreal w = width() / (rects+2) - margin;
-    qreal w2 = w - border;
-    qreal posX = w + margin + border/2;
-    qreal posY = 6*(w+margin) + border/2;
+    float margin = width()*0.02f;
+    float border = margin + margin * m_animationSine;
+    float w = width() / (rects+2) - margin;
+    float w2 = w - border;
+    float posX = w + margin + border/2;
+    float posY = 6*(w+margin) + border/2;
 
     QRectF rect1(posX,posY,w2,w2);
     painter()->setLineWidth(border);
@@ -332,18 +332,18 @@ void GalleryItemPainter::drawRectsWithBrushStroke() {
 void GalleryItemPainter::drawRect(float x, float y, float w, float h) {
     painter()->beginPath();
     painter()->rect(x, y, w, h);
-    painter()->setLineWidth(w*0.05);
+    painter()->setLineWidth(w*0.05f);
     painter()->fill();
     painter()->stroke();
 }
 
 void GalleryItemPainter::drawPaths() {
     int rects = 3;
-    qreal margin = width()*0.1;
-    qreal w = width() / (rects) - margin;
-    qreal posX = margin/2;
-    qreal posY = margin;
-    qreal lineWidth = width()*0.02;
+    float margin = width()*0.1f;
+    float w = width() / (rects) - margin;
+    float posX = margin/2;
+    float posY = margin;
+    float lineWidth = width()*0.02f;
 
     painter()->setFillStyle(0xFFE0E0E0);
     painter()->setStrokeStyle(0xFFE00000);
@@ -363,17 +363,17 @@ void GalleryItemPainter::drawPaths() {
     painter()->ellipse(posX+w/2, posY+w/2, w/3+w/4*m_animationSine, w/3+w/4*(1-m_animationSine));
     posX += w + margin;
     painter()->moveTo(posX+w/2, posY+w/2);
-    painter()->arc(posX+w/2, posY+w/2, w/2, 0, 0.5 + m_animationSine*5);
+    painter()->arc(posX+w/2, posY+w/2, w/2, 0, 0.5f + m_animationSine*5);
     painter()->closePath();
     posX += w + margin;
     QRectF r(posX, posY, w, w);
     painter()->ellipse(r);
-    qreal a = w*0.1*m_animationSine;
-    qreal a2 = w*0.1*(1-m_animationSine);
-    r.adjust(w*0.1+a, w*0.1+a2, -w*0.1-a, -w*0.1-a2);
+    float a = w*0.1f*m_animationSine;
+    float a2 = w*0.1f*(1-m_animationSine);
+    r.adjust(w*0.1f+a, w*0.1f+a2, -w*0.1f-a, -w*0.1f-a2);
     painter()->beginHoleSubPath();
     painter()->ellipse(r);
-    r.adjust(w*0.2, w*0.2, -w*0.2, -w*0.2);
+    r.adjust(w*0.2f, w*0.2f, -w*0.2f, -w*0.2f);
     painter()->beginSolidSubPath();
     painter()->rect(r);
 
@@ -384,10 +384,10 @@ void GalleryItemPainter::drawPaths() {
     posX = margin/2;
     painter()->beginPath();
     painter()->moveTo(posX, posY);
-    painter()->bezierTo(posX+w*0.2*m_animationSine, posY+w*0.8*m_animationSine, posX+w*0.8*m_animationSine, posY+w*0.2*m_animationSine, posX+w, posY+w);
+    painter()->bezierTo(posX+w*0.2f*m_animationSine, posY+w*0.8f*m_animationSine, posX+w*0.8f*m_animationSine, posY+w*0.2f*m_animationSine, posX+w, posY+w);
     posX += w + margin;
     painter()->moveTo(posX, posY);
-    painter()->quadTo(posX+w*0.8*m_animationSine, posY+w*0.2*m_animationSine, posX+w, posY+w);
+    painter()->quadTo(posX+w*0.8f*m_animationSine, posY+w*0.2f*m_animationSine, posX+w, posY+w);
     posX += w + margin;
     painter()->moveTo(posX, posY);
     painter()->arcTo(posX, posY+w, posX+w, posY+w, w*m_animationSine);
@@ -423,11 +423,11 @@ void GalleryItemPainter::drawPaths() {
 
 void GalleryItemPainter::drawTransforms() {
     int rects = 3;
-    qreal margin = width()*0.1;
-    qreal w = width() / (rects) - margin;
-    qreal posX = margin/2;
-    qreal posY = margin;
-    qreal lineWidth = width()*0.01;
+    float margin = width()*0.1f;
+    float w = width() / (rects) - margin;
+    float posX = margin/2;
+    float posY = margin;
+    float lineWidth = width()*0.01f;
 
     painter()->setLineWidth(lineWidth);
     painter()->fillRect(posX, posY, w, w);
@@ -444,7 +444,7 @@ void GalleryItemPainter::drawTransforms() {
     painter()->setLineJoin(QNanoPainter::JOIN_ROUND);
     painter()->translate(posX+w/2, posY+w/2);
     painter()->rotate(m_animationSine);
-    painter()->scale(0.5 + 0.5*m_animationSine);
+    painter()->scale(0.5f + 0.5f*m_animationSine);
     painter()->translate(-(posX+w/2), -(posY+w/2));
     painter()->fillRect(posX, posY, w, w);
     painter()->strokeRect(posX, posY, w, w);
@@ -473,7 +473,7 @@ void GalleryItemPainter::drawTransforms() {
     posX = margin/2;
     painter()->save();
     painter()->translate(posX+w/2, posY+w/2);
-    painter()->skewX(0.4 * m_animationSine);
+    painter()->skewX(0.4f * m_animationSine);
     painter()->translate(-(posX+w/2), -(posY+w/2));
     painter()->strokeRect(posX, posY, w, w);
     painter()->restore();
@@ -481,7 +481,7 @@ void GalleryItemPainter::drawTransforms() {
     posX += w + margin;
     painter()->save();
     painter()->translate(posX+w/2, posY+w/2);
-    painter()->skewY(0.4 * m_animationSine);
+    painter()->skewY(0.4f * m_animationSine);
     painter()->translate(-(posX+w/2), -(posY+w/2));
     painter()->strokeRect(posX, posY, w, w);
     painter()->restore();
@@ -490,7 +490,7 @@ void GalleryItemPainter::drawTransforms() {
     QTransform t;
     t.translate(posX+w/2, posY+w/2);
     t.rotate(m_animationTime*20);
-    float scale = 0.5 + 0.5*m_animationSine;
+    float scale = 0.5f + 0.5f*m_animationSine;
     t.scale(scale, scale);
     t.translate(-(posX+w/2), -(posY+w/2));
     painter()->transform(t);
@@ -520,11 +520,11 @@ void GalleryItemPainter::drawTransforms() {
 
 void GalleryItemPainter::drawAntialiasing() {
     int rects = 3;
-    qreal margin = width()*0.1;
-    qreal w = width() / (rects) - margin;
-    qreal posX = margin/2;
-    qreal posY = margin;
-    qreal lineWidth = width()*0.01;
+    float margin = width()*0.1f;
+    float w = width() / (rects) - margin;
+    float posX = margin/2;
+    float posY = margin;
+    float lineWidth = width()*0.01f;
 
     painter()->setLineCap(QNanoPainter::CAP_ROUND);
     painter()->setStrokeStyle(0xFFFFFFFF);
@@ -534,12 +534,12 @@ void GalleryItemPainter::drawAntialiasing() {
     painter()->roundedRect(posX, posY, w, w, w/4);
     painter()->stroke();
     posX += w + margin;
-    painter()->setAntialias(1.0);
+    painter()->setAntialias(1.0f);
     painter()->beginPath();
     painter()->roundedRect(posX, posY, w, w, w/4);
     painter()->stroke();
     posX += w + margin;
-    painter()->setAntialias(1.0 + m_animationSine*5);
+    painter()->setAntialias(1.0f + m_animationSine*5);
     painter()->beginPath();
     painter()->roundedRect(posX, posY, w, w, w/4);
     painter()->stroke();
@@ -552,25 +552,25 @@ void GalleryItemPainter::drawAntialiasing() {
     painter()->setPixelAlign(QNanoPainter::PIXEL_ALIGN_HALF);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines);
         painter()->stroke();
     }
     posX += w + margin;
-    painter()->setAntialias(1.0);
+    painter()->setAntialias(1.0f);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines);
         painter()->stroke();
     }
     posX += w + margin;
-    painter()->setAntialias(1.0 + m_animationSine*5);
+    painter()->setAntialias(1.0f + m_animationSine*5);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines);
         painter()->stroke();
@@ -581,7 +581,7 @@ void GalleryItemPainter::drawAntialiasing() {
     painter()->setAntialias(0);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines+5);
         painter()->stroke();
@@ -590,16 +590,16 @@ void GalleryItemPainter::drawAntialiasing() {
     painter()->setAntialias(1.0);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines+5);
         painter()->stroke();
     }
     posX += w + margin;
-    painter()->setAntialias(1.0 + m_animationSine*5);
+    painter()->setAntialias(1.0f + m_animationSine*5);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines+5);
         painter()->stroke();
@@ -613,25 +613,25 @@ void GalleryItemPainter::drawAntialiasing() {
     painter()->setPixelAlign(QNanoPainter::PIXEL_ALIGN_NONE);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines+5);
         painter()->stroke();
     }
     posX += w + margin;
-    painter()->setAntialias(1.0);
+    painter()->setAntialias(1.0f);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines+5);
         painter()->stroke();
     }
     posX += w + margin;
-    painter()->setAntialias(1.0 + m_animationSine*5);
+    painter()->setAntialias(1.0f + m_animationSine*5);
     for (int i=0 ; i<lines ; i++) {
         painter()->beginPath();
-        painter()->setLineWidth(i*0.5);
+        painter()->setLineWidth(i*0.5f);
         painter()->moveTo(posX, posY+i*w/lines);
         painter()->lineTo(posX+w, posY+i*w/lines+5);
         painter()->stroke();
@@ -640,7 +640,7 @@ void GalleryItemPainter::drawAntialiasing() {
 }
 
 void GalleryItemPainter::drawTextsFonts() {
-    float margin = height() * 0.04;
+    float margin = height() * 0.04f;
     float posX = margin/2;
     float posY = margin;
     painter()->fillText("This is text without setting any font", posX, posY);
@@ -708,7 +708,7 @@ void GalleryItemPainter::drawTextsFonts() {
     painter()->fillText("This is text with custom font", posX, posY);
 
     posY += 2*margin;
-    f2.setBlur(margin*0.2 + margin*0.4*m_animationSine);
+    f2.setBlur(margin*0.2f + margin*0.4f*m_animationSine);
     painter()->setFont(f2);
     painter()->fillText("This is text with some glowing", posX, posY);
     f2.setBlur(0);
@@ -718,7 +718,7 @@ void GalleryItemPainter::drawTextsFonts() {
 
     posY += 2*margin;
     QNanoFont f5 = QNanoFont();
-    f5.setPixelSize(margin*0.8);
+    f5.setPixelSize(margin*0.8f);
     f5.setLetterSpacing(6 * m_animationSine - 2);
     painter()->setFont(f5);
     painter()->setFillStyle(0xFFFFFFFF);
@@ -733,8 +733,8 @@ void GalleryItemPainter::drawTextsFonts() {
 }
 
 void GalleryItemPainter::drawTextsAlignments() {
-    float margin = height() * 0.2;
-    float fontSize = height() * 0.04;
+    float margin = height() * 0.2f;
+    float fontSize = height() * 0.04f;
     float posX = margin/2;
     float posY = margin/2;
 
@@ -743,7 +743,7 @@ void GalleryItemPainter::drawTextsAlignments() {
     painter()->setFont(f3);
 
     // Test horizontal alignments
-    posX = width() * 0.5;
+    posX = width() * 0.5f;
     painter()->setFillStyle(0xFF808080);
     painter()->fillRect(posX-1, posY-fontSize, 2, fontSize*3);
     painter()->setTextBaseline(QNanoPainter::BASELINE_BOTTOM);
@@ -759,9 +759,9 @@ void GalleryItemPainter::drawTextsAlignments() {
 
     // Test vertical (baseline) alignments
     posY += margin;
-    posX = width() * 0.1;
+    posX = width() * 0.1f;
     painter()->setFillStyle(0xFF808080);
-    painter()->fillRect(width()*0.1, posY-1, width()*0.8, 2);
+    painter()->fillRect(width()*0.1f, posY-1, width()*0.8f, 2);
     painter()->setTextAlign(QNanoPainter::ALIGN_LEFT);
     painter()->setFillStyle(0xFFFF9090);
     painter()->setTextBaseline(QNanoPainter::BASELINE_BOTTOM);
@@ -771,10 +771,10 @@ void GalleryItemPainter::drawTextsAlignments() {
     painter()->fillText("BASELINE_ALPHABETIC", posX+width()*0.15, posY);
     painter()->setFillStyle(0xFF9090FF);
     painter()->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
-    painter()->fillText("BASELINE_MIDDLE", posX+width()*0.3, posY);
+    painter()->fillText("BASELINE_MIDDLE", posX+width()*0.3f, posY);
     painter()->setFillStyle(0xFFFF90FF);
     painter()->setTextBaseline(QNanoPainter::BASELINE_TOP);
-    painter()->fillText("BASELINE_TOP", posX+width()*0.45, posY);
+    painter()->fillText("BASELINE_TOP", posX+width()*0.45f, posY);
 
     // Test text alignment and line wrapping
     posY += margin;
@@ -783,7 +783,7 @@ void GalleryItemPainter::drawTextsAlignments() {
     //painter()->setTextAlign(QNanoPainter::ALIGN_LEFT);
     //painter()->setTextAlign(QNanoPainter::ALIGN_RIGHT);
     painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
-    QRectF rect1(width()*0.1, posY, width()*0.8 - m_animationSine*width()*0.4, 100);
+    QRectF rect1(width()*0.1f, posY, width()*0.8f - m_animationSine*width()*0.4f, 100);
     painter()->fillText(s, rect1);
 
     // Text bounding box
@@ -791,7 +791,7 @@ void GalleryItemPainter::drawTextsAlignments() {
     //painter()->setTextAlign(QNanoPainter::ALIGN_LEFT);
     painter()->setTextAlign(QNanoPainter::ALIGN_RIGHT);
     //painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
-    QRectF bounds = painter()->textBoundingBox(s, width()*0.1, posY, width()*0.8 - m_animationSine*width()*0.4);
+    QRectF bounds = painter()->textBoundingBox(s, width()*0.1f, posY, width()*0.8f - m_animationSine*width()*0.4f);
     painter()->setFillStyle(0x80808080);
     painter()->fillRect(bounds);
     painter()->setFillStyle(0xFFFFFF80);
@@ -800,9 +800,9 @@ void GalleryItemPainter::drawTextsAlignments() {
 
 void GalleryItemPainter::drawImages() {
 
-    qreal margin = height()*0.05;
-    qreal posX = width()*0.1;
-    qreal posY = margin;
+    float margin = height()*0.05f;
+    float posX = width()*0.1f;
+    float posY = margin;
 
     QRectF rect1(0, 0, width(), height());
     painter()->setFillStyle(QNanoImagePattern(m_patternImage2));
@@ -816,12 +816,12 @@ void GalleryItemPainter::drawImages() {
     posY += image.height() + margin;
     QRectF sourceArea(3,89,192-6,28);
     float cx = width()/2;
-    float r = width()*0.1 + m_animationSine*width()*0.2;
+    float r = width()*0.1f + m_animationSine*width()*0.2f;
     QRectF targetArea(cx-r, posY, r*2, width()*0.1);
     painter()->drawImage(m_testImage, sourceArea, targetArea);
 
     // Draw rotating & scaling face
-    posY += targetArea.height() + height()*0.2;
+    posY += targetArea.height() + height()*0.2f;
     image.setFilename(":/qnanopainter_features/images/face.png");
     QRectF rect(cx-r, posY-r, r*2, r*2);
     QPointF c(rect.x()+rect.width()/2, rect.y()+rect.height()/2);
@@ -833,15 +833,15 @@ void GalleryItemPainter::drawImages() {
     painter()->restore();
 
     // Scaled images with and without mipmapping
-    posY = height() * 0.7;
-    qreal posY2 = posY + (height() * 0.1);
-    bool useNearest = (m_animationSine > 0.5);
+    posY = height() * 0.7f;
+    float posY2 = posY + (height() * 0.1f);
+    bool useNearest = (m_animationSine > 0.5f);
     QNanoImage imageNoMipmap(":/qnanopainter_features/images/face.png");
     QNanoImage imageNoMipmapNearest(":/qnanopainter_features/images/face.png", QNanoImage::NEAREST);
     QNanoImage imageMipmap(":/qnanopainter_features/images/face.png", QNanoImage::GENERATE_MIPMAPS);
     QNanoImage imageMipmapNearest(":/qnanopainter_features/images/face.png", QNanoImage::GENERATE_MIPMAPS | QNanoImage::NEAREST);
     for (int i=0; i<6; ++i) {
-        qreal size = (i+1) * (width() * 0.036);
+        float size = (i+1) * (width() * 0.036f);
         QRectF rect2(posX, posY, size, size);
         painter()->drawImage(useNearest ? imageNoMipmapNearest : imageNoMipmap, rect2);
         QRectF rect3(posX, posY2, size, size);
