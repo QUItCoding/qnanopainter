@@ -9,7 +9,7 @@ Window {
 
     property real animationTime: 0
     // Cutting corners a bit and not using enum
-    // 1=ruler, 2=circles, 4=lines, 8=bars, 16=icons
+    // 1=ruler, 2=circles, 4=lines, 8=bars, 16=icons, 32=flower
     property int enabledTests: 31
     // Amount of items (QNanoQuickItemPainter / QQuickPaintedItem / Shape Item) to render
     property int itemCount: 1
@@ -61,7 +61,7 @@ Window {
 
             Item {
                 id: sizeAnimatedContainer
-                readonly property real itemMargin: (mainWindow.width / 80)
+                readonly property real itemMargin: (mainWindow.width / (40 + mainWindow.itemCount*2))
                 readonly property real itemPos: (index * itemMargin)
                 readonly property real itemPosCentered: (index * itemMargin) - (itemRepeater.count/2 * itemMargin)
                 // Move each item slightly to see the item amount

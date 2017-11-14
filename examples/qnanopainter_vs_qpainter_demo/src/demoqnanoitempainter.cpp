@@ -79,6 +79,11 @@ void DemoQNanoItemPainter::paint(QNanoPainter *painter)
             drawIcons(0, h*0.2, w, h*0.2, icons, t);
         }
 
+        // Paint flower
+        if (m_enabledTests & 32) {
+            drawFlower(0, h/2-w/2, w, w, t);
+        }
+
         // Increase animation time when m_testCount > 1
         t += 0.3;
     }
@@ -262,4 +267,45 @@ void DemoQNanoItemPainter::drawRuler(float x, float y, float w, float h, float t
     }
     m_painter->setLineWidth(1.0f);
     m_painter->stroke();
+}
+
+float DemoQNanoItemPainter::_flowerPos(int i) {
+    const int items = 12;
+    return (2*M_PI) * (1 - (float)i/items) - M_PI/2;
+}
+
+void DemoQNanoItemPainter::drawFlower(float x, float y, float w, float h, float t)
+{
+    const float cx = x + w/2;
+    const float cy = y + h/2;
+    const float leafSize = w/2;
+    m_painter->save(); // Required to prevent rotation multiply
+
+    m_painter->translate(cx, cy);
+    m_painter->rotate(sinf(t)*20 * M_PI/180);
+    m_painter->translate(-cx, -cy);
+
+    m_painter->setStrokeStyle("#40000000");
+    m_painter->setLineWidth(4);
+    QNanoRadialGradient gradient1(cx, cy, leafSize);
+    QNanoColor startColor((0.5 + sinf(t*2)*0.5)*255, 0, (0.5 + sinf(t+M_PI)*0.5)*255);
+    gradient1.setStartColor(startColor);
+    gradient1.setEndColor("#ffffff");
+    m_painter->setFillStyle(gradient1);
+
+    m_painter->beginPath();
+    m_painter->moveTo(cx, cy);
+    const int items = 12;
+    for (int i=0; i<items; i+=2) {
+        m_painter->quadTo(cx + cosf(_flowerPos(i))*leafSize, cy + sinf(_flowerPos(i))*leafSize, cx + cosf(_flowerPos(i+1))*leafSize, cy + sinf(_flowerPos(i+1))*leafSize);
+        m_painter->quadTo(cx + cosf(_flowerPos(i+2))*leafSize, cy + sinf(_flowerPos(i+2))*leafSize, cx, cy);
+    }
+    m_painter->fill();
+    m_painter->stroke();
+
+    m_painter->setFillStyle("#ffffff");
+    m_painter->beginPath();
+    m_painter->circle(cx, cy, 0.1*w);
+    m_painter->fill();
+    m_painter->restore();
 }

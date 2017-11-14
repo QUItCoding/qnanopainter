@@ -76,6 +76,13 @@ Item {
                     enabledTests ^= 16;
                 }
             }
+            Switch {
+                text: "Render flower"
+                checked: false
+                onCheckedChanged: {
+                    enabledTests ^= 32;
+                }
+            }
         }
         Column {
             id: contentItemTab2

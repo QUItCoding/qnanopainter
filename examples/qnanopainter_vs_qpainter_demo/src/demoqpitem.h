@@ -84,6 +84,8 @@ private:
     void drawGraphCircles(float x, float y, float w, float h, int items, float t);
     void drawIcons(float x, float y, float w, float h, int items, float t);
     void drawRuler(float x, float y, float w, float h, float t);
+    void drawFlower(float x, float y, float w, float h, float t);
+    float _flowerPos(int i);
 
     qreal m_animationTime;
     int m_enabledTests;

@@ -74,6 +74,10 @@ void DemoQPItem::paint(QPainter *painter)
         if (m_enabledTests & 16) {
             drawIcons(0, h*0.2, w, h*0.2, icons, t);
         }
+        // Paint flower
+        if (m_enabledTests & 32) {
+            drawFlower(0, h/2-w/2, w, w, t);
+        }
 
         // Increase animation time when m_testCount > 1
         t += 0.3;
@@ -245,4 +249,45 @@ void DemoQPItem::drawRuler(float x, float y, float w, float h, float t)
     QPen pen(QColor("#E0E0E0"), 1);
     m_painter->setPen(pen);
     m_painter->drawLines(pointPairs);
+}
+
+float DemoQPItem::_flowerPos(int i) {
+    const int items = 12;
+    return (2*M_PI) * (1 - (float)i/items) - M_PI/2;
+}
+
+
+void DemoQPItem::drawFlower(float x, float y, float w, float h, float t)
+{
+    const float cx = x + w/2;
+    const float cy = y + h/2;
+    const float leafSize = w/2;
+
+    m_painter->save(); // Required to prevent rotation multiply
+
+    m_painter->translate(cx, cy);
+    m_painter->rotate(sinf(t)*20);
+    m_painter->translate(-cx, -cy);
+
+    m_painter->setPen(QPen(QColor("#40000000"), 4));
+    QRadialGradient gradient1(cx, cy, leafSize);
+    QColor startColor((0.5 + sinf(t*2)*0.5)*255, 0, (0.5 + sinf(t+M_PI)*0.5)*255);
+    gradient1.setColorAt(0, startColor);
+    gradient1.setColorAt(1, QColor("#ffffff"));
+    m_painter->setBrush(gradient1);
+
+    QPainterPath path;
+    path.moveTo(cx, cy);
+    const int items = 12;
+    for (int i=0; i<items; i+=2) {
+        path.quadTo(cx + cosf(_flowerPos(i))*leafSize, cy + sinf(_flowerPos(i))*leafSize, cx + cosf(_flowerPos(i+1))*leafSize, cy + sinf(_flowerPos(i+1))*leafSize);
+        path.quadTo(cx + cosf(_flowerPos(i+2))*leafSize, cy + sinf(_flowerPos(i+2))*leafSize, cx, cy);
+    }
+    m_painter->drawPath(path);
+
+    m_painter->setPen(Qt::NoPen);
+    m_painter->setBrush(QColor("#ffffff"));
+    m_painter->drawEllipse(QPointF(cx, cy), 0.1*w, 0.1*w);
+    m_painter->restore();
+
 }

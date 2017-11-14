@@ -153,6 +153,19 @@ Item {
                     items: 50
                 }
             }
+
+            Item {
+                id: flowersComponents
+                anchors.fill: parent
+                visible: enabledTests & 32
+                FlowerComponent {
+                    y: parent.height/2 - height/2
+                    width: parent.width
+                    height: parent.width
+                    time: parent.visible ? itemTime : 0
+                }
+            }
+
         }
     }
 }

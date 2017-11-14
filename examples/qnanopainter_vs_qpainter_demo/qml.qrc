@@ -20,5 +20,6 @@
         <file>qml/shapeitem/CirclesComponent.qml</file>
         <file>qml/shapeitem/LinesComponent.qml</file>
         <file>qml/shapeitem/IconsComponent.qml</file>
+        <file>qml/shapeitem/FlowerComponent.qml</file>
     </qresource>
 </RCC>
