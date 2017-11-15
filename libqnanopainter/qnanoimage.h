@@ -71,12 +71,13 @@ private:
 
     void setParentPainter(QNanoPainter *parentPainter);
 
+    void updateUniqueKey();
+
     QNanoPainter *m_parentPainter;
+    QNanoDataElement *m_imageData;
     QString m_filename;
-    int m_flags;
-    int m_id;
-    int m_width;
-    int m_height;
+    QNanoImage::ImageFlags m_flags;
+    QString m_uniqueKey;
 
 };
 
