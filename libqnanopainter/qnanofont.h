@@ -70,6 +70,7 @@ private:
     float m_spacing;
     float m_lineHeight;
     bool m_fontPropertiesChanged;
+    bool m_fontFilenameChanged;
 };
 
 #endif // QNANOFONT_H
