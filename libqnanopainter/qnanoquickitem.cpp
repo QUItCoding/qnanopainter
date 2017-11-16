@@ -98,6 +98,28 @@
 */
 
 /*!
+    \property QNanoQuickItem::textureWidth
+    \brief This property controls the width of attached QNanoQuickItemPainter texture.
+    By default width is -1, meaning it follows QNanoQuickItem width.
+
+    Changing the texture size will recreate the FBO which can affect
+    the performance. So if item size is e.g. animated it may be useful
+    to set the texture size manually. Note: When setting texture size
+    manually, usually you should also set textureFollowsItemSize to false.
+*/
+
+/*!
+    \property QNanoQuickItem::textureHeight
+    \brief This property controls the height of attached QNanoQuickItemPainter texture.
+    By default height is -1, meaning it follows QNanoQuickItem height.
+
+    Changing the texture size will recreate the FBO which can affect
+    the performance. So if item size is e.g. animated it may be useful
+    to set the texture size manually. Note: When setting texture size
+    manually, usually you should also set textureFollowsItemSize to false.
+*/
+
+/*!
     \macro void QNANO_PROPERTY(type, variable, getter, setter)
     \relates QNanoQuickItem
 
@@ -429,7 +451,7 @@ int QNanoQuickItem::textureWidth() const
 /*!
     \fn void QNanoQuickItem::setTextureWidth(int width)
 
-    Set width (in pixels) of attached QNanoQuickItemPainter texture.
+    Set \a width (in pixels) of attached QNanoQuickItemPainter texture.
     To make it follow QNanoQuickItem width, set to -1 (default).
 
     Changing the texture size will recreate the FBO which can affect
@@ -462,7 +484,7 @@ int QNanoQuickItem::textureHeight() const
 /*!
     \fn void QNanoQuickItem::setTextureHeight(int height)
 
-    Set height (in pixels) of attached QNanoQuickItemPainter texture.
+    Set \a height (in pixels) of attached QNanoQuickItemPainter texture.
     To make it follow QNanoQuickItem height, set to -1 (default).
 
     Changing the texture size will recreate the FBO which can affect
