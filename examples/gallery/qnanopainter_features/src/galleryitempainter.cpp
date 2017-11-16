@@ -356,7 +356,7 @@ void GalleryItemPainter::drawPaths() {
     posX += w + margin;
     painter()->roundedRect(posX, posY, w, w, w/2*m_animationSine);
     posX += w + margin;
-    painter()->circle(posX+w/2, posY+w/2, w/2);
+    painter()->roundedRect(posX, posY, w, w, w/2*m_animationSine, 0, w/2*(cos(m_animationTime)*0.5+0.5), w/4*(sin(m_animationTime*10)*0.5+0.5));
 
     posY += w+margin;
     posX = margin/2;

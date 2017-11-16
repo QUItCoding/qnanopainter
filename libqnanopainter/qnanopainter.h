@@ -138,6 +138,8 @@ public:
     void rect(const QRectF &rect);
     void roundedRect(float x, float y, float width, float height, float radius);
     void roundedRect(const QRectF &rect, float radius);
+    void roundedRect(float x, float y, float width, float height, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft);
+    void roundedRect(const QRectF &rect, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft);
     void ellipse(float centerX, float centerY, float radiusX, float radiusY);
     void ellipse(const QRectF &rect);
     void circle(float centerX, float centerY, float radius);

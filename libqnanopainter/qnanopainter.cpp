@@ -811,6 +811,35 @@ void QNanoPainter::roundedRect(const QRectF &rect, float radius)
 }
 
 /*!
+    \fn void QNanoPainter::roundedRect(float x, float y, float width, float height, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft)
+
+    Creates new rounded rectangle shaped sub-path in position \a x, \a y with
+    size \a width, \a height. Corners rounding can be varying per-corner, with
+    \a radiusTopLeft, \a radiusTopRight, \a radiusBottomRight, \a radiusBottomLeft.
+*/
+
+void QNanoPainter::roundedRect(float x, float y, float width, float height, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft)
+{
+    _checkAlignPixelsAdjust(&x, &y);
+    _checkAlignPixels(&width, &height);
+    nvgRoundedRectVarying(nvgCtx(), x, y, width, height, radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft);
+}
+
+/*!
+    \fn void QNanoPainter::roundedRect(const QRectF &rect, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft)
+    \overload
+
+    Creates new rounded rectangle shaped sub-path at \a rect. Corners rounding can be
+    varying per-corner, with \a radiusTopLeft, \a radiusTopRight, \a radiusBottomRight,
+    \a radiusBottomLeft.
+*/
+
+void QNanoPainter::roundedRect(const QRectF &rect, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft)
+{
+    roundedRect(rect.x(), rect.y(), rect.width(), rect.height(), radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft);
+}
+
+/*!
     \fn void QNanoPainter::ellipse(float centerX, float centerY, float radiusX, float radiusY)
 
     Creates new ellipse shaped sub-path into ( \a centerX, \a centerY) with \a radiusX and \a radiusY.
