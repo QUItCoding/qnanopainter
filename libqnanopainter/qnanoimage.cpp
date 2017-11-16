@@ -23,12 +23,68 @@
 #include "qnanopainter.h"
 #include <QDir>
 
+/*!
+    \class QNanoImage
+    \brief QNanoImage is a class for loading and drawing images with QNanoPainter.
+    \inmodule QNanoPainter
+
+    QNanoImage can be rendered with QNanoPainter::drawImage() methods or used
+    inside QNanoImagePattern.
+
+    Here's how to render single image into specific position:
+    \code
+        ...
+        QNanoImage image(":/images/icon.png", QNanoImage::GENERATE_MIPMAPS);
+        painter()->drawImage(image, 10, 20);
+        ...
+    \endcode
+
+    Here's how to fill item with QNanoImagePattern:
+    \code
+        ...
+        QNanoImage patternImage(":/images/pattern1.png");
+        QNanoImagePattern p1 = QNanoImagePattern(patternImage);
+        p1.setImageSize(128, 128);
+        painter()->setFillStyle(p1);
+        painter()->fillRect(0, 0, width(), height());
+        ...
+    \endcode
+*/
+
+/*!
+    \enum QNanoImage::ImageFlag
+
+    ImageFlag is used to define properties of loaded image.
+    \value GENERATE_MIPMAPS Generate mipmaps during creation of the image. Enabling this often improves rendering quality of scaled images, while consuming a bit more memory.
+    \value REPEATX Repeat image in X direction. Enable this when image is used as tiled in QNanoImagePattern.
+    \value REPEATY Repeat image in Y direction. Enable this when image is used as tiled in QNanoImagePattern.
+    \value FLIPY Flips (inverses) image in Y direction when rendered.
+    \value PREMULTIPLIED Image data has premultiplied alpha.
+    \value NEAREST Image interpolation is Nearest instead Linear. By default Linear interpolation is used which gives smoother results when scaling the image, but if sharp pixelated outcome is preferred enable this flag.
+
+    \sa setFlags()
+*/
+
+/*!
+    \fn QNanoImage::QNanoImage()
+
+    Constructs a default image object.
+*/
+
 QNanoImage::QNanoImage()
     : m_parentPainter(nullptr)
     , m_imageData(nullptr)
     , m_flags(0)
 {
 }
+
+/*!
+    \fn QNanoImage::QNanoImage(const QString &filename, ImageFlags flags)
+
+    Constructs a image by loading it with a \a filename and optional \a flags.
+
+    \sa setFilename(), setFlags()
+*/
 
 QNanoImage::QNanoImage(const QString &filename, ImageFlags flags)
     : m_parentPainter(nullptr)
@@ -39,9 +95,19 @@ QNanoImage::QNanoImage(const QString &filename, ImageFlags flags)
     updateUniqueKey();
 }
 
+/*!
+    Destroys the QNanoImage.
+*/
+
 QNanoImage::~QNanoImage()
 {
 }
+
+/*!
+    \fn void QNanoImage::setFilename(const QString &filename)
+
+    Sets to load an image with a \a filename.
+*/
 
 void QNanoImage::setFilename(const QString &filename)
 {
@@ -51,6 +117,12 @@ void QNanoImage::setFilename(const QString &filename)
     updateUniqueKey();
 }
 
+/*!
+    \fn void QNanoImage::setFlags(ImageFlags flags)
+
+    Sets image to use \a flags.
+*/
+
 void QNanoImage::setFlags(ImageFlags flags)
 {
     if (m_flags == flags)
@@ -58,6 +130,36 @@ void QNanoImage::setFlags(ImageFlags flags)
     m_flags = flags;
     updateUniqueKey();
 }
+
+/*!
+    \fn int QNanoImage::width() const
+
+    Returns the width of image in pixels.
+*/
+
+int QNanoImage::width() const
+{
+    if (!m_imageData) return 0;
+    return m_imageData->width;
+}
+
+/*!
+    \fn int QNanoImage::height() const
+
+    Returns the height of image in pixels.
+*/
+
+int QNanoImage::height() const
+{
+    if (!m_imageData) return 0;
+    return m_imageData->height;
+}
+
+// ***** Private *****
+
+/*!
+   \internal
+*/
 
 int QNanoImage::getID(NVGcontext* nvg)
 {
@@ -85,24 +187,6 @@ int QNanoImage::getID(NVGcontext* nvg)
     }
     return m_imageData->id;
 }
-
-int QNanoImage::width() const
-{
-    if (!m_imageData) return 0;
-    return m_imageData->width;
-}
-
-int QNanoImage::height() const
-{
-    if (!m_imageData) return 0;
-    return m_imageData->height;
-}
-
-// ***** Private *****
-
-/*!
-   \internal
-*/
 
 void QNanoImage::setParentPainter(QNanoPainter *parentPainter)
 {
