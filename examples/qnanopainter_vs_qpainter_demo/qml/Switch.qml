@@ -59,7 +59,7 @@ Item {
         anchors.rightMargin: 32 * dp
         height: priv.barHeight
         width: priv.switchWidth
-        radius: height/2
+        radius: height/8
         color: "#404040"
     }
     Rectangle {
@@ -69,7 +69,7 @@ Item {
         anchors.rightMargin: 32 * dp
         height: priv.barHeight
         width: priv.switchWidth
-        radius: height/2
+        radius: height/8
         color: "transparent"
         border.width: 1 * dp
         border.color: "#808080"
@@ -79,6 +79,7 @@ Item {
     Item {
         id: switchItem
         anchors.fill: switchBackgroundImage
+        clip: true
 
         Text {
             id: textOnItem
@@ -128,24 +129,5 @@ Item {
         color: Qt.rgba(colorValue, colorValue, colorValue, 1.0)
         border.width: 1 * dp
         border.color: "#404040"
-    }
-
-    // Mask out switch parts which should be hidden
-    ShaderEffect {
-        id: shaderItem
-        property variant source: ShaderEffectSource { sourceItem: switchItem; hideSource: true }
-        property variant maskSource: ShaderEffectSource { sourceItem: switchBackgroundImage; hideSource: false }
-
-        anchors.fill: switchBackgroundImage
-
-        fragmentShader: "
-            varying highp vec2 qt_TexCoord0;
-            uniform highp float qt_Opacity;
-            uniform sampler2D source;
-            uniform sampler2D maskSource;
-            void main(void) {
-                gl_FragColor = texture2D(source, qt_TexCoord0.st) * (texture2D(maskSource, qt_TexCoord0.st).a) * qt_Opacity;
-            }
-        "
     }
 }
