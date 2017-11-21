@@ -21,40 +21,12 @@
 
 #include "qnanopainter.h"
 
-#if defined(QNANO_QT_GL_INCLUDE)
-// Let the Qt include OpenGL headers
-
-#define GL_GLEXT_PROTOTYPES
-#include <QtGui/qopengl.h>
-
-#else
-// Manually include OpenGL headers
-
-#if defined(Q_OS_IOS)
-#include <OpenGLES/ES2/gl.h>
-#elif defined(Q_OS_ANDROID)
-#include <GLES2/gl2.h>
-#elif defined(Q_OS_OSX)
-#include <OpenGL/gl.h>
-#elif defined(Q_OS_LINUX)
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#else
-#include <GLES2/gl2.h>
-#endif
-
-#endif
-
-#ifdef QT_OPENGL_ES_2
-#define NANOVG_GLES2_IMPLEMENTATION
-#else
-#define NANOVG_GL2_IMPLEMENTATION
-#endif
-
 #include "nanovg/nanovg.h"
-#include "nanovg/nanovg_gl.h"
+#include "private/qnanobackendfactory.h"
+
 #include <QScreen>
 #include <QGuiApplication>
+#include <QOpenGLContext>
 
 /*!
     \class QNanoPainter
@@ -161,13 +133,21 @@ QNanoPainter::QNanoPainter()
     , m_devicePixelRatio(1.0)
     , m_fontSet(false)
 {
+
+    // Request actual OpenGL context version and type
+    QOpenGLContext *context = QOpenGLContext::currentContext();
+    Q_ASSERT_X(context, "QNanoPainter::QNanoPainter", "No QOpenGL Context available!");
+    m_surfaceFormat =  context->format();
+    int major = m_surfaceFormat.majorVersion();
+    int minor = m_surfaceFormat.minorVersion();
+    bool isGLES = (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGLES);
+
+    // Create QNanoBackend most suitable for the context
+    m_backend.reset(QNanoBackendFactory::createBackend(major, minor, isGLES));
+
     // Initialize NanoVG for correct GL version
     // NOTE: Add also NVG_DEBUG when want to check possible OpenGL errors.
-#ifdef QT_OPENGL_ES_2
-    m_nvgContext = nvgCreateGLES2(NVG_ANTIALIAS);
-#else
-    m_nvgContext = nvgCreateGL2(NVG_ANTIALIAS);
-#endif
+    m_nvgContext = m_backend->nvgCreate(NVG_ANTIALIAS);
 
     Q_ASSERT_X(m_nvgContext, "QNanoPainter::QNanoPainter", "Could not init nanovg!");
 
@@ -181,12 +161,8 @@ QNanoPainter::QNanoPainter()
 
 QNanoPainter::~QNanoPainter()
 {
-    if (m_nvgContext) {
-#ifdef QT_OPENGL_ES_2
-    nvgDeleteGLES2(m_nvgContext);
-#else
-    nvgDeleteGL2(m_nvgContext);
-#endif
+    if (m_backend && m_nvgContext) {
+        m_backend->nvgDelete(m_nvgContext);
     }
 
     qDeleteAll(m_dataCache);
@@ -1365,35 +1341,16 @@ int QNanoPainter::textBreakLines(const char* string, const char* end, float brea
 
 void QNanoPainter::enableAntialiasing(bool enable)
 {
-    NVGparams *params = nvgInternalParams(nvgCtx());
+    NVGparams *params = m_backend->internalParams(nvgCtx());
     if (params && params->edgeAntiAlias != (enable ? 1 : 0)) {
         params->edgeAntiAlias = enable;
-        GLNVGcontext *gl = static_cast<GLNVGcontext*>(params->userPtr);
-        if (gl) {
-            if (enable) {
-                gl->flags |= NVG_ANTIALIAS;
-            } else {
-                gl->flags &= ~NVG_ANTIALIAS;
-            }
-            // Re-create shader
-            glnvg__renderCreate(gl);
-        }
+        m_backend->setFlag(nvgCtx(), NVG_ANTIALIAS, enable);
     }
 }
 
 void QNanoPainter::enableHighQualityRendering(bool enable)
 {
-
-    GLNVGcontext *gl = static_cast<GLNVGcontext*>(nvgInternalParams(nvgCtx())->userPtr);
-    if (gl) {
-        if (enable) {
-            gl->flags |= NVG_STENCIL_STROKES;
-        } else {
-            gl->flags &= ~NVG_STENCIL_STROKES;
-        }
-        // Re-create shader
-        glnvg__renderCreate(gl);
-    }
+    m_backend->setFlag(nvgCtx(), NVG_STENCIL_STROKES, enable);
 }
 
 void QNanoPainter::_checkFont() {

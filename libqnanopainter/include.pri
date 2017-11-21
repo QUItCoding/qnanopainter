@@ -68,7 +68,31 @@ HEADERS +=  \
     $$PWD/qnanofont.h \
     $$PWD/qnanoradialgradient.h \
     $$PWD/qnanoboxgradient.h \
-    $$PWD/private/qnanodataelement.h
+    $$PWD/private/qnanodataelement.h \
+    $$PWD/private/qnanobackend.h \
+    $$PWD/private/qnanobackendfactory.h
+
+# Note: Due to Angle, windows might use either OpenGL (desktop) or
+#       openGL ES (angle) backend.
+android | ios | windows {
+    message("Including QNanoPainter OpenGL ES backends")
+HEADERS += \
+    $$PWD/private/qnanobackendgles2.h \
+    $$PWD/private/qnanobackendgles3.h
+SOURCES +=  \
+    $$PWD/private/qnanobackendgles2.cpp \
+    $$PWD/private/qnanobackendgles3.cpp
+}
+
+osx | linux:!android | windows {
+    message("Including QNanoPainter OpenGL backends")
+HEADERS += \
+    $$PWD/private/qnanobackendgl2.h \
+    $$PWD/private/qnanobackendgl3.h
+SOURCES +=  \
+    $$PWD/private/qnanobackendgl2.cpp \
+    $$PWD/private/qnanobackendgl3.cpp
+}
 
 ## Include NanoVG
 SOURCES +=  $$PWD/nanovg/nanovg.c

@@ -26,9 +26,11 @@
 #include <QCache>
 #include <QTransform>
 #include <QSharedPointer>
+#include <QSurfaceFormat>
 #include "qnanocolor.h"
 #include "private/qnanobrush.h"
 #include "private/qnanodataelement.h"
+#include "private/qnanobackend.h"
 #include "qnanolineargradient.h"
 #include "qnanoradialgradient.h"
 #include "qnanoimage.h"
@@ -234,6 +236,9 @@ private:
     QHash<QString, QNanoDataElement*> m_dataCache;
 
     NVGcontext* m_nvgContext;
+    QScopedPointer<QNanoBackend> m_backend;
+    QSurfaceFormat m_surfaceFormat;
+
     QNanoPainter::TextAlign m_textAlign;
     QNanoPainter::TextBaseline m_textBaseline;
     double m_devicePixelRatio;
