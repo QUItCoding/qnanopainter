@@ -43,43 +43,43 @@ Item {
             visible: tabView.currentIndex == 0
             Switch {
                 text: "Render ruler"
-                checked: true
-                onCheckedChanged: {
+                checked: (enabledTests & 1)
+                onUserChecked: {
                     enabledTests ^= 1;
                 }
             }
             Switch {
                 text: "Render circles"
-                checked: true
-                onCheckedChanged: {
+                checked: (enabledTests & 2)
+                onUserChecked: {
                     enabledTests ^= 2;
                 }
             }
             Switch {
                 text: "Render bezier lines"
-                checked: true
-                onCheckedChanged: {
+                checked: (enabledTests & 4)
+                onUserChecked: {
                     enabledTests ^= 4;
                 }
             }
             Switch {
                 text: "Render bars"
-                checked: true
-                onCheckedChanged: {
+                checked: (enabledTests & 8)
+                onUserChecked: {
                     enabledTests ^= 8;
                 }
             }
             Switch {
                 text: "Render icons&text"
-                checked: true
-                onCheckedChanged: {
+                checked: (enabledTests & 16)
+                onUserChecked: {
                     enabledTests ^= 16;
                 }
             }
             Switch {
                 text: "Render flower"
-                checked: false
-                onCheckedChanged: {
+                checked: (enabledTests & 32)
+                onUserChecked: {
                     enabledTests ^= 32;
                 }
             }

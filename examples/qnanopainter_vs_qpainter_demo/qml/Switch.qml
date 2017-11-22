@@ -8,6 +8,8 @@ Item {
     property string textOn: "ON"
     property string textOff: "OFF"
 
+    signal userChecked()
+
     QtObject {
         id: priv
         property real switchWidth: Math.max(66*dp, textOnItem.paintedWidth + 50*dp)
@@ -16,12 +18,17 @@ Item {
         property real knobSize: 32 * dp
         property real knobState: knob.x / knobMovement
 
+        function doSwitch() {
+            root.checked = !root.checked;
+            root.userChecked();
+        }
+
         function releaseSwitch() {
             // Don't switch if we are in correct side
             if ((knob.x == -2 && !checked) || (knob.x == priv.knobMovement && checked)) {
                 return;
             }
-            checked = !checked;
+            priv.doSwitch();
         }
     }
 
@@ -31,9 +38,7 @@ Item {
     MouseArea {
         width: parent.width
         height: parent.height
-        onClicked: {
-            root.checked = !root.checked;
-        }
+        onClicked: priv.doSwitch();
     }
 
     Text {
@@ -108,7 +113,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 drag.target: knob; drag.axis: Drag.XAxis; drag.minimumX: -2; drag.maximumX: priv.knobMovement
-                onClicked: checked = !checked;
+                onClicked: priv.doSwitch();
                 onReleased: priv.releaseSwitch();
             }
             Behavior on x {
