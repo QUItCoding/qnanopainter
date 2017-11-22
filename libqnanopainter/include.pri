@@ -22,6 +22,9 @@ win32  {
 # Enable this to let Qt include OpenGL headers
 DEFINES += QNANO_QT_GL_INCLUDE
 
+# This will enable GLES3 (disable to force GLES2)
+DEFINES += QNANO_ENABLE_GLES3
+
 equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 7) {
     message("Building with Qt at least 5.8 so may enabled QNANO_USE_RENDERNODE")
     # Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject
