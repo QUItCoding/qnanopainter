@@ -1,6 +1,6 @@
 #include "qnanobackendgles3.h"
 
-#ifndef QT_OPENGL_ES_3
+#if !defined(QT_OPENGL_ES_3) && !defined(QT_OPENGL_ES_2_ANGLE)
 
 // QT_OPENGL_ES_3 not defined, so include manually
 // Can include either own headers or system headers
