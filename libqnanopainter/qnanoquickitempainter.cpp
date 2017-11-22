@@ -385,7 +385,10 @@ void QNanoQuickItemPainter::paintDrawDebug()
     m_debugCounter++;
     if(!m_debugUpdateTimer.isValid()) m_debugUpdateTimer.start();
 
-    if (m_debugUpdateTimer.elapsed() >= 1000) {
+    // How often time is updated, in seconds
+    // Longer period increases accuracy
+    const int UPDATE_FREQUENCY_MS = 1000;
+    if (m_debugUpdateTimer.elapsed() >= UPDATE_FREQUENCY_MS) {
         qint64 ms = 1000000;
         double msElapsed = (double)m_debugNsElapsed/(ms*m_debugCounter);
         m_debugMsElapsed = QString::number(msElapsed, 'f', 3);
