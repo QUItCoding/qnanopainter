@@ -27,5 +27,5 @@ NVGparams *QNanoBackendGLES2::internalParams(NVGcontext* nvgCtx) {
 }
 
 void QNanoBackendGLES2::setFlag(NVGcontext* nvgCtx, int flag, bool enable) {
-    setFlagT<GLNVGcontext>(nvgCtx, flag, enable);
+    QNANOBACKEND_SETFLAG(nvgCtx, flag, enable)
 }

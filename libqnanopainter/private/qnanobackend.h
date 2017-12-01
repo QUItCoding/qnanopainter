@@ -45,22 +45,19 @@ public:
     virtual NVGparams *internalParams(NVGcontext* nvgCtx) = 0;
     virtual void setFlag(NVGcontext* nvgCtx, int flag, bool enable) = 0;
 
-protected:
-
     // Common setFlag implementation
-    // Using template as GLNVGcontext & glnvg__renderCreate aren't known here
-    template <class T>
-    void setFlagT (NVGcontext* nvgCtx, int flag, bool enable) {
+    // Using macro as GLNVGcontext & glnvg__renderCreate aren't known here
+    #define QNANOBACKEND_SETFLAG(nvgCtx, flag, enable) {\
         NVGparams *params = nvgInternalParams(nvgCtx);\
-        T *gl = static_cast<T*>(params->userPtr);\
-        if (gl) {
-            if (enable) {
-                gl->flags |= flag;
-            } else {
-                gl->flags &= ~flag;
-            }
-            glnvg__renderCreate(gl);
-        }
+        GLNVGcontext *gl = static_cast<GLNVGcontext*>(params->userPtr);\
+        if (gl) {\
+            if (enable) {\
+                gl->flags |= flag;\
+            } else {\
+                gl->flags &= ~flag;\
+            }\
+            glnvg__renderCreate(gl);\
+        }\
     }
 
 };
