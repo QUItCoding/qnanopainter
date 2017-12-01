@@ -1,10 +1,21 @@
 #include "qnanobackendgl3.h"
 
+#ifdef Q_OS_WIN
+#include <QOpenGLFunctions_3_1>
+static QOpenGLFunctions_3_1 *glf;
+#define QNANO_GLFWRAPPER glf->
+#else
+#define QNANO_GLFWRAPPER
+#endif
+
 #define NANOVG_GL_IMPLEMENTATION 1
-#include "nanovg/nanovg_gl.h"
+#include "nanovg/nanovg_gl_wrapped.h"
 
 QNanoBackendGL3::QNanoBackendGL3()
 {
+#ifdef Q_OS_WIN
+    glf = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_1>();
+#endif
 }
 
 const QString QNanoBackendGL3::backendName()
