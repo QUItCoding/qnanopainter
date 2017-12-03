@@ -25,7 +25,8 @@ Item {
         'readonly property real dotSize: root.dotSize;' +
         'readonly property real itemWidth: root.width;' +
         'readonly property real itemHeight: root.height;' +
-        'asynchronous: true;' +
+        // Note: asynchronous disabled for now, see QTBUG-64508
+        //'asynchronous: true;' +
         'vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled;';
 
         // Draw graph background area
@@ -59,6 +60,20 @@ Item {
         newObject += '}'; // ShapePath
 
         // Draw dots
+        for (i=0; i<items; ++i) {
+        newObject += 'Rectangle {' +
+                'x: posX(' + i +') - width/2;' +
+                'y: posY(' + i +') - height/2;' +
+                'width: dotSize*2*0.9;' +
+                'height: width;' +
+                'radius: height/2;' +
+                'color: m_colorWhite;' +
+                'border.color: m_colorBlack;' +
+                'border.width: dotSize*0.2; }';
+        }
+
+        /*
+        // Alternative for dots using QML Shape
         newObject += 'ShapePath {' +
                 'strokeColor: m_colorBlack;' +
                 'fillColor: m_colorWhite;' +
@@ -70,6 +85,7 @@ Item {
             newObject += 'PathArc { relativeX: -dotSize*2*0.8; relativeY: 0; radiusX: dotSize*0.4; radiusY: dotSize*0.4; useLargeArc: true }';
         }
         newObject += '}'; // ShapePath
+        */
 
         newObject += '}'; // Shape
 
