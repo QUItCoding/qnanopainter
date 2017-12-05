@@ -3,6 +3,7 @@
 #include <QPen>
 #include <QPointF>
 #include <QFontDatabase>
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 DemoQPItem::DemoQPItem(QQuickItem *parent)
