@@ -20,7 +20,7 @@ Item {
         Text {
             x: space*5*index - paintedWidth/2
             y: root.height - paintedHeight/2
-            font.pixelSize: root.width / 35.0
+            font.pixelSize: 10.0 + root.width*0.01
             font.family: m_testFont.name
             color: "#E0E0B0"
             text: index * 5

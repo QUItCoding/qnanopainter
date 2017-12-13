@@ -3,6 +3,7 @@
 #include <math.h>
 #include <QtMath>
 #include <QVarLengthArray>
+#include <algorithm>
 
 DemoQNanoItemPainter::DemoQNanoItemPainter()
     : m_animationTime(0.0)
@@ -46,6 +47,7 @@ void DemoQNanoItemPainter::paint(QNanoPainter *painter)
 
     float w = width();
     float h = height();
+    float s = std::min(w, h);
     float t = m_animationTime;
 
     // These painting commands are identical with both renderers
@@ -56,9 +58,11 @@ void DemoQNanoItemPainter::paint(QNanoPainter *painter)
         }
         // Paint circles
         if (m_enabledTests & 2) {
-            drawGraphCircles(w*0.15f, h*0.1f, w*0.7f, w*0.7f, 10, t*2);
-            drawGraphCircles(w*0.05f, h*0.55f, w*0.25f, w*0.25f, 8, t*3);
-            drawGraphCircles(w*0.70f, h*0.55f, w*0.25f, w*0.25f, 3, t);
+            float bigCircle = 80.0f + s*0.5f;
+            float smallCircle = 40.0f + s*0.2f;
+            drawGraphCircles(w/2-bigCircle/2, h*0.1f, bigCircle, bigCircle, 10, t*2);
+            drawGraphCircles(w*0.05, h*0.55f, smallCircle, smallCircle, 8, t*3);
+            drawGraphCircles(w-smallCircle-w*0.05, h*0.55f, smallCircle, smallCircle, 3, t);
         }
         // Paint lines
         if (m_enabledTests & 4) {
@@ -81,7 +85,8 @@ void DemoQNanoItemPainter::paint(QNanoPainter *painter)
 
         // Paint flower
         if (m_enabledTests & 32) {
-            drawFlower(0, h/2-w/2, w, w, t);
+            float flowerSize = 80.0f + s*0.6f;
+            drawFlower(w/2-flowerSize/2, h-flowerSize, flowerSize, flowerSize, t);
         }
 
         // Increase animation time when m_testCount > 1
@@ -94,7 +99,7 @@ void DemoQNanoItemPainter::drawGraphLine(float x, float y, float w, float h, int
     QVarLengthArray<float, 1024> samples(items);
     QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
     float dx = w/(items-1);
-    float dotSize = w/50;
+    float dotSize = 4.0f + w*0.005;
     int i;
 
     // Generate positions
@@ -123,7 +128,7 @@ void DemoQNanoItemPainter::drawGraphLine(float x, float y, float w, float h, int
     for (i = 1; i < items; i++)
         m_painter->bezierTo(sx[i-1]+dx*0.5f,sy[i-1], sx[i]-dx*0.5f,sy[i], sx[i],sy[i]);
     m_painter->setStrokeStyle(m_colorGray);
-    m_painter->setLineWidth(dotSize*0.4);
+    m_painter->setLineWidth(1.0f+dotSize*0.2f);
     m_painter->stroke();
 
     // Draw dots
@@ -160,7 +165,7 @@ void DemoQNanoItemPainter::drawGraphBars(float x, float y, float w, float h, int
     for (i = 0; i < items; i++) {
         m_painter->rect((int)sx[i]+0.5f, (int)y+1.5f, (int)barWidth, (int)sy[i]);
     }
-    float lineWidth = 0.5f + w * 0.002f;
+    int lineWidth = 1.0f;
     m_painter->setLineWidth(lineWidth);
     m_painter->setLineJoin(QNanoPainter::JOIN_MITER);
     m_painter->setFillStyle(m_color3);
@@ -218,14 +223,15 @@ void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, 
 
 void DemoQNanoItemPainter::drawIcons(float x, float y, float w, float h, int items, float t)
 {
+    float s = std::min(width(), height());
+    float size = 16.0f + s*0.05f;
     // Note: Adjust font size to match QPainter sizing
-    float fontSize = w/22.0f * 1.32f;
+    float fontSize = size * 0.5f * 1.32f;
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setFillStyle("#FFFFFF");
     m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
     m_painter->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
-    float size = w/12;
     for (int i=0 ; i<items ; i++) {
         float xp = x + (w-size)/items*i;
         float yp = y + h*0.5f + h * sinf((i+1) * t * 0.1) * 0.5f;
@@ -241,7 +247,7 @@ void DemoQNanoItemPainter::drawRuler(float x, float y, float w, float h, float t
     m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
     m_painter->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
     // Note: Adjust font size to match QPainter sizing
-    float fontSize = w/35.0f * 1.32f;
+    float fontSize = (10.0f + w*0.01f) * 1.32f;
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setStrokeStyle("#E0E0E0");

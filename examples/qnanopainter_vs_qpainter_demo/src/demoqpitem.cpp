@@ -5,6 +5,7 @@
 #include <QFontDatabase>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <algorithm>
 
 DemoQPItem::DemoQPItem(QQuickItem *parent)
     : QQuickPaintedItem(parent)
@@ -43,6 +44,7 @@ void DemoQPItem::paint(QPainter *painter)
 
     float w = boundingRect().width();
     float h = boundingRect().height();
+    float s = std::min(w, h);
     float t = m_animationTime;
 
     // These painting commands are identical with both renderers
@@ -53,9 +55,11 @@ void DemoQPItem::paint(QPainter *painter)
         }
         // Paint circles
         if (m_enabledTests & 2) {
-            drawGraphCircles(w*0.15f, h*0.1f, w*0.7f, w*0.7f, 10, t*2);
-            drawGraphCircles(w*0.05f, h*0.55f, w*0.25f, w*0.25f, 8, t*3);
-            drawGraphCircles(w*0.70f, h*0.55f, w*0.25f, w*0.25f, 3, t);
+            float bigCircle = 80.0f + s*0.5f;
+            float smallCircle = 40.0f + s*0.2f;
+            drawGraphCircles(w/2-bigCircle/2, h*0.1f, bigCircle, bigCircle, 10, t*2);
+            drawGraphCircles(w*0.05, h*0.55f, smallCircle, smallCircle, 8, t*3);
+            drawGraphCircles(w-smallCircle-w*0.05, h*0.55f, smallCircle, smallCircle, 3, t);
         }
         // Paint lines
         if (m_enabledTests & 4) {
@@ -77,7 +81,8 @@ void DemoQPItem::paint(QPainter *painter)
         }
         // Paint flower
         if (m_enabledTests & 32) {
-            drawFlower(0, h/2-w/2, w, w, t);
+            float flowerSize = 80.0f + s*0.6f;
+            drawFlower(w/2-flowerSize/2, h-flowerSize, flowerSize, flowerSize, t);
         }
 
         // Increase animation time when m_testCount > 1
@@ -90,7 +95,7 @@ void DemoQPItem::drawGraphLine(float x, float y, float w, float h, int items, fl
     QVarLengthArray<float, 1024> samples(items);
     QVarLengthArray<float, 1024> sx(items); QVarLengthArray<float, 1024> sy(items);
     float dx = w/(items-1);
-    float dotSize = w/50;
+    float dotSize = 4.0f + w*0.005;
     int i;
 
     // Generate positions
@@ -119,7 +124,7 @@ void DemoQPItem::drawGraphLine(float x, float y, float w, float h, int items, fl
     path2.moveTo(sx[0], sy[0]);
     for (i = 1; i < items; i++)
             path2.cubicTo(sx[i-1]+dx*0.5f,sy[i-1], sx[i]-dx*0.5f,sy[i], sx[i],sy[i]);
-    m_painter->strokePath(path2, QPen(m_colorGray, dotSize*0.4));
+    m_painter->strokePath(path2, QPen(m_colorGray, 1.0f+dotSize*0.2f));
 
     // Draw dots
     m_painter->setBrush(m_colorWhite);
@@ -147,7 +152,7 @@ void DemoQPItem::drawGraphBars(float x, float y, float w, float h, int items, fl
 
     // Draw graph bars
     m_painter->setBrush(m_color3);
-    float lineWidth = 0.5f + w * 0.002f;
+    float lineWidth = 1.0f;
     QPen pen(m_colorBlack, lineWidth);
     pen.setJoinStyle(Qt::MiterJoin);
     m_painter->setPen(pen);
@@ -206,12 +211,13 @@ void DemoQPItem::drawGraphCircles(float x, float y, float w, float h, int items,
 
 void DemoQPItem::drawIcons(float x, float y, float w, float h, int items, float t)
 {
-    float fontSize = w/22.0f;
+    float s = std::min(width(), height());
+    float size = 16.0f + s*0.05f;
+    float fontSize = size * 0.5f;
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setPen("#FFFFFF");
     m_painter->setBrush(Qt::NoBrush);
-    float size = w/12;
     for (int i=0 ; i<items ; i++) {
         float xp = x + (w-size)/items*i;
         float yp = y + h*0.5f + h * sinf((i+1) * t * 0.1f) * 0.5f;
@@ -224,7 +230,8 @@ void DemoQPItem::drawRuler(float x, float y, float w, float h, float t)
 {
     float posX = x + w*0.05f;
     double space = w*0.03f + sinf(t)*w*0.02f;
-    m_testFont.setPixelSize(w/35.0f);
+    float fontSize = 10.0f + w*0.01f;
+    m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setPen("#E0E0B0");
     m_painter->setBrush(Qt::NoBrush);

@@ -9,7 +9,6 @@ Item {
     readonly property real dx: root.width / items
     readonly property real barWidth: dx * 0.8
     readonly property real margin: dx - barWidth
-    readonly property real borderWidth: 0.5 + width * 0.002
 
     Repeater {
         model: items
@@ -20,7 +19,7 @@ Item {
             height: root.height * (0.5 + Math.sin(index*0.1+time)*0.5)
             color: m_color3
             border.color: m_colorBlack
-            border.width: borderWidth
+            border.width: 1
         }
     }
 }

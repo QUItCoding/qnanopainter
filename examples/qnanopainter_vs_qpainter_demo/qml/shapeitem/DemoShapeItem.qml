@@ -50,30 +50,33 @@ Item {
 
             Item {
                 id: circlesComponents
+                readonly property real s: Math.min(parent.width, parent.height)
+                readonly property real bigCircle: 80.0 + s*0.5
+                readonly property real smallCircle: 40.0 + s*0.2
                 anchors.fill: parent
                 visible: enabledTests & 2
 
                 CirclesComponent {
-                    x: parent.width * 0.15
+                    x: parent.width/2 - circlesComponents.bigCircle/2
                     y: parent.height * 0.1
-                    width: parent.width * 0.7
-                    height: parent.width * 0.7
+                    width: circlesComponents.bigCircle
+                    height: circlesComponents.bigCircle
                     time: parent.visible ? itemTime * 2 : 0
                     items: 10
                 }
                 CirclesComponent {
                     x: parent.width * 0.05
                     y: parent.height * 0.55
-                    width: parent.width * 0.25
-                    height: parent.width * 0.25
+                    width: circlesComponents.smallCircle
+                    height: circlesComponents.smallCircle
                     time: parent.visible ? itemTime * 3 : 0
                     items: 8
                 }
                 CirclesComponent {
-                    x: parent.width * 0.70
+                    x: parent.width - circlesComponents.smallCircle - parent.width * 0.05
                     y: parent.height * 0.55
-                    width: parent.width * 0.25
-                    height: parent.width * 0.25
+                    width: circlesComponents.smallCircle
+                    height: circlesComponents.smallCircle
                     time: parent.visible ? itemTime : 0
                     items: 3
                 }
@@ -156,12 +159,15 @@ Item {
 
             Item {
                 id: flowersComponents
+                readonly property real s: Math.min(parent.width, parent.height)
+                readonly property real flowerSize: 80.0 + s*0.6
                 anchors.fill: parent
                 visible: enabledTests & 32
                 FlowerComponent {
-                    y: parent.height/2 - height/2
-                    width: parent.width
-                    height: parent.width
+                    x: parent.width/2 - flowersComponents.flowerSize/2
+                    y: parent.height - flowersComponents.flowerSize
+                    width: flowersComponents.flowerSize
+                    height: flowersComponents.flowerSize
                     time: parent.visible ? itemTime : 0
                 }
             }

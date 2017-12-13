@@ -6,8 +6,8 @@ Item {
     property real time: 0
     property int items: 0
 
-    readonly property real size: width/12
-    readonly property real fontSize: width/22
+    readonly property real size: 16.0 + Math.min(iconsComponents.width, iconsComponents.height)*0.05
+    readonly property real fontSize: size*0.5
 
     function posX(i) {
         return (root.width - size) / items*i;

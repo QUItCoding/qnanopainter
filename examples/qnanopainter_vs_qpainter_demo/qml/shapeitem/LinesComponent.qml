@@ -8,7 +8,7 @@ Item {
     property int items: 0
 
     readonly property real dx: width / (items-1)
-    readonly property real dotSize: width / 50
+    readonly property real dotSize: 4.0 + width * 0.005
 
     function posY(i) {
         return root.height - (0.5 + Math.sin((i+1) * time * 0.2) * 0.1) * 0.8 * root.height;
@@ -50,7 +50,7 @@ Item {
         // Draw graph line
         newObject += 'ShapePath {' +
                 'strokeColor: m_colorGray;' +
-                'strokeWidth: dotSize*0.4;' +
+                'strokeWidth: 1.0 + dotSize*0.2;' +
                 'fillColor: "transparent";' +
                 'startX: posX(0);' +
                 'startY: posY(0);';
