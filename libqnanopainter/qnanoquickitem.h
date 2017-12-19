@@ -95,7 +95,7 @@ protected:
     QSGNode *updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData) Q_DECL_OVERRIDE Q_DECL_FINAL;
 #endif
 #ifdef QNANO_USE_RENDERNODE
-    void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
+    void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) Q_DECL_OVERRIDE Q_DECL_FINAL;
 #endif
 
 Q_SIGNALS:
