@@ -27,8 +27,6 @@ public:
             major = 2;
             minor = 0;
         }
-#else
-        Q_UNUSED(minor);
 #endif
 
         qDebug("Creating QNanoBackend for %s %d.%d", (isGLES ? "OpenGL ES" : "OpenGL"), major, minor);
@@ -44,7 +42,7 @@ public:
 #endif
             }
         } else {
-            if (major >= 3) {
+            if (major > 3 || (major == 3 && minor >= 2)) {
 #ifdef QT_OPENGL_3
                 return new QNanoBackendGL3();
 #endif
