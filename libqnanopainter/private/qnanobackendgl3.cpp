@@ -1,8 +1,8 @@
 #include "qnanobackendgl3.h"
 
 #ifdef Q_OS_WIN
-#include <QOpenGLFunctions_3_1>
-static QOpenGLFunctions_3_1 *glf;
+#include <QOpenGLFunctions_3_2_Core>
+static QOpenGLFunctions_3_2_Core *glf;
 #define QNANO_GLFWRAPPER glf->
 #else
 #define QNANO_GLFWRAPPER
@@ -14,7 +14,7 @@ static QOpenGLFunctions_3_1 *glf;
 QNanoBackendGL3::QNanoBackendGL3()
 {
 #ifdef Q_OS_WIN
-    glf = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_1>();
+    glf = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_2_Core>();
 #endif
 }
 

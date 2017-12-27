@@ -144,6 +144,7 @@ QNanoPainter::QNanoPainter()
 
     // Create QNanoBackend most suitable for the context
     m_backend.reset(QNanoBackendFactory::createBackend(major, minor, isGLES));
+    qDebug() << "Using backend:" << m_backend->backendName();
 
     // Initialize NanoVG for correct GL version
     // NOTE: Add also NVG_DEBUG when want to check possible OpenGL errors.

@@ -29,7 +29,7 @@ public:
         }
 #endif
 
-        qDebug("Creating QNanoBackend for %s %d.%d", (isGLES ? "OpenGL ES" : "OpenGL"), major, minor);
+        qDebug("Creating suitable QNanoBackend for %s %d.%d context", (isGLES ? "OpenGL ES" : "OpenGL"), major, minor);
 
         if (isGLES) {
             if (major >= 3) {
