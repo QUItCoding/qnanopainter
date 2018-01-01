@@ -1,4 +1,5 @@
 import QtQuick 2.9
+import QtQuick.Shapes 1.0
 
 Item {
     id: root
@@ -27,6 +28,19 @@ Item {
     FontLoader {
         id: m_testFont
         source: "../fonts/Roboto-Regular.ttf"
+    }
+
+    Shape {
+        // Dummy Shape item to request used rendererType
+        id: dummyShape
+        vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled
+        onRendererTypeChanged: {
+            mainWindow.settingShapeBackendName =
+                    (rendererType === 1) ? "GeometryRenderer"
+                                         : (rendererType === 2) ? "NvprRenderer"
+                                                                : (rendererType === 3) ? "SoftwareRenderer"
+                                                                                       : "UnknownRenderer";
+        }
     }
 
     Repeater {

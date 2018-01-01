@@ -189,6 +189,31 @@ Item {
                     }
                 }
             }
+            Text {
+                anchors.right: parent.right
+                anchors.rightMargin: 32 * dp
+                font.pixelSize: 16 * dp
+                color: "#ffffff"
+                text: "Context: <b>" + mainWindow.settingContextName + "</b>"
+            }
+            Text {
+                anchors.right: parent.right
+                anchors.rightMargin: 32 * dp
+                font.pixelSize: 16 * dp
+                color: "#ffffff"
+                text: "QNanoPainter backend: <b>" + mainWindow.settingQNanoBackendName + "</b>"
+            }
+            Text {
+                anchors.right: parent.right
+                anchors.rightMargin: 32 * dp
+                font.pixelSize: 16 * dp
+                color: "#ffffff"
+                text: "QML Shape backend: <b>" + mainWindow.settingShapeBackendName + "</b>"
+            }
+            Item {
+                width: 1
+                height: 16 * dp
+            }
         }
     }
 

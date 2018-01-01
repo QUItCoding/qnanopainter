@@ -30,6 +30,9 @@ Window {
     property bool settingFBORendering: false
     property bool settingAnimateSize: false
     property bool settingVendorExtensionsEnabled: true
+    property string settingContextName: "(unknown)"
+    property string settingQNanoBackendName: "(unknown)"
+    property string settingShapeBackendName: "(unknown)"
 
     property real itemHeight: graphContainer.height
 
@@ -83,6 +86,12 @@ Window {
                     pixelAlign: mainWindow.settingPixelAlign ? DemoQNanoItem.PixelAlignHalf : DemoQNanoItem.PixelAlignNone
                     pixelAlignText: mainWindow.settingPixelAlignText ? DemoQNanoItem.PixelAlignFull : DemoQNanoItem.PixelAlignNone
                     highQualityRendering: mainWindow.settingHighQualityRendering
+                    onContextNameChanged: {
+                        mainWindow.settingContextName = qnItem.contextName;
+                    }
+                    onBackendNameChanged: {
+                        mainWindow.settingQNanoBackendName = qnItem.backendName;
+                    }
                 }
 
                 DemoQPItem {
