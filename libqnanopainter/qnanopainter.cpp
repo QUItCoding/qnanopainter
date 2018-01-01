@@ -144,6 +144,8 @@ QNanoPainter::QNanoPainter()
 
     // Create QNanoBackend most suitable for the context
     m_backend.reset(QNanoBackendFactory::createBackend(major, minor, isGLES));
+    m_openglContextName = QString("%1 %2.%3").arg(isGLES ? "OpenGL ES" : "OpenGL").arg(major).arg(minor);
+
     qDebug() << "Using backend:" << m_backend->backendName();
 
     // Initialize NanoVG for correct GL version

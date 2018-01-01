@@ -33,6 +33,8 @@ class QNanoQuickItem : public QQuickFramebufferObject
 #endif
 {
     Q_OBJECT
+    Q_PROPERTY(QString contextName READ contextName NOTIFY contextNameChanged)
+    Q_PROPERTY(QString backendName READ backendName NOTIFY backendNameChanged)
     Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
     Q_PROPERTY(PixelAlign pixelAlign READ pixelAlign WRITE setPixelAlign NOTIFY pixelAlignChanged)
     Q_PROPERTY(PixelAlign pixelAlignText READ pixelAlignText WRITE setPixelAlignText NOTIFY pixelAlignTextChanged)
@@ -54,6 +56,10 @@ public:
 
     QNanoQuickItem(QQuickItem *parent = 0);
     ~QNanoQuickItem();
+
+    QString contextName() const;
+
+    QString backendName() const;
 
     QColor fillColor() const;
     void setFillColor(const QColor &color);
@@ -99,6 +105,8 @@ protected:
 #endif
 
 Q_SIGNALS:
+    void contextNameChanged();
+    void backendNameChanged();
     void fillColorChanged();
     void pixelAlignChanged();
     void pixelAlignTextChanged();
@@ -111,6 +119,13 @@ Q_SIGNALS:
 
 private:
 
+    friend class QNanoQuickItemPainter;
+
+    void setContextName(const QString &name);
+    void setBackendName(const QString &name);
+
+    QString m_contextName;
+    QString m_backendName;
     QColor m_fillColor;
     QNanoQuickItem::PixelAlign m_pixelAlign;
     QNanoQuickItem::PixelAlign m_pixelAlignText;

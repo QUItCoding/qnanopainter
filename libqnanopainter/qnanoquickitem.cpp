@@ -48,6 +48,16 @@
 */
 
 /*!
+    \property QNanoQuickItem::contextName
+    \brief Get name and version of used OpenGL context.
+*/
+
+/*!
+    \property QNanoQuickItem::backendName
+    \brief Get name of used QNanoPainter backend.
+*/
+
+/*!
     \property QNanoQuickItem::fillColor
     \brief The color to use for filling the item ie. the item background.
 
@@ -195,6 +205,34 @@ QNanoQuickItem::~QNanoQuickItem()
     }
 
 */
+
+/*!
+    \fn QString QNanoQuickItem::contextName() const
+
+    Returns used Qt OpenGL context type and version as a string.
+    This can be for example "OpenGL ES 2.0", "OpenGL 4.3" etc.
+*/
+QString QNanoQuickItem::contextName() const
+{
+    return m_contextName;
+}
+
+/*!
+    \fn QString QNanoQuickItem::backendName() const
+
+    Returns used rendering backend name. Currently available backends are:
+    - "OpenGL 2": Used for desktop OpenGL context 2.0 - 3.1
+    - "OpenGL 3": Used for desktop OpenGL context >= 3.2
+    - "OpenGL ES 2": Used for OpenGL ES context 2.0
+    - "OpenGL ES 3": Used for OpenGL ES context >= 3.0
+
+    To affect which backend is used, configure the OpenGL context
+    version of the Qt application e.g. with QSurfaceFormat.
+*/
+QString QNanoQuickItem::backendName() const
+{
+    return m_backendName;
+}
 
 /*!
     \fn bool QNanoQuickItem::pixelAlign() const
@@ -512,6 +550,30 @@ QQuickFramebufferObject::Renderer *QNanoQuickItem::createRenderer() const
     return createItemPainter();
 }
 #endif
+
+/*!
+   \internal
+*/
+
+void QNanoQuickItem::setContextName(const QString &name)
+{
+    if (m_contextName != name) {
+        m_contextName = name;
+        emit contextNameChanged();
+    }
+}
+
+/*!
+   \internal
+*/
+
+void QNanoQuickItem::setBackendName(const QString &name)
+{
+    if (m_backendName != name) {
+        m_backendName = name;
+        emit backendNameChanged();
+    }
+}
 
 /*!
    \internal

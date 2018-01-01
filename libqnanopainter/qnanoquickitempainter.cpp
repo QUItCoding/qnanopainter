@@ -241,6 +241,11 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
         m_painter->enableAntialiasing(antialiasing);
     }
 
+    realItem->setContextName(m_painter->m_openglContextName);
+    if (m_painter->m_backend) {
+        realItem->setBackendName(m_painter->m_backend->backendName());
+    }
+
 #ifdef QNANO_DEBUG
     m_debugTimer.start();
 #endif

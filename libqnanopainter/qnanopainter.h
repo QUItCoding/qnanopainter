@@ -246,6 +246,7 @@ private:
     QNanoPainter::PixelAlign m_pixelAlign;
     QNanoPainter::PixelAlign m_pixelAlignText;
     QSharedPointer<QNanoFont> m_defaultFont;
+    QString m_openglContextName;
 
 };
 
