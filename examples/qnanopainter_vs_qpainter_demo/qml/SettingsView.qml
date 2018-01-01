@@ -181,6 +181,12 @@ Item {
                 checked: mainWindow.settingVendorExtensionsEnabled
                 onCheckedChanged: {
                     mainWindow.settingVendorExtensionsEnabled = checked;
+                    // Force reloading Shape elements as currently vendorExtensionsEnabled
+                    // can't be dynamically changed, see QTBUG-65515.
+                    if (mainWindow.renderType == 2) {
+                        mainWindow.renderType = 0;
+                        mainWindow.renderType = 2;
+                    }
                 }
             }
         }
