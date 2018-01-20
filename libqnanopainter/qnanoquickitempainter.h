@@ -26,7 +26,6 @@
 #include <QtQuick/QQuickFramebufferObject>
 #include <QColor>
 #include <QElapsedTimer>
-#include <QSharedPointer>
 #ifdef QNANO_USE_RENDERNODE
 #include <QSGRenderNode>
 #endif
@@ -72,7 +71,7 @@ public:
     QColor fillColor() const;
     inline QNanoPainter *painter() const
     {
-        return m_painter.data();
+        return m_painter;
     }
     inline float width() const
     {
@@ -131,7 +130,7 @@ private:
 
     QQuickWindow *m_window;
 
-    QSharedPointer<QNanoPainter> m_painter;
+    QNanoPainter *m_painter;
     QColor m_fillColor;
     int m_viewWidth, m_viewHeight;
     int m_textureWidth, m_textureHeight;

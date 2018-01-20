@@ -219,6 +219,8 @@ private:
     friend class QNanoLinearGradient;
     friend class QNanoRadialGradient;
 
+    static QNanoPainter *getInstance();
+
     inline NVGcontext* nvgCtx() const {
         return m_nvgContext;
     }

@@ -35,11 +35,6 @@
     TODO: Write more documentation here.
 */
 
-static QSharedPointer<QNanoPainter> getSharedPainter()
-{
-    static QSharedPointer<QNanoPainter> s_nano = QSharedPointer<QNanoPainter>::create();
-    return s_nano;
-}
 
 /*!
     Constructs a QNanoQuickItemPainter.
@@ -47,7 +42,7 @@ static QSharedPointer<QNanoPainter> getSharedPainter()
 
 QNanoQuickItemPainter::QNanoQuickItemPainter()
     : m_window(nullptr)
-    , m_painter(getSharedPainter())
+    , m_painter(QNanoPainter::getInstance())
     , m_fillColor(0.0, 0.0, 0.0, 0.0)
     , m_viewWidth(0)
     , m_viewHeight(0)
@@ -328,7 +323,7 @@ void QNanoQuickItemPainter::render()
     if ((m_itemData.width > 0 && m_itemData.height > 0) || m_setupDone) {
         m_setupDone = true;
         prepaint();
-        paint(m_painter.data());
+        paint(m_painter);
         postpaint();
     }
     // Reset the GL state for Qt side

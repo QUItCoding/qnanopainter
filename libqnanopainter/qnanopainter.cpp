@@ -28,6 +28,8 @@
 #include <QGuiApplication>
 #include <QOpenGLContext>
 
+Q_GLOBAL_STATIC(QNanoPainter, instance)
+
 /*!
     \class QNanoPainter
     \brief The QNanoPainter class provides an API for painting into QNanoQuickItem.
@@ -1341,6 +1343,11 @@ int QNanoPainter::textBreakLines(const char* string, const char* end, float brea
 /*!
    \internal
 */
+
+QNanoPainter* QNanoPainter::getInstance()
+{
+    return instance();
+}
 
 void QNanoPainter::enableAntialiasing(bool enable)
 {
