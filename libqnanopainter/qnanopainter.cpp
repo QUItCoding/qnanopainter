@@ -166,7 +166,9 @@ QNanoPainter::QNanoPainter()
 
 QNanoPainter::~QNanoPainter()
 {
-    if (m_backend && m_nvgContext) {
+
+    if (m_backend && m_nvgContext && QOpenGLContext::currentContext()) {
+        // Do NanoVG side cleanups only if OpenGL context still exists
         m_backend->nvgDelete(m_nvgContext);
     }
 
