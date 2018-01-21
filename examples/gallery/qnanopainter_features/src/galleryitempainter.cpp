@@ -814,16 +814,16 @@ void GalleryItemPainter::drawImages() {
 
     // Draw just the "coding" part of the image
     posY += image.height() + margin;
-    QRectF sourceArea(3,89,192-6,28);
+    QRectF sourceArea(0, 100, image.width(), image.height()-100);
     float cx = width()/2;
-    float r = width()*0.1f + m_animationSine*width()*0.2f;
+    float r = width()*0.15f + m_animationSine*width()*0.25f;
     QRectF targetArea(cx-r, posY, r*2, width()*0.1);
     painter()->drawImage(m_testImage, sourceArea, targetArea);
 
-    // Draw rotating & scaling face
-    posY += targetArea.height() + height()*0.2f;
-    image.setFilename(":/qnanopainter_features/images/face.png");
-    QRectF rect(cx-r, posY-r, r*2, r*2);
+    // Draw rotating & scaling image
+    posY += targetArea.height() + height()*0.15f;
+    image.setFilename(":/qnanopainter_features/images/qnanopainter_small.png");
+    QRectF rect(cx-r/2, posY-r/2, r, r);
     QPointF c(rect.x()+rect.width()/2, rect.y()+rect.height()/2);
     painter()->save();
     painter()->translate(c);
@@ -833,18 +833,20 @@ void GalleryItemPainter::drawImages() {
     painter()->restore();
 
     // Scaled images with and without mipmapping
-    posY = height() * 0.7f;
-    float posY2 = posY + (height() * 0.1f);
+    posY = height() * 0.6f;
+    float posY2 = posY + (height() * 0.15f);
     bool useNearest = (m_animationSine > 0.5f);
-    QNanoImage imageNoMipmap(":/qnanopainter_features/images/face.png");
-    QNanoImage imageNoMipmapNearest(":/qnanopainter_features/images/face.png", QNanoImage::NEAREST);
-    QNanoImage imageMipmap(":/qnanopainter_features/images/face.png", QNanoImage::GENERATE_MIPMAPS);
-    QNanoImage imageMipmapNearest(":/qnanopainter_features/images/face.png", QNanoImage::GENERATE_MIPMAPS | QNanoImage::NEAREST);
-    for (int i=0; i<6; ++i) {
-        float size = (i+1) * (width() * 0.036f);
-        QRectF rect2(posX, posY, size, size);
+    QNanoImage imageNoMipmap(":/qnanopainter_features/images/qnanopainter_small.png");
+    QNanoImage imageNoMipmapNearest(":/qnanopainter_features/images/qnanopainter_small.png", QNanoImage::NEAREST);
+    QNanoImage imageMipmap(":/qnanopainter_features/images/qnanopainter_small.png", QNanoImage::GENERATE_MIPMAPS);
+    QNanoImage imageMipmapNearest(":/qnanopainter_features/images/qnanopainter_small.png", QNanoImage::GENERATE_MIPMAPS | QNanoImage::NEAREST);
+    float sizeDiff = width() * 0.05f;
+    float centerY = 4 * sizeDiff;
+    for (int i=0; i<5; ++i) {
+        float size = (i+1) * sizeDiff;
+        QRectF rect2(posX, posY+centerY-size/2, size, size);
         painter()->drawImage(useNearest ? imageNoMipmapNearest : imageNoMipmap, rect2);
-        QRectF rect3(posX, posY2, size, size);
+        QRectF rect3(posX, posY2+centerY-size/2, size, size);
         painter()->drawImage(useNearest ? imageMipmapNearest : imageMipmap, rect3);
         posX += size + 2;
     }
@@ -855,14 +857,16 @@ void GalleryItemPainter::drawImages() {
     QString scaling = useNearest ? "NEAREST" : "LINEAR";
     QString offString = QString("MIPMAPS: OFF, TEXTURE: %1").arg(scaling);
     QString onString = QString("MIPMAPS: ON, TEXTURE: %1").arg(scaling);
+    float text1PosY = posY+centerY/2;
+    float text2PosY = posY2+centerY/2;
     font.setBlur(margin*0.05);
     painter()->setFont(font);
     painter()->setFillStyle("#000000");
-    painter()->fillText(offString, cx, posY);
-    painter()->fillText(onString, cx, posY2);
+    painter()->fillText(offString, cx, text1PosY);
+    painter()->fillText(onString, cx, text2PosY);
     font.setBlur(0);
     painter()->setFillStyle("#ffffff");
     painter()->setFont(font);
-    painter()->fillText(offString, cx, posY);
-    painter()->fillText(onString, cx, posY2);
+    painter()->fillText(offString, cx, text1PosY);
+    painter()->fillText(onString, cx, text2PosY);
 }
