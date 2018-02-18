@@ -48,8 +48,6 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES +=  \
-    $$PWD/qnanoquickitem.cpp \
-    $$PWD/qnanoquickitempainter.cpp \
     $$PWD/qnanopainter.cpp \
     $$PWD/qnanocolor.cpp \
     $$PWD/qnanolineargradient.cpp \
@@ -57,12 +55,12 @@ SOURCES +=  \
     $$PWD/qnanoimage.cpp \
     $$PWD/qnanofont.cpp \
     $$PWD/qnanoradialgradient.cpp \
-    $$PWD/qnanoboxgradient.cpp
+    $$PWD/qnanoboxgradient.cpp \
+    $$PWD/qnanowindow.cpp \
+    $$PWD/private/qnanodebug.cpp
 
 HEADERS +=  \
     $$PWD/private/qnanobrush.h \
-    $$PWD/qnanoquickitem.h \
-    $$PWD/qnanoquickitempainter.h \
     $$PWD/qnanopainter.h \
     $$PWD/qnanocolor.h \
     $$PWD/qnanolineargradient.h \
@@ -73,7 +71,18 @@ HEADERS +=  \
     $$PWD/qnanoboxgradient.h \
     $$PWD/private/qnanodataelement.h \
     $$PWD/private/qnanobackend.h \
-    $$PWD/private/qnanobackendfactory.h
+    $$PWD/private/qnanobackendfactory.h \
+    $$PWD/qnanowindow.h \
+    $$PWD/private/qnanodebug.h
+
+contains(QT, quick) {
+    SOURCES +=  \
+        $$PWD/qnanoquickitem.cpp \
+        $$PWD/qnanoquickitempainter.cpp
+    HEADERS +=  \
+        $$PWD/qnanoquickitem.h \
+        $$PWD/qnanoquickitempainter.h
+}
 
 # Note: Due to Angle, windows might use either OpenGL (desktop) or
 #       openGL ES (angle) backend.

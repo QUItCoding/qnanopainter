@@ -211,6 +211,8 @@ public:
 
 private:
 
+    friend class QNanoDebug;
+    friend class QNanoWindow;
     friend class QNanoQuickItemPainter;
     friend class QNanoFont;
     friend class QNanoImage;

@@ -53,11 +53,6 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
     , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
     , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
     , m_setupDone(false)
-#ifdef QNANO_DEBUG
-    , m_debugNsElapsed(0)
-    , m_debugCounter(0)
-    , m_debugMsElapsed("0.000")
-#endif
 {
     // Initialize QOpenGLFunctions for the context
     initializeOpenGLFunctions();
@@ -242,7 +237,7 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     }
 
 #ifdef QNANO_DEBUG
-    m_debugTimer.start();
+    m_debug.start();
 #endif
 
     synchronize(realItem);
@@ -298,8 +293,7 @@ void QNanoQuickItemPainter::prepaint()
 void QNanoQuickItemPainter::postpaint()
 {
 #ifdef QNANO_DEBUG
-    m_drawDebug = nvgDrawDebug(m_painter->nvgCtx());
-    paintDrawDebug();
+    m_debug.paintDrawDebug(m_painter, width(), height());
 #endif
 
     nvgEndFrame(m_painter->nvgCtx());
@@ -375,58 +369,3 @@ QPointF QNanoQuickItemPainter::itemTransformOrigin() const
     }
 }
 
-#ifdef QNANO_DEBUG
-
-void QNanoQuickItemPainter::paintDrawDebug()
-{
-    int totalTriCount = m_drawDebug.fillTriCount + m_drawDebug.strokeTriCount + m_drawDebug.textTriCount;
-    qint64 elapsed = m_debugTimer.nsecsElapsed();
-    m_debugNsElapsed += elapsed;
-    m_debugCounter++;
-    if(!m_debugUpdateTimer.isValid()) m_debugUpdateTimer.start();
-
-    // How often time is updated, in seconds
-    // Longer period increases accuracy
-    const int UPDATE_FREQUENCY_MS = 1000;
-    if (m_debugUpdateTimer.elapsed() >= UPDATE_FREQUENCY_MS) {
-        qint64 ms = 1000000;
-        double msElapsed = (double)m_debugNsElapsed/(ms*m_debugCounter);
-        m_debugMsElapsed = QString::number(msElapsed, 'f', 3);
-        m_debugNsElapsed = 0;
-        m_debugCounter = 0;
-        m_debugUpdateTimer.start();
-    }
-    float fontSize = qMin((double)QNanoPainter::ptToPx(14), width()*0.05);
-    int debugHeight = fontSize*2;
-    int debugY = height() - debugHeight;
-    m_painter->reset();
-
-    // Background
-    m_painter->setFillStyle(0xB0000000);
-    m_painter->fillRect(0, debugY, width(), debugHeight);
-
-    // Texts
-    m_painter->setFillStyle(0xFFFFFFFF);
-    QNanoFont font(QNanoFont::DEFAULT_FONT_NORMAL);
-    font.setPixelSize(fontSize);
-    m_painter->setFont(font);
-    m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
-    m_painter->setTextBaseline(QNanoPainter::BASELINE_TOP);
-    m_painter->setPixelAlignText(QNanoPainter::PIXEL_ALIGN_HALF);
-    int textY = debugY;
-    int textWidth = width()/6;
-    QString debugText1 = QString("TIME\n%1").arg(m_debugMsElapsed);
-    m_painter->fillText(debugText1, 0, textY, textWidth);
-    QString debugText2 = QString("DCC\n%1").arg(m_drawDebug.drawCallCount);
-    m_painter->fillText(debugText2, textWidth, textY, textWidth);
-    QString debugText3 = QString("FILL\n%1").arg(m_drawDebug.fillTriCount);
-    m_painter->fillText(debugText3, 2*textWidth, textY, textWidth);
-    QString debugText4 = QString("STROKE\n%1").arg(m_drawDebug.strokeTriCount);
-    m_painter->fillText(debugText4, 3*textWidth, textY, textWidth);
-    QString debugText5 = QString("TEXT\n%1").arg(m_drawDebug.textTriCount);
-    m_painter->fillText(debugText5, 4*textWidth, textY, textWidth);
-    QString debugText6 = QString("TOTAL\n%1").arg(totalTriCount);
-    m_painter->fillText(debugText6, 5*textWidth, textY, textWidth);
-}
-
-#endif

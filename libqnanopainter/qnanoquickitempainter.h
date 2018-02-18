@@ -31,6 +31,9 @@
 #endif
 #include "qnanopainter.h"
 #include "qnanoquickitem.h"
+#ifdef QNANO_DEBUG
+#include "private/qnanodebug.h"
+#endif
 
 class QQuickWindow;
 
@@ -141,13 +144,7 @@ private:
     QNanoQuickItem::PixelAlign m_pixelAlignText;
     bool m_setupDone;
 #ifdef QNANO_DEBUG
-    void paintDrawDebug();
-    NVGdrawDebug m_drawDebug;
-    QElapsedTimer m_debugTimer;
-    QElapsedTimer m_debugUpdateTimer;
-    qint64 m_debugNsElapsed;
-    qint64 m_debugCounter;
-    QString m_debugMsElapsed;
+    QNanoDebug m_debug;
 #endif
 };
 
