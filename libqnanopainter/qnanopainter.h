@@ -213,6 +213,7 @@ private:
 
     friend class QNanoDebug;
     friend class QNanoWindow;
+    friend class QNanoWidget;
     friend class QNanoQuickItemPainter;
     friend class QNanoFont;
     friend class QNanoImage;

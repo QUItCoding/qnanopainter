@@ -84,6 +84,13 @@ contains(QT, quick) {
         $$PWD/qnanoquickitempainter.h
 }
 
+contains(QT, widgets) {
+    SOURCES +=  \
+        $$PWD/qnanowidget.cpp
+    HEADERS +=  \
+        $$PWD/qnanowidget.h
+}
+
 # Note: Due to Angle, windows might use either OpenGL (desktop) or
 #       openGL ES (angle) backend.
 android | ios | windows {
