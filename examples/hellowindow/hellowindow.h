@@ -25,7 +25,6 @@
 #include "qnanowindow.h"
 #include "qnanopainter.h"
 
-// HelloItemPainter contains the painting code
 class HelloWindow : public QNanoWindow
 {
 
