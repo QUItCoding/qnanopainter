@@ -31,6 +31,7 @@
 
 class QNanoWindow : public QOpenGLWindow
 {
+    Q_OBJECT
 public:
     QNanoWindow();
 
