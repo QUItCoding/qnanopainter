@@ -22,6 +22,9 @@ win32  {
 # Enable this to let Qt include OpenGL headers
 DEFINES += QNANO_QT_GL_INCLUDE
 
+# This will enable GLES3 (disable to force GLES2)
+DEFINES += QNANO_ENABLE_GLES3
+
 equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 7) {
     message("Building with Qt at least 5.8 so may enabled QNANO_USE_RENDERNODE")
     # Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject
@@ -45,8 +48,6 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES +=  \
-    $$PWD/qnanoquickitem.cpp \
-    $$PWD/qnanoquickitempainter.cpp \
     $$PWD/qnanopainter.cpp \
     $$PWD/qnanocolor.cpp \
     $$PWD/qnanolineargradient.cpp \
@@ -54,12 +55,12 @@ SOURCES +=  \
     $$PWD/qnanoimage.cpp \
     $$PWD/qnanofont.cpp \
     $$PWD/qnanoradialgradient.cpp \
-    $$PWD/qnanoboxgradient.cpp
+    $$PWD/qnanoboxgradient.cpp \
+    $$PWD/qnanowindow.cpp \
+    $$PWD/private/qnanodebug.cpp
 
 HEADERS +=  \
     $$PWD/private/qnanobrush.h \
-    $$PWD/qnanoquickitem.h \
-    $$PWD/qnanoquickitempainter.h \
     $$PWD/qnanopainter.h \
     $$PWD/qnanocolor.h \
     $$PWD/qnanolineargradient.h \
@@ -68,7 +69,49 @@ HEADERS +=  \
     $$PWD/qnanofont.h \
     $$PWD/qnanoradialgradient.h \
     $$PWD/qnanoboxgradient.h \
-    $$PWD/private/qnanodataelement.h
+    $$PWD/private/qnanodataelement.h \
+    $$PWD/private/qnanobackend.h \
+    $$PWD/private/qnanobackendfactory.h \
+    $$PWD/qnanowindow.h \
+    $$PWD/private/qnanodebug.h
+
+contains(QT, quick) {
+    SOURCES +=  \
+        $$PWD/qnanoquickitem.cpp \
+        $$PWD/qnanoquickitempainter.cpp
+    HEADERS +=  \
+        $$PWD/qnanoquickitem.h \
+        $$PWD/qnanoquickitempainter.h
+}
+
+contains(QT, widgets) {
+    SOURCES +=  \
+        $$PWD/qnanowidget.cpp
+    HEADERS +=  \
+        $$PWD/qnanowidget.h
+}
+
+# Note: Due to Angle, windows might use either OpenGL (desktop) or
+#       openGL ES (angle) backend.
+android | ios | windows {
+    message("Including QNanoPainter OpenGL ES backends")
+HEADERS += \
+    $$PWD/private/qnanobackendgles2.h \
+    $$PWD/private/qnanobackendgles3.h
+SOURCES +=  \
+    $$PWD/private/qnanobackendgles2.cpp \
+    $$PWD/private/qnanobackendgles3.cpp
+}
+
+osx | linux:!android | windows {
+    message("Including QNanoPainter OpenGL backends")
+HEADERS += \
+    $$PWD/private/qnanobackendgl2.h \
+    $$PWD/private/qnanobackendgl3.h
+SOURCES +=  \
+    $$PWD/private/qnanobackendgl2.cpp \
+    $$PWD/private/qnanobackendgl3.cpp
+}
 
 ## Include NanoVG
 SOURCES +=  $$PWD/nanovg/nanovg.c

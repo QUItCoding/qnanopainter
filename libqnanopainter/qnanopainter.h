@@ -26,9 +26,11 @@
 #include <QCache>
 #include <QTransform>
 #include <QSharedPointer>
+#include <QSurfaceFormat>
 #include "qnanocolor.h"
 #include "private/qnanobrush.h"
 #include "private/qnanodataelement.h"
+#include "private/qnanobackend.h"
 #include "qnanolineargradient.h"
 #include "qnanoradialgradient.h"
 #include "qnanoimage.h"
@@ -138,6 +140,8 @@ public:
     void rect(const QRectF &rect);
     void roundedRect(float x, float y, float width, float height, float radius);
     void roundedRect(const QRectF &rect, float radius);
+    void roundedRect(float x, float y, float width, float height, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft);
+    void roundedRect(const QRectF &rect, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft);
     void ellipse(float centerX, float centerY, float radiusX, float radiusY);
     void ellipse(const QRectF &rect);
     void circle(float centerX, float centerY, float radius);
@@ -207,6 +211,9 @@ public:
 
 private:
 
+    friend class QNanoDebug;
+    friend class QNanoWindow;
+    friend class QNanoWidget;
     friend class QNanoQuickItemPainter;
     friend class QNanoFont;
     friend class QNanoImage;
@@ -214,6 +221,8 @@ private:
     friend class QNanoImagePattern;
     friend class QNanoLinearGradient;
     friend class QNanoRadialGradient;
+
+    static QNanoPainter *getInstance();
 
     inline NVGcontext* nvgCtx() const {
         return m_nvgContext;
@@ -229,9 +238,12 @@ private:
     void _checkAlignPixelsAdjustOne(float *a);
 
     // TODO: Consider implementing QNanoDataCache class with methods instead of this
-    QMap<QString, QNanoDataElement*> m_dataCache;
+    QHash<QString, QNanoDataElement*> m_dataCache;
 
     NVGcontext* m_nvgContext;
+    QScopedPointer<QNanoBackend> m_backend;
+    QSurfaceFormat m_surfaceFormat;
+
     QNanoPainter::TextAlign m_textAlign;
     QNanoPainter::TextBaseline m_textBaseline;
     double m_devicePixelRatio;
@@ -239,6 +251,7 @@ private:
     QNanoPainter::PixelAlign m_pixelAlign;
     QNanoPainter::PixelAlign m_pixelAlignText;
     QSharedPointer<QNanoFont> m_defaultFont;
+    QString m_openglContextName;
 
 };
 

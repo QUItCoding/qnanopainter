@@ -47,8 +47,8 @@ private:
     void drawRect(float x, float y, float w, float h);
 
     //QNanoPainter *m_painter;
-    qreal m_animationTime;
-    qreal m_animationSine;
+    float m_animationTime;
+    float m_animationSine;
     int m_viewIndex;
 
     QNanoImage m_testImage;

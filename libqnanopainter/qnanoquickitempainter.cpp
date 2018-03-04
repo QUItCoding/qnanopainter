@@ -35,11 +35,6 @@
     TODO: Write more documentation here.
 */
 
-static QSharedPointer<QNanoPainter> getSharedPainter()
-{
-    static QSharedPointer<QNanoPainter> s_nano = QSharedPointer<QNanoPainter>::create();
-    return s_nano;
-}
 
 /*!
     Constructs a QNanoQuickItemPainter.
@@ -47,20 +42,17 @@ static QSharedPointer<QNanoPainter> getSharedPainter()
 
 QNanoQuickItemPainter::QNanoQuickItemPainter()
     : m_window(nullptr)
-    , m_painter(getSharedPainter())
+    , m_painter(QNanoPainter::getInstance())
     , m_fillColor(0.0, 0.0, 0.0, 0.0)
     , m_viewWidth(0)
     , m_viewHeight(0)
+    , m_textureWidth(-1)
+    , m_textureHeight(-1)
     , m_antialiasing(true)
     , m_highQualityRendering(false)
     , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
     , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
     , m_setupDone(false)
-#ifdef QNANO_DEBUG
-    , m_debugNsElapsed(0)
-    , m_debugCounter(0)
-    , m_debugMsElapsed("0.000")
-#endif
 {
     // Initialize QOpenGLFunctions for the context
     initializeOpenGLFunctions();
@@ -166,7 +158,10 @@ QOpenGLFramebufferObject *QNanoQuickItemPainter::createFramebufferObject(const Q
 {
     QOpenGLFramebufferObjectFormat format;
     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-    return new QOpenGLFramebufferObject(size, format);
+    QSize fboSize(size);
+    if (m_textureWidth > -1) fboSize.setWidth(m_textureWidth*m_itemData.devicePixelRatio);
+    if (m_textureHeight > -1) fboSize.setHeight(m_textureHeight*m_itemData.devicePixelRatio);
+    return new QOpenGLFramebufferObject(fboSize, format);
 }
 #endif
 
@@ -200,10 +195,22 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     m_itemData.opacity = this->inheritedOpacity();
     m_itemData.clip = realItem->clip();
 #else
+    // See if user has adjusted manual texture size
+    int newTextureWidth = realItem->textureWidth();
+    int newTextureHeight = realItem->textureHeight();
+    if ((newTextureWidth != m_textureWidth) || (newTextureHeight != m_textureHeight)) {
+        m_textureWidth = newTextureWidth;
+        m_textureHeight = newTextureHeight;
+        invalidateFramebufferObject();
+    }
+
     // If size has changed, update
-    if (static_cast<int>(width()) != static_cast<int>(item->width()) || static_cast<int>(height()) != static_cast<int>(item->height())) {
-        setViewSize(item->width(), item->height());
-        sizeChanged(item->width(), item->height());
+    int viewWidth = (m_textureWidth > -1) ? m_textureWidth : static_cast<int>(item->width());
+    int viewHeight = (m_textureHeight > -1) ? m_textureHeight : static_cast<int>(item->height());
+
+    if ((static_cast<int>(width()) != viewWidth) || (static_cast<int>(height()) != viewHeight)) {
+        setViewSize(viewWidth, viewHeight);
+        sizeChanged(viewWidth, viewHeight);
         // Note: invalidated automatically when size changes if textureFollowsItemSize is true
         //invalidateFramebufferObject();
     }
@@ -224,8 +231,13 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
         m_painter->enableAntialiasing(antialiasing);
     }
 
+    realItem->setContextName(m_painter->m_openglContextName);
+    if (m_painter->m_backend) {
+        realItem->setBackendName(m_painter->m_backend->backendName());
+    }
+
 #ifdef QNANO_DEBUG
-    m_debugTimer.start();
+    m_debug.start();
 #endif
 
     synchronize(realItem);
@@ -281,8 +293,7 @@ void QNanoQuickItemPainter::prepaint()
 void QNanoQuickItemPainter::postpaint()
 {
 #ifdef QNANO_DEBUG
-    m_drawDebug = nvgDrawDebug(m_painter->nvgCtx());
-    paintDrawDebug();
+    m_debug.paintDrawDebug(m_painter, width(), height());
 #endif
 
     nvgEndFrame(m_painter->nvgCtx());
@@ -306,7 +317,7 @@ void QNanoQuickItemPainter::render()
     if ((m_itemData.width > 0 && m_itemData.height > 0) || m_setupDone) {
         m_setupDone = true;
         prepaint();
-        paint(m_painter.data());
+        paint(m_painter);
         postpaint();
     }
     // Reset the GL state for Qt side
@@ -358,55 +369,3 @@ QPointF QNanoQuickItemPainter::itemTransformOrigin() const
     }
 }
 
-#ifdef QNANO_DEBUG
-
-void QNanoQuickItemPainter::paintDrawDebug()
-{
-    int totalTriCount = m_drawDebug.fillTriCount + m_drawDebug.strokeTriCount + m_drawDebug.textTriCount;
-    qint64 elapsed = m_debugTimer.nsecsElapsed();
-    m_debugNsElapsed += elapsed;
-    m_debugCounter++;
-    if(!m_debugUpdateTimer.isValid()) m_debugUpdateTimer.start();
-
-    if (m_debugUpdateTimer.elapsed() >= 1000) {
-        qint64 ms = 1000000;
-        double msElapsed = (double)m_debugNsElapsed/(ms*m_debugCounter);
-        m_debugMsElapsed = QString::number(msElapsed, 'f', 3);
-        m_debugNsElapsed = 0;
-        m_debugCounter = 0;
-        m_debugUpdateTimer.start();
-    }
-    float fontSize = qMin((double)QNanoPainter::ptToPx(14), width()*0.05);
-    int debugHeight = fontSize*2;
-    int debugY = height() - debugHeight;
-    m_painter->reset();
-
-    // Background
-    m_painter->setFillStyle(0xB0000000);
-    m_painter->fillRect(0, debugY, width(), debugHeight);
-
-    // Texts
-    m_painter->setFillStyle(0xFFFFFFFF);
-    QNanoFont font(QNanoFont::DEFAULT_FONT_NORMAL);
-    font.setPixelSize(fontSize);
-    m_painter->setFont(font);
-    m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
-    m_painter->setTextBaseline(QNanoPainter::BASELINE_TOP);
-    m_painter->setPixelAlignText(QNanoPainter::PIXEL_ALIGN_HALF);
-    int textY = debugY;
-    int textWidth = width()/6;
-    QString debugText1 = QString("TIME\n%1").arg(m_debugMsElapsed);
-    m_painter->fillText(debugText1, 0, textY, textWidth);
-    QString debugText2 = QString("DCC\n%1").arg(m_drawDebug.drawCallCount);
-    m_painter->fillText(debugText2, textWidth, textY, textWidth);
-    QString debugText3 = QString("FILL\n%1").arg(m_drawDebug.fillTriCount);
-    m_painter->fillText(debugText3, 2*textWidth, textY, textWidth);
-    QString debugText4 = QString("STROKE\n%1").arg(m_drawDebug.strokeTriCount);
-    m_painter->fillText(debugText4, 3*textWidth, textY, textWidth);
-    QString debugText5 = QString("TEXT\n%1").arg(m_drawDebug.textTriCount);
-    m_painter->fillText(debugText5, 4*textWidth, textY, textWidth);
-    QString debugText6 = QString("TOTAL\n%1").arg(totalTriCount);
-    m_painter->fillText(debugText6, 5*textWidth, textY, textWidth);
-}
-
-#endif

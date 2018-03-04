@@ -8,20 +8,27 @@ Item {
     property string textOn: "ON"
     property string textOff: "OFF"
 
+    signal userChecked()
+
     QtObject {
         id: priv
-        property real switchWidth: Math.max(76*dp, textOnItem.paintedWidth + 60*dp)
+        property real switchWidth: Math.max(66*dp, textOnItem.paintedWidth + 50*dp)
         property real barHeight: 19 * dp
         property real knobMovement: switchWidth - knobSize + 2
         property real knobSize: 32 * dp
         property real knobState: knob.x / knobMovement
+
+        function doSwitch() {
+            root.checked = !root.checked;
+            root.userChecked();
+        }
 
         function releaseSwitch() {
             // Don't switch if we are in correct side
             if ((knob.x == -2 && !checked) || (knob.x == priv.knobMovement && checked)) {
                 return;
             }
-            checked = !checked;
+            priv.doSwitch();
         }
     }
 
@@ -31,9 +38,7 @@ Item {
     MouseArea {
         width: parent.width
         height: parent.height
-        onClicked: {
-            root.checked = !root.checked;
-        }
+        onClicked: priv.doSwitch();
     }
 
     Text {
@@ -59,7 +64,7 @@ Item {
         anchors.rightMargin: 32 * dp
         height: priv.barHeight
         width: priv.switchWidth
-        radius: height/2
+        radius: height/8
         color: "#404040"
     }
     Rectangle {
@@ -69,7 +74,7 @@ Item {
         anchors.rightMargin: 32 * dp
         height: priv.barHeight
         width: priv.switchWidth
-        radius: height/2
+        radius: height/8
         color: "transparent"
         border.width: 1 * dp
         border.color: "#808080"
@@ -79,6 +84,7 @@ Item {
     Item {
         id: switchItem
         anchors.fill: switchBackgroundImage
+        clip: true
 
         Text {
             id: textOnItem
@@ -107,7 +113,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 drag.target: knob; drag.axis: Drag.XAxis; drag.minimumX: -2; drag.maximumX: priv.knobMovement
-                onClicked: checked = !checked;
+                onClicked: priv.doSwitch();
                 onReleased: priv.releaseSwitch();
             }
             Behavior on x {
@@ -128,24 +134,5 @@ Item {
         color: Qt.rgba(colorValue, colorValue, colorValue, 1.0)
         border.width: 1 * dp
         border.color: "#404040"
-    }
-
-    // Mask out switch parts which should be hidden
-    ShaderEffect {
-        id: shaderItem
-        property variant source: ShaderEffectSource { sourceItem: switchItem; hideSource: true }
-        property variant maskSource: ShaderEffectSource { sourceItem: switchBackgroundImage; hideSource: false }
-
-        anchors.fill: switchBackgroundImage
-
-        fragmentShader: "
-            varying highp vec2 qt_TexCoord0;
-            uniform highp float qt_Opacity;
-            uniform sampler2D source;
-            uniform sampler2D maskSource;
-            void main(void) {
-                gl_FragColor = texture2D(source, qt_TexCoord0.st) * (texture2D(maskSource, qt_TexCoord0.st).a) * qt_Opacity;
-            }
-        "
     }
 }

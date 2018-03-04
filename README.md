@@ -1,20 +1,20 @@
 # QNanoPainter
 
-QNanoPainter is a library for implementing custom C++ Qt [QQuickItems](http://doc.qt.io/qt-5/qquickitem.html). In a nutshell, it's like [QQuickPaintedItem](http://doc.qt.io/qt-5/qquickpainteditem.html), but instead of QPainter offers own QNanoPainter API for drawing. QNanoPainter API is a mixture of QPainter and HTML5 canvas APIs. In other words, it's very close to HTML5 canvas but transformed to object oriented C++ with separate classes. The reason for QNanoPainter existence is to try offer performance, productivity and rendering quality all-in-one for custom Qt5 scene graph items.
+QNanoPainter is an OpenGL accelerated C\++ vector drawing library for Qt, offering optimal performance, productivity and rendering quality all-in-one. QNanoPainter API is a mixture of QPainter and HTML5 canvas APIs. In other words, it's very close to HTML5 canvas but transformed to object oriented C++ with separate classes.
+
+QNanoPainter can be used together with Qt5 UIs in different ways:
+
+* Use QNanoQuickItem and QNanoQuickItemPainter when implementing custom C\++ Qt [QQuickItems](http://doc.qt.io/qt-5/qquickitem.html). This is comparable to [QQuickPaintedItem](http://doc.qt.io/qt-5/qquickpainteditem.html), but instead of QPainter offers own QNanoPainter API for drawing.
+* Use QNanoWidget when implementing custom QWidget. This is based on [QOpenGLWidget](http://doc.qt.io/qt-5/qopenglwidget.html).
+* Use QNanoWindow when implementing single-view UI, optimal for embedded usage. This is based on [QOpenGLWindow](http://doc.qt.io/qt-5/qopenglwindow.html).
 
 QNanoPainter uses excellent [NanoVG](https://github.com/memononen/nanovg) as its rendering backend.
 
 
 ## Screenshots
 
-<img src="doc/images/sc_qnanopainter_1.png" width="24%">
-<img src="doc/images/sc_qnanopainter_2.png" width="24%">
-<img src="doc/images/sc_events_1.png" width="24%">
-<img src="doc/images/sc_helloworld_1.png" width="24%">
-<img src="doc/images/sc_gallery_1.png" width="24%">
-<img src="doc/images/sc_gallery_2.png" width="24%">
-<img src="doc/images/sc_gallery_3.png" width="24%">
-<img src="doc/images/sc_gallery_4.png" width="24%">
+<img src="doc/images/sc_qnanopainter_1.png" width="24%"><img src="doc/images/sc_qnanopainter_2.png" width="24%"><img src="doc/images/sc_events_1.png" width="24%"><img src="doc/images/sc_helloworld_1.png" width="24%">
+<img src="doc/images/sc_gallery_1.png" width="24%"><img src="doc/images/sc_gallery_2.png" width="24%"><img src="doc/images/sc_gallery_3.png" width="24%"><img src="doc/images/sc_gallery_4.png" width="24%">
 
 
 ## Features
@@ -40,6 +40,7 @@ Taking QNanoPainter into use in your Qt application is simple:
 ```
 include(src/libqnanopainter/include.pri)
 ```
+### For custom QQuickItem
 
 * Implement your QNanoQuickItem and QNanoQuickItemPainter based classes (see more about these below or from available examples).
 * Export your item into QML in main.cpp with something like: 
@@ -61,8 +62,6 @@ Item {
 	}
 }
 ```
-
-### Implementing custom item
 
 To create own QNanoPainter item you should implement 2 classes:
 
@@ -136,6 +135,30 @@ public:
 };
 ```
 
+### For custom QWidget or QWindow
+
+Implement your own QNanoWidget or QNanoWindow subclass depending on your needs. APIs of these are very similar, basically you just override *paint()* method like this:
+
+```C++:
+#include "qnanowindow.h"
+#include "qnanopainter.h"
+
+class HelloWindow : public QNanoWindow
+{
+public:
+    HelloWindow()
+    {
+        setFillColor("#ffffff");
+    }
+
+    void paint(QNanoPainter *p)
+    {
+        // Paint using QNanoPainter here
+        ...
+    }
+};
+```
+
 
 ## API Reference
 
@@ -160,3 +183,7 @@ The library is licensed under [zlib license](LICENSE.txt).
 * Uses Google Fonts [Roboto](http://www.google.com/fonts/specimen/Roboto) (and [Pacifico](http://www.google.com/fonts/specimen/Pacifico) in gallery example).
 * Blog posts:
   * [Introducing QNanoPainter](http://kgronholm.blogspot.fi/2015/10/introducing-qnanopainter.html)
+  * [QNanoPainter with Qt 5.8 (and QSGRenderNode)](http://kgronholm.blogspot.fi/2017/03/qnanopainter-with-qt-58-and.html)
+  * [FitGraph NG UI prototype](http://kgronholm.blogspot.fi/2017/10/fitgraph-ng-ui-prototype.html)
+  * [Qt 5.10 Rendering Benchmarks](http://kgronholm.blogspot.fi/2017/12/qt-510-rendering-benchmarks.html)
+  * [Qt 5.10 Windows Rendering Benchmarks](http://kgronholm.blogspot.fi/2018/01/qt-510-windows-rendering-benchmarks.html)

@@ -174,13 +174,13 @@ int EventItem::resizeItemAt(QPointF pos)
 void EventItem::generateRandomItems()
 {
     m_items.clear();
-    int margin = width()*0.05;
+    int margin = width()*0.05f;
     int items = 2 + qrand()%150;
     for (int i=0; i<items ; i++) {
-        qreal w = qrand() % (int)(width()*0.2) + margin;
-        qreal h = qrand() % (int)(height()*0.2) + margin;
-        qreal x = qrand() % (int)(width()-w-margin*2) + margin;
-        qreal y = qrand() % (int)(height()-h-margin*2) + margin;
+        float w = qrand() % (int)(width()*0.2f) + margin;
+        float h = qrand() % (int)(height()*0.2f) + margin;
+        float x = qrand() % (int)(width()-w-margin*2) + margin;
+        float y = qrand() % (int)(height()-h-margin*2) + margin;
         m_items << QRectF(x, y, w, h);
     }
     update();

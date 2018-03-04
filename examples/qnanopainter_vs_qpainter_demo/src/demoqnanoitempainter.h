@@ -20,9 +20,11 @@ private:
     void drawGraphCircles(float x, float y, float w, float h, int items, float t);
     void drawIcons(float x, float y, float w, float h, int items, float t);
     void drawRuler(float x, float y, float w, float h, float t);
+    void drawFlower(float x, float y, float w, float h, float t);
+    float _flowerPos(int i);
 
     QNanoPainter *m_painter;
-    qreal m_animationTime;
+    float m_animationTime;
     int m_enabledTests;
     int m_testCount;
 

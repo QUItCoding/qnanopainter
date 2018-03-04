@@ -26,12 +26,14 @@
 #include <QtQuick/QQuickFramebufferObject>
 #include <QColor>
 #include <QElapsedTimer>
-#include <QSharedPointer>
 #ifdef QNANO_USE_RENDERNODE
 #include <QSGRenderNode>
 #endif
 #include "qnanopainter.h"
 #include "qnanoquickitem.h"
+#ifdef QNANO_DEBUG
+#include "private/qnanodebug.h"
+#endif
 
 class QQuickWindow;
 
@@ -72,7 +74,7 @@ public:
     QColor fillColor() const;
     inline QNanoPainter *painter() const
     {
-        return m_painter.data();
+        return m_painter;
     }
     inline float width() const
     {
@@ -131,9 +133,10 @@ private:
 
     QQuickWindow *m_window;
 
-    QSharedPointer<QNanoPainter> m_painter;
+    QNanoPainter *m_painter;
     QColor m_fillColor;
     int m_viewWidth, m_viewHeight;
+    int m_textureWidth, m_textureHeight;
     ItemData m_itemData;
     bool m_antialiasing;
     bool m_highQualityRendering;
@@ -141,13 +144,7 @@ private:
     QNanoQuickItem::PixelAlign m_pixelAlignText;
     bool m_setupDone;
 #ifdef QNANO_DEBUG
-    void paintDrawDebug();
-    NVGdrawDebug m_drawDebug;
-    QElapsedTimer m_debugTimer;
-    QElapsedTimer m_debugUpdateTimer;
-    qint64 m_debugNsElapsed;
-    qint64 m_debugCounter;
-    QString m_debugMsElapsed;
+    QNanoDebug m_debug;
 #endif
 };
 

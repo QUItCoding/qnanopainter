@@ -71,6 +71,7 @@ QNanoFont::QNanoFont()
     , m_spacing(0.0f)
     , m_lineHeight(1.0f)
     , m_fontPropertiesChanged(false)
+    , m_fontFilenameChanged(true)
 {
 }
 
@@ -93,6 +94,7 @@ QNanoFont::QNanoFont(const QString &filename)
     , m_spacing(0.0f)
     , m_lineHeight(1.0f)
     , m_fontPropertiesChanged(false)
+    , m_fontFilenameChanged(true)
 {
 }
 
@@ -141,6 +143,7 @@ void QNanoFont::setFilename(const QString &filename)
     if (m_filename == filename)
         return;
     m_filename = filename;
+    m_fontFilenameChanged = true;
 }
 
 /*!
@@ -154,28 +157,28 @@ void QNanoFont::setFontId(FontId fontId)
     switch (fontId)
     {
     case QNanoFont::DEFAULT_FONT_THIN:
-        m_filename = ":/qnanopainter/data/Roboto-Thin.ttf";
+        setFilename(":/qnanopainter/data/Roboto-Thin.ttf");
         break;
     case QNanoFont::DEFAULT_FONT_THIN_ITALIC:
-        m_filename = ":/qnanopainter/data/Roboto-ThinItalic.ttf";
+        setFilename(":/qnanopainter/data/Roboto-ThinItalic.ttf");
         break;
     case QNanoFont::DEFAULT_FONT_LIGHT:
-        m_filename = ":/qnanopainter/data/Roboto-Light.ttf";
+        setFilename(":/qnanopainter/data/Roboto-Light.ttf");
         break;
     case QNanoFont::DEFAULT_FONT_LIGHT_ITALIC:
-        m_filename = ":/qnanopainter/data/Roboto-LightItalic.ttf";
+        setFilename(":/qnanopainter/data/Roboto-LightItalic.ttf");
         break;
     case QNanoFont::DEFAULT_FONT_NORMAL:
-        m_filename = ":/qnanopainter/data/Roboto-Regular.ttf";
+        setFilename(":/qnanopainter/data/Roboto-Regular.ttf");
         break;
     case QNanoFont::DEFAULT_FONT_NORMAL_ITALIC:
-        m_filename = ":/qnanopainter/data/Roboto-Italic.ttf";
+        setFilename(":/qnanopainter/data/Roboto-Italic.ttf");
         break;
     case QNanoFont::DEFAULT_FONT_BOLD:
-        m_filename = ":/qnanopainter/data/Roboto-Bold.ttf";
+        setFilename(":/qnanopainter/data/Roboto-Bold.ttf");
         break;
     case QNanoFont::DEFAULT_FONT_BOLD_ITALIC:
-        m_filename = ":/qnanopainter/data/Roboto-BoldItalic.ttf";
+        setFilename(":/qnanopainter/data/Roboto-BoldItalic.ttf");
         break;
     }
 }
@@ -255,13 +258,19 @@ int QNanoFont::getID(NVGcontext* nvg)
         nvgFontBlur(nvg, m_blur);
         nvgTextLetterSpacing(nvg, m_spacing);
         nvgTextLineHeight(nvg, m_lineHeight);
+        m_fontPropertiesChanged = false;
     }
 
     if (m_filename.isEmpty()) {
         // No font file set, so loading the default font
         setFontId(QNanoFont::DEFAULT_FONT_NORMAL);
     }
-    m_id = nvgFindFont(nvg,m_filename.toUtf8().constData());
+
+    if (m_fontFilenameChanged) {
+        m_id = nvgFindFont(nvg,m_filename.toUtf8().constData());
+        m_fontFilenameChanged = false;
+    }
+
     if (m_id == -1) {
         // Font is not yet in cache, so load and add it
         QFile file(m_filename);
