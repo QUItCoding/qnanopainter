@@ -90,7 +90,7 @@ void DemoQNanoItemPainter::paint(QNanoPainter *painter)
         }
 
         // Increase animation time when m_testCount > 1
-        t += 0.3;
+        t += 0.3f;
     }
 }
 
@@ -187,7 +187,7 @@ void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, 
     int i;
 
     // Setup values
-    float a1 = -M_PI/2;
+    float a1 = -(float)M_PI/2;
     QVarLengthArray<float, 1024> a0(items);
     for (i=0; i<items; i++) {
         a0[i] = -M_PI/2 + 2*M_PI*(((float)items-i)/items)*showAnimationProgress;
