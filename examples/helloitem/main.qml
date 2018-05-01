@@ -17,7 +17,7 @@ Window {
 
     HelloItem {
         anchors.top: textItem.bottom
+        anchors.bottom: parent.bottom
         width: parent.width
-        height: width
     }
 }
