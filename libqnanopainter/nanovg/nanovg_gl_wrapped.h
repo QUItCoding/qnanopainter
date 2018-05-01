@@ -754,7 +754,7 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 	if (type == NVG_TEXTURE_RGBA)
 		QNANO_GLFWRAPPER glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else
-#if defined(NANOVG_GLES2)
+#if defined(NANOVG_GLES2) || defined (NANOVG_GL2)
 		QNANO_GLFWRAPPER glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
 #elif defined(NANOVG_GLES3)
 		QNANO_GLFWRAPPER glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, data);
@@ -846,7 +846,7 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 	if (tex->type == NVG_TEXTURE_RGBA)
 		QNANO_GLFWRAPPER glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else
-#ifdef NANOVG_GLES2
+#if defined(NANOVG_GLES2) || defined(NANOVG_GL2)
 		QNANO_GLFWRAPPER glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
 #else
 		QNANO_GLFWRAPPER glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RED, GL_UNSIGNED_BYTE, data);
@@ -989,13 +989,14 @@ static void glnvg__setUniforms(GLNVGcontext* gl, int uniformOffset, int image)
 	}
 }
 
-static void glnvg__renderViewport(void* uptr, int x, int y, int width, int height, float devicePixelRatio)
+static void glnvg__renderViewport(void* uptr, float x, float y, float width, float height, float devicePixelRatio)
 {
+	NVG_NOTUSED(devicePixelRatio);
 	GLNVGcontext* gl = (GLNVGcontext*)uptr;
-	gl->view[0] = (float)x;
-	gl->view[1] = (float)y;
-	gl->view[2] = (float)width;
-	gl->view[3] = (float)height;
+	gl->view[0] = x;
+	gl->view[1] = y;
+	gl->view[2] = width;
+	gl->view[3] = height;
 }
 
 static void glnvg__fill(GLNVGcontext* gl, GLNVGcall* call)
