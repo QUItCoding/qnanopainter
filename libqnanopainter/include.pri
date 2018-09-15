@@ -93,7 +93,14 @@ contains(QT, widgets) {
 
 # Note: Due to Angle, windows might use either OpenGL (desktop) or
 #       openGL ES (angle) backend.
-android | ios | windows {
+android | ios | linux-rasp-* | windows {
+    CONFIG += build_gles_backends
+}
+!CONFIG(build_gles_backends) | windows {
+    CONFIG += build_gl_backends
+}
+
+CONFIG(build_gles_backends) {
     message("Including QNanoPainter OpenGL ES backends")
 HEADERS += \
     $$PWD/private/qnanobackendgles2.h \
@@ -103,7 +110,7 @@ SOURCES +=  \
     $$PWD/private/qnanobackendgles3.cpp
 }
 
-osx | linux:!android | windows {
+CONFIG(build_gl_backends) {
     message("Including QNanoPainter OpenGL backends")
 HEADERS += \
     $$PWD/private/qnanobackendgl2.h \
