@@ -111,7 +111,8 @@ void QNanoWindow::prepaint()
         m_painter->setFillStyle(QNanoColor::fromQColor(Qt::transparent));
     }
 
-    nvgBeginFrame(m_painter->nvgCtx(), width(), height(), devicePixelRatio());
+    nvgBeginFrame(m_painter->nvgCtx(), width(), height(),
+                  static_cast<float>(devicePixelRatio()));
 }
 
 void QNanoWindow::postpaint()

@@ -88,10 +88,10 @@ QNanoBoxGradient::QNanoBoxGradient(float x, float y, float width, float height, 
 
 QNanoBoxGradient::QNanoBoxGradient(const QRectF &rect, float feather, float radius)
 {
-    m_x = rect.x();
-    m_y = rect.y();
-    m_width = rect.width();
-    m_height = rect.height();
+    m_x = static_cast<float>(rect.x());
+    m_y = static_cast<float>(rect.y());
+    m_width = static_cast<float>(rect.width());
+    m_height = static_cast<float>(rect.height());
     m_feather = feather;
     m_radius = radius;
     m_icol = nvgRGB(255, 255, 255);
@@ -122,7 +122,8 @@ void QNanoBoxGradient::setRect(float x, float y, float width, float height)
 
 void QNanoBoxGradient::setRect(const QRectF &rect)
 {
-    setRect(rect.x(), rect.y(), rect.width(), rect.height());
+    setRect(static_cast<float>(rect.x()), static_cast<float>(rect.y()),
+            static_cast<float>(rect.width()), static_cast<float>(rect.height()));
 }
 
 /*!

@@ -278,10 +278,12 @@ int QNanoFont::getID(NVGcontext* nvg)
         {
             qWarning() << "Could not open font file: " << m_filename;
         } else {
-            qint64 length = file.bytesAvailable();
+            size_t length = static_cast<size_t>(file.bytesAvailable());
             char * data = static_cast<char*>(malloc(length));
-            file.read(data,length);
-            m_id = nvgCreateFontMem(nvg, m_filename.toUtf8().constData(), reinterpret_cast<unsigned char*>(data), length, 1);
+            file.read(data, length);
+            m_id = nvgCreateFontMem(nvg, m_filename.toUtf8().constData(),
+                                    reinterpret_cast<unsigned char*>(data),
+                                    static_cast<int>(length), 1);
             file.close();
         }
     }

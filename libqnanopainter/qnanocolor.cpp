@@ -52,7 +52,10 @@ QNanoColor::QNanoColor()
 
 QNanoColor::QNanoColor(int r, int g, int b, int a)
 {
-    m_nvgColor = nvgRGBA(r, g, b, a);
+    m_nvgColor = nvgRGBA(static_cast<unsigned char>(r),
+                         static_cast<unsigned char>(g),
+                         static_cast<unsigned char>(b),
+                         static_cast<unsigned char>(a));
 }
 
 /*!
@@ -106,13 +109,13 @@ QNanoColor::QNanoColor(const char *hex)
 
 void QNanoColor::setHexColor(unsigned int hex)
 {
-    m_nvgColor.b = (float)(0x000000FF & hex) / 255.0f;
+    m_nvgColor.b = static_cast<float>(0x000000FF & hex) / 255.0f;
     hex = hex >> 8;
-    m_nvgColor.g = (float)(0x000000FF & hex) / 255.0f;
+    m_nvgColor.g = static_cast<float>(0x000000FF & hex) / 255.0f;
     hex = hex >> 8;
-    m_nvgColor.r = (float)(0x000000FF & hex) / 255.0f;
+    m_nvgColor.r = static_cast<float>(0x000000FF & hex) / 255.0f;
     hex = hex >> 8;
-    m_nvgColor.a = (float)(0x000000FF & hex) / 255.0f;
+    m_nvgColor.a = static_cast<float>(0x000000FF & hex) / 255.0f;
 }
 
 /*!
@@ -138,14 +141,14 @@ void QNanoColor::setHexColor(const char *hex)
     uchar a,r,g,b;
     if (length == 7) {
         a = 255;
-        r = s.mid(1,2).toInt(&ok, 16);
-        g = s.mid(3,2).toInt(&ok, 16);
-        b = s.mid(5,2).toInt(&ok, 16);
+        r = static_cast<unsigned char>(s.mid(1,2).toInt(&ok, 16));
+        g = static_cast<unsigned char>(s.mid(3,2).toInt(&ok, 16));
+        b = static_cast<unsigned char>(s.mid(5,2).toInt(&ok, 16));
     } else {
-        a = s.mid(1,2).toInt(&ok, 16);
-        r = s.mid(3,2).toInt(&ok, 16);
-        g = s.mid(5,2).toInt(&ok, 16);
-        b = s.mid(7,2).toInt(&ok, 16);
+        a = static_cast<unsigned char>(s.mid(1,2).toInt(&ok, 16));
+        r = static_cast<unsigned char>(s.mid(3,2).toInt(&ok, 16));
+        g = static_cast<unsigned char>(s.mid(5,2).toInt(&ok, 16));
+        b = static_cast<unsigned char>(s.mid(7,2).toInt(&ok, 16));
     }
     m_nvgColor = nvgRGBA(r, g, b, a);
 }
@@ -158,7 +161,7 @@ void QNanoColor::setHexColor(const char *hex)
 
 int QNanoColor::red() const
 {
-    return m_nvgColor.r * 255.0f;
+    return static_cast<int>(m_nvgColor.r * 255.0f);
 }
 
 /*!
@@ -169,7 +172,7 @@ int QNanoColor::red() const
 
 int QNanoColor::green() const
 {
-    return m_nvgColor.g * 255.0f;
+    return static_cast<int>(m_nvgColor.g * 255.0f);
 }
 
 /*!
@@ -180,7 +183,7 @@ int QNanoColor::green() const
 
 int QNanoColor::blue() const
 {
-    return m_nvgColor.b * 255.0f;
+    return static_cast<int>(m_nvgColor.b * 255.0f);
 }
 
 /*!
@@ -191,7 +194,7 @@ int QNanoColor::blue() const
 
 int QNanoColor::alpha() const
 {
-    return m_nvgColor.a * 255.0f;
+    return static_cast<int>(m_nvgColor.a * 255.0f);
 }
 
 /*!

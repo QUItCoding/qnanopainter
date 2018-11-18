@@ -74,7 +74,7 @@
 QNanoImage::QNanoImage()
     : m_parentPainter(nullptr)
     , m_imageData(nullptr)
-    , m_flags(0)
+    , m_flags(nullptr)
 {
 }
 
@@ -179,7 +179,7 @@ int QNanoImage::getID(NVGcontext* nvg)
             m_imageData = new QNanoDataElement();
             QByteArray array = file.readAll();
             int length = array.size();
-            unsigned char* data = (unsigned char*)&array.constData()[0];
+            unsigned char* data = reinterpret_cast<unsigned char*>(&array.data()[0]);
             m_imageData->id = nvgCreateImageMem(nvg, m_flags, data, length);
             nvgImageSize(nvg, m_imageData->id, &m_imageData->width, &m_imageData->height);
             dataCache->insert(m_uniqueKey, m_imageData);

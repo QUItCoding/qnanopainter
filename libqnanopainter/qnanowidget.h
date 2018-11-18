@@ -34,6 +34,7 @@ class QNanoWidget : public QOpenGLWidget
     Q_OBJECT
 public:
     explicit QNanoWidget(QWidget *parent = nullptr);
+    virtual ~QNanoWidget() Q_DECL_OVERRIDE {}
 
     QColor fillColor() const;
     void setFillColor(const QColor &color);

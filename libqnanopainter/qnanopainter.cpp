@@ -132,7 +132,7 @@ QNanoPainter::QNanoPainter()
     : m_nvgContext(nullptr)
     , m_textAlign(QNanoPainter::ALIGN_LEFT)
     , m_textBaseline(QNanoPainter::BASELINE_ALPHABETIC)
-    , m_devicePixelRatio(1.0)
+    , m_devicePixelRatio(1.0f)
     , m_fontSet(false)
 {
 
@@ -406,9 +406,12 @@ void QNanoPainter::resetTransform()
 void QNanoPainter::transform(const QTransform &transform)
 {
     nvgTransform(nvgCtx()
-                 , transform.m11(), transform.m12()
-                 , transform.m21(), transform.m22()
-                 , transform.m31(), transform.m32());
+                 , static_cast<float>(transform.m11())
+                 , static_cast<float>(transform.m12())
+                 , static_cast<float>(transform.m21())
+                 , static_cast<float>(transform.m22())
+                 , static_cast<float>(transform.m31())
+                 , static_cast<float>(transform.m32()));
 }
 
 /*!
@@ -430,7 +433,8 @@ void QNanoPainter::translate(float x, float y)
 
 void QNanoPainter::translate(const QPointF &point)
 {
-    translate(point.x(), point.y());
+    translate(static_cast<float>(point.x()),
+              static_cast<float>(point.y()));
 }
 
 /*!
@@ -499,7 +503,12 @@ const QTransform QNanoPainter::currentTransform() const
 {
     float *xform = new float[6];
     nvgCurrentTransform(nvgCtx(), xform);
-    QTransform t(xform[0], xform[1], xform[2], xform[3], xform[4], xform[5]);
+    QTransform t(static_cast<double>(xform[0]),
+            static_cast<double>(xform[1]),
+            static_cast<double>(xform[2]),
+            static_cast<double>(xform[3]),
+            static_cast<double>(xform[4]),
+            static_cast<double>(xform[5]));
     delete [] xform;
     return t;
 }
@@ -533,7 +542,10 @@ void QNanoPainter::setClipRect(float x, float y, float width, float height)
 
 void QNanoPainter::setClipRect(const QRectF &rect)
 {
-    setClipRect(rect.x(), rect.y(), rect.width(), rect.height());
+    setClipRect(static_cast<float>(rect.x()),
+                static_cast<float>(rect.y()),
+                static_cast<float>(rect.width()),
+                static_cast<float>(rect.height()));
 }
 
 /*!
@@ -603,7 +615,8 @@ void QNanoPainter::moveTo(float x, float y)
 
 void QNanoPainter::moveTo(const QPointF &point)
 {
-    moveTo(point.x(), point.y());
+    moveTo(static_cast<float>(point.x()),
+           static_cast<float>(point.y()));
 }
 
 /*!
@@ -627,7 +640,8 @@ void QNanoPainter::lineTo(float x, float y)
 
 void QNanoPainter::lineTo(const QPointF &point)
 {
-    lineTo(point.x(), point.y());
+    lineTo(static_cast<float>(point.x()),
+           static_cast<float>(point.y()));
 }
 
 /*!
@@ -654,7 +668,12 @@ void QNanoPainter::bezierTo(float c1x, float c1y, float c2x, float c2y, float x,
 
 void QNanoPainter::bezierTo(const QPointF &controlPoint1, const QPointF &controlPoint2, const QPointF &endPoint)
 {
-    bezierTo(controlPoint1.x(), controlPoint1.y(), controlPoint2.x(), controlPoint2.y(), endPoint.x(), endPoint.y());
+    bezierTo(static_cast<float>(controlPoint1.x()),
+             static_cast<float>(controlPoint1.y()),
+             static_cast<float>(controlPoint2.x()),
+             static_cast<float>(controlPoint2.y()),
+             static_cast<float>(endPoint.x()),
+             static_cast<float>(endPoint.y()));
 }
 
 /*!
@@ -680,7 +699,10 @@ void QNanoPainter::quadTo(float cx, float cy, float x, float y)
 
 void QNanoPainter::quadTo(const QPointF &controlPoint, const QPointF &endPoint)
 {
-    quadTo(controlPoint.x(), controlPoint.y(), endPoint.x(), endPoint.y());
+    quadTo(static_cast<float>(controlPoint.x()),
+           static_cast<float>(controlPoint.y()),
+           static_cast<float>(endPoint.x()),
+           static_cast<float>(endPoint.y()));
 }
 
 /*!
@@ -706,7 +728,11 @@ void QNanoPainter::arcTo(float c1x, float c1y, float c2x, float c2y, float radiu
 
 void QNanoPainter::arcTo(const QPointF &controlPoint1, const QPointF &controlPoint2, float radius)
 {
-    arcTo(controlPoint1.x(), controlPoint1.y(), controlPoint2.x(), controlPoint2.y(), radius);
+    arcTo(static_cast<float>(controlPoint1.x()),
+          static_cast<float>(controlPoint1.y()),
+          static_cast<float>(controlPoint2.x()),
+          static_cast<float>(controlPoint2.y()),
+          radius);
 }
 
 /*!
@@ -736,7 +762,9 @@ void QNanoPainter::arc(float centerX, float centerY, float radius, float a0, flo
 
 void QNanoPainter::arc(const QPointF &centerPoint, float radius, float a0, float a1, PathWinding direction)
 {
-    arc(centerPoint.x(), centerPoint.y(), radius, a0, a1, direction);
+    arc(static_cast<float>(centerPoint.x()),
+        static_cast<float>(centerPoint.y()),
+        radius, a0, a1, direction);
 }
 
 /*!
@@ -763,7 +791,10 @@ void QNanoPainter::rect(float x, float y, float width, float height)
 
 void QNanoPainter::rect(const QRectF &rect)
 {
-    this->rect(rect.x(), rect.y(), rect.width(), rect.height());
+    this->rect(static_cast<float>(rect.x()),
+               static_cast<float>(rect.y()),
+               static_cast<float>(rect.width()),
+               static_cast<float>(rect.height()));
 }
 
 /*!
@@ -790,7 +821,11 @@ void QNanoPainter::roundedRect(float x, float y, float width, float height, floa
 
 void QNanoPainter::roundedRect(const QRectF &rect, float radius)
 {
-    roundedRect(rect.x(), rect.y(), rect.width(), rect.height(), radius);
+    roundedRect(static_cast<float>(rect.x()),
+                static_cast<float>(rect.y()),
+                static_cast<float>(rect.width()),
+                static_cast<float>(rect.height()),
+                radius);
 }
 
 /*!
@@ -819,7 +854,11 @@ void QNanoPainter::roundedRect(float x, float y, float width, float height, floa
 
 void QNanoPainter::roundedRect(const QRectF &rect, float radiusTopLeft, float radiusTopRight, float radiusBottomRight, float radiusBottomLeft)
 {
-    roundedRect(rect.x(), rect.y(), rect.width(), rect.height(), radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft);
+    roundedRect(static_cast<float>(rect.x()),
+                static_cast<float>(rect.y()),
+                static_cast<float>(rect.width()),
+                static_cast<float>(rect.height()),
+                radiusTopLeft, radiusTopRight, radiusBottomRight, radiusBottomLeft);
 }
 
 /*!
@@ -844,7 +883,10 @@ void QNanoPainter::ellipse(float centerX, float centerY, float radiusX, float ra
 
 void QNanoPainter::ellipse(const QRectF &rect)
 {
-    ellipse(rect.x()+rect.width()/2, rect.y()+rect.height()/2, rect.width()/2, rect.height()/2);
+    ellipse(static_cast<float>(rect.x()+rect.width()/2),
+            static_cast<float>(rect.y()+rect.height()/2),
+            static_cast<float>(rect.width()/2),
+            static_cast<float>(rect.height()/2));
 }
 
 /*!
@@ -867,7 +909,8 @@ void QNanoPainter::circle(float centerX, float centerY, float radius)
 
 void QNanoPainter::circle(const QPointF &centerPoint, float radius)
 {
-    circle(centerPoint.x(), centerPoint.y(), radius);
+    circle(static_cast<float>(centerPoint.x()),
+           static_cast<float>(centerPoint.y()), radius);
 }
 
 /*!
@@ -959,7 +1002,10 @@ void QNanoPainter::fillRect(float x, float y, float width, float height)
 
 void QNanoPainter::fillRect(const QRectF &rect)
 {
-    fillRect(rect.x(), rect.y(), rect.width(), rect.height());
+    fillRect(static_cast<float>(rect.x()),
+             static_cast<float>(rect.y()),
+             static_cast<float>(rect.width()),
+             static_cast<float>(rect.height()));
 }
 
 /*!
@@ -987,7 +1033,10 @@ void QNanoPainter::strokeRect(float x, float y, float width, float height)
 
 void QNanoPainter::strokeRect(const QRectF &rect)
 {
-    strokeRect(rect.x(), rect.y(), rect.width(), rect.height());
+    strokeRect(static_cast<float>(rect.x()),
+               static_cast<float>(rect.y()),
+               static_cast<float>(rect.width()),
+               static_cast<float>(rect.height()));
 }
 
 // *** Images ***
@@ -1038,7 +1087,11 @@ void QNanoPainter::drawImage(QNanoImage &image, float x, float y, float width, f
 
 void QNanoPainter::drawImage(QNanoImage &image, const QRectF destinationRect)
 {
-    drawImage(image, destinationRect.x(), destinationRect.y(), destinationRect.width(), destinationRect.height());
+    drawImage(image,
+              static_cast<float>(destinationRect.x()),
+              static_cast<float>(destinationRect.y()),
+              static_cast<float>(destinationRect.width()),
+              static_cast<float>(destinationRect.height()));
 }
 
 /*!
@@ -1051,14 +1104,14 @@ void QNanoPainter::drawImage(QNanoImage &image, const QRectF destinationRect)
 void QNanoPainter::drawImage(QNanoImage &image, const QRectF sourceRect, const QRectF destinationRect)
 {
     image.setParentPainter(this);
-    float sx = sourceRect.x();
-    float sy = sourceRect.y();
-    float sw = sourceRect.width();
-    float sh = sourceRect.height();
-    float dx = destinationRect.x();
-    float dy = destinationRect.y();
-    float dw = destinationRect.width();
-    float dh = destinationRect.height();
+    float sx = static_cast<float>(sourceRect.x());
+    float sy = static_cast<float>(sourceRect.y());
+    float sw = static_cast<float>(sourceRect.width());
+    float sh = static_cast<float>(sourceRect.height());
+    float dx = static_cast<float>(destinationRect.x());
+    float dy = static_cast<float>(destinationRect.y());
+    float dw = static_cast<float>(destinationRect.width());
+    float dh = static_cast<float>(destinationRect.height());
     _checkAlignPixelsAdjust(&dx, &dy);
     _checkAlignPixels(&dw, &dh);
     float startX = dx - sx * (dw/sw);
@@ -1167,7 +1220,10 @@ void QNanoPainter::fillText(const QString &text, float x, float y, float maxWidt
 
 void QNanoPainter::fillText(const QString &text, const QPointF &point, float maxWidth)
 {
-    fillText(text, point.x(), point.y(), maxWidth);
+    fillText(text,
+             static_cast<float>(point.x()),
+             static_cast<float>(point.y()),
+             maxWidth);
 }
 
 /*!
@@ -1182,11 +1238,13 @@ void QNanoPainter::fillText(const QString &text, const QPointF &point, float max
 
 void QNanoPainter::fillText(const QString &text, const QRectF &rect)
 {
-    float x = rect.x();
-    float y = rect.y();
+    float x = static_cast<float>(rect.x());
+    float y = static_cast<float>(rect.y());
     _checkAlignPixelsText(&x, &y);
     _checkFont();
-    nvgTextBox(nvgCtx(), x, y, rect.width(), text.toUtf8().constData(), nullptr);
+    nvgTextBox(nvgCtx(), x, y,
+               static_cast<float>(rect.width()),
+               text.toUtf8().constData(), nullptr);
 }
 
 /*!
@@ -1208,7 +1266,10 @@ const QRectF QNanoPainter::textBoundingBox(const QString &text, float x, float y
     } else {
         nvgTextBoxBounds(nvgCtx(), x, y, maxWidth, text.toUtf8().constData(), nullptr, bounds);
     }
-    return QRectF(bounds[0], bounds[1], bounds[2]-bounds[0], bounds[3]-bounds[1]);
+    return QRectF(static_cast<double>(bounds[0]),
+            static_cast<double>(bounds[1]),
+            static_cast<double>(bounds[2]-bounds[0]),
+            static_cast<double>(bounds[3]-bounds[1]));
 }
 
 /*!
@@ -1268,7 +1329,7 @@ void QNanoPainter::setPixelAlignText(PixelAlign align)
 }
 
 /*!
-    \fn double QNanoPainter::devicePixelRatio() const
+    \fn float QNanoPainter::devicePixelRatio() const
 
     Returns the ratio between physical pixels and device-independent pixels.
     This is only used on Apple #retina" displays, where it's 2.0 or 3.0
@@ -1276,7 +1337,7 @@ void QNanoPainter::setPixelAlignText(PixelAlign align)
     The default value is 1.0.
 */
 
-double QNanoPainter::devicePixelRatio() const
+float QNanoPainter::devicePixelRatio() const
 {
     return m_devicePixelRatio;
 }
@@ -1298,9 +1359,9 @@ float QNanoPainter::mmToPx(float mm)
     float ldp = 72.0f;
     QScreen *screen = QGuiApplication::primaryScreen();
     if (screen) {
-        ldp = screen->physicalDotsPerInch();
+        ldp = static_cast<float>(screen->physicalDotsPerInch());
     } else {
-        qWarning() << "QScreen required for pxToMm";
+        qWarning() << "QScreen required for mmToPx";
     }
     return ldp * mm / 25.4f;
 }
@@ -1316,7 +1377,7 @@ float QNanoPainter::ptToPx(float pt)
     float ldp = 72.0f;
     QScreen *screen = QGuiApplication::primaryScreen();
     if (screen) {
-        ldp = screen->physicalDotsPerInch();
+        ldp = static_cast<float>(screen->physicalDotsPerInch());
     } else {
         qWarning() << "QScreen required for ptToPx";
     }
@@ -1389,25 +1450,25 @@ void QNanoPainter::_checkAlignPixelsAdjust(float *a, float *b, float *c, float *
 // Align to full pixel
 void QNanoPainter::_checkAlignPixels(float *a, float *b, float *c, float *d) {
     if (m_pixelAlign) {
-        if (a) *a = ((int)(*a * m_devicePixelRatio + 0.5)) / m_devicePixelRatio;
-        if (b) *b = ((int)(*b * m_devicePixelRatio + 0.5)) / m_devicePixelRatio;
-        if (c) *c = ((int)(*c * m_devicePixelRatio + 0.5)) / m_devicePixelRatio;
-        if (d) *d = ((int)(*d * m_devicePixelRatio + 0.5)) / m_devicePixelRatio;
+        if (a) *a = (static_cast<int>(*a * m_devicePixelRatio + 0.5f)) / m_devicePixelRatio;
+        if (b) *b = (static_cast<int>(*b * m_devicePixelRatio + 0.5f)) / m_devicePixelRatio;
+        if (c) *c = (static_cast<int>(*c * m_devicePixelRatio + 0.5f)) / m_devicePixelRatio;
+        if (d) *d = (static_cast<int>(*d * m_devicePixelRatio + 0.5f)) / m_devicePixelRatio;
     }
 }
 
 // Align text to full pixel
 void QNanoPainter::_checkAlignPixelsText(float *a, float *b) {
     if (m_pixelAlignText) {
-        if (a) *a = ((int)(*a * m_devicePixelRatio + 0.5)) / m_devicePixelRatio;
-        if (b) *b = ((int)(*b * m_devicePixelRatio + 0.5)) / m_devicePixelRatio;
+        if (a) *a = (static_cast<int>(*a * m_devicePixelRatio + 0.5f)) / m_devicePixelRatio;
+        if (b) *b = (static_cast<int>(*b * m_devicePixelRatio + 0.5f)) / m_devicePixelRatio;
     }
 }
 
 void QNanoPainter::_checkAlignPixelsAdjustOne(float *a) {
     if (a) {
-        float adjustment = 0.5/m_devicePixelRatio;
-        *a = ((int)(*a * m_devicePixelRatio)) / m_devicePixelRatio;
+        float adjustment = 0.5f / m_devicePixelRatio;
+        *a = (static_cast<int>(*a * m_devicePixelRatio)) / m_devicePixelRatio;
         if (m_pixelAlign == QNanoPainter::PIXEL_ALIGN_HALF) *a += adjustment;
     }
 }

@@ -48,7 +48,7 @@ public:
     QNanoImage();
 
     // Constructs an image with the filename and flags
-    QNanoImage(const QString &filename, ImageFlags flags=0);
+    QNanoImage(const QString &filename, ImageFlags flags = nullptr);
 
     ~QNanoImage();
 

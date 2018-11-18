@@ -81,10 +81,10 @@ QNanoRadialGradient::QNanoRadialGradient(float centerX, float centerY, float out
 
 QNanoRadialGradient::QNanoRadialGradient(const QPointF &center, float outerRadius, float innerRadius)
     : m_changed(true)
-    , m_cx(center.x())
-    , m_cy(center.y())
-    , m_or(outerRadius)
-    , m_ir(innerRadius)
+    , m_cx(static_cast<float>(center.x()))
+    , m_cy(static_cast<float>(center.y()))
+    , m_or(static_cast<float>(outerRadius))
+    , m_ir(static_cast<float>(innerRadius))
 {
     m_icol = nvgRGB(255, 255, 255);
     m_ocol = nvgRGBA(0, 0, 0, 0);
@@ -111,7 +111,8 @@ void QNanoRadialGradient::setCenterPosition(float x, float y)
 
 void QNanoRadialGradient::setCenterPosition(const QPointF &center)
 {
-    setCenterPosition(center.x(), center.y());
+    setCenterPosition(static_cast<float>(center.x()),
+                      static_cast<float>(center.y()));
     m_changed = true;
 }
 

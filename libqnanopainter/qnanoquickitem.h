@@ -54,8 +54,8 @@ public:
         PixelAlignFull = 2
     };
 
-    QNanoQuickItem(QQuickItem *parent = 0);
-    ~QNanoQuickItem();
+    QNanoQuickItem(QQuickItem *parent = nullptr);
+    ~QNanoQuickItem() Q_DECL_OVERRIDE;
 
     QString contextName() const;
 
