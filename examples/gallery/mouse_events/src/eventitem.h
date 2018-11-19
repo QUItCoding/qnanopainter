@@ -7,7 +7,7 @@ class EventItem : public QNanoQuickItem
 {
     Q_OBJECT
 public:
-    EventItem(QQuickItem *parent = 0);
+    EventItem(QQuickItem *parent = nullptr);
 
     // Reimplement
     QNanoQuickItemPainter *createItemPainter() const;

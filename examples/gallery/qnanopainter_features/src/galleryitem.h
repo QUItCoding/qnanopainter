@@ -18,7 +18,7 @@ class GalleryItem : public QNanoQuickItem
 
 public:
 
-    GalleryItem(QQuickItem *parent = 0);
+    GalleryItem(QQuickItem *parent = nullptr);
 
     // Reimplement
     QNanoQuickItemPainter *createItemPainter() const;
@@ -27,7 +27,7 @@ public:
     float animationSine() const { return m_animationSine; }
 
     void setAnimationTime(const float value) {
-        if (value == m_animationTime)
+        if (qFuzzyCompare(value, m_animationTime))
             return;
         m_animationTime = value;
         emit animationTimeChanged();
@@ -35,7 +35,7 @@ public:
     }
 
     void setAnimationSine(const float value) {
-        if (value == m_animationSine)
+        if (qFuzzyCompare(value, m_animationSine))
             return;
         m_animationSine = value;
         emit animationSineChanged();

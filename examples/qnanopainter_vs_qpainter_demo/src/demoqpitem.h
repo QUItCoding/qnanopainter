@@ -18,7 +18,7 @@ class DemoQPItem : public QQuickPaintedItem
     Q_PROPERTY(bool qpRenderTargetFBO READ qpRenderTargetFBO WRITE setQpRenderTargetFBO NOTIFY qpRenderTargetFBOChanged)
 
 public:    
-    DemoQPItem(QQuickItem *parent = 0);
+    DemoQPItem(QQuickItem *parent = nullptr);
     void paint(QPainter *painter);
 
     float animationTime() const { return m_animationTime; }
@@ -28,7 +28,7 @@ public:
     bool qpRenderTargetFBO() const { return m_qpRenderTargetFBO; }
 
     void setAnimationTime(const float value) {
-        if (value == m_animationTime)
+        if (qFuzzyCompare(value, m_animationTime))
             return;
         m_animationTime = value;
         emit animationTimeChanged();

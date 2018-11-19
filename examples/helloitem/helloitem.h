@@ -27,7 +27,7 @@ class HelloItem : public QNanoQuickItem
     Q_OBJECT
 
 public:
-    HelloItem(QQuickItem *parent = 0)
+    HelloItem(QQuickItem *parent = nullptr)
         :  QNanoQuickItem(parent)
     {
     }

@@ -23,7 +23,7 @@ void EventItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeom
 {
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
     if (widthValid() && heightValid()) {
-        m_circleSize = 2 + qMin(width(), height())*0.01;
+        m_circleSize = 2 + int(qMin(width(), height())*0.01);
         generateRandomItems();
     }
 }
@@ -174,13 +174,13 @@ int EventItem::resizeItemAt(QPointF pos)
 void EventItem::generateRandomItems()
 {
     m_items.clear();
-    int margin = width()*0.05f;
+    int margin = int(width()*0.05);
     int items = 2 + qrand()%150;
     for (int i=0; i<items ; i++) {
-        float w = qrand() % (int)(width()*0.2f) + margin;
-        float h = qrand() % (int)(height()*0.2f) + margin;
-        float x = qrand() % (int)(width()-w-margin*2) + margin;
-        float y = qrand() % (int)(height()-h-margin*2) + margin;
+        double w = qrand() % int(width()*0.2) + margin;
+        double h = qrand() % int(height()*0.2) + margin;
+        double x = qrand() % int(width()-w-margin*2) + margin;
+        double y = qrand() % int(height()-h-margin*2) + margin;
         m_items << QRectF(x, y, w, h);
     }
     update();
