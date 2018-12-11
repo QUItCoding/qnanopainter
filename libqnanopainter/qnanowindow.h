@@ -33,7 +33,8 @@ class QNanoWindow : public QOpenGLWindow
 {
     Q_OBJECT
 public:
-    QNanoWindow();
+    QNanoWindow(QOpenGLWindow::UpdateBehavior updateBehavior = NoPartialUpdate,
+                QWindow *parent = nullptr);
 
     QColor fillColor() const;
     void setFillColor(const QColor &color);

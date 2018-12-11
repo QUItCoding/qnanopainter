@@ -21,8 +21,8 @@
 
 #include "qnanowindow.h"
 
-QNanoWindow::QNanoWindow()
-    : QOpenGLWindow(QOpenGLWindow::NoPartialUpdate)
+QNanoWindow::QNanoWindow(UpdateBehavior updateBehavior, QWindow *parent)
+    : QOpenGLWindow(updateBehavior, parent)
     , m_fillColor(0.0, 0.0, 0.0, 0.0)
     , m_painter(nullptr)
     , m_setupDone(false)
