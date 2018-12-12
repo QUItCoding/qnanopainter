@@ -48,7 +48,7 @@ void QNanoDebug::paintDrawDebug(QNanoPainter *painter, float width, float height
     const int UPDATE_FREQUENCY_MS = 1000;
     if (m_debugUpdateTimer.elapsed() >= UPDATE_FREQUENCY_MS) {
         qint64 ms = 1000000;
-        double msElapsed = static_cast<double>(m_debugNsElapsed/(ms*m_debugCounter));
+        double msElapsed = static_cast<double>(m_debugNsElapsed)/(ms*m_debugCounter);
         m_debugMsElapsed = QString::number(msElapsed, 'f', 3);
         m_debugNsElapsed = 0;
         m_debugCounter = 0;
