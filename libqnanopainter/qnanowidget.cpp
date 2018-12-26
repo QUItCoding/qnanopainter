@@ -20,6 +20,7 @@
 **********************************************************/
 
 #include "qnanowidget.h"
+#include <QOpenGLFunctions>
 
 QNanoWidget::QNanoWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -108,9 +109,12 @@ void QNanoWidget::paint(QNanoPainter *painter)
 void QNanoWidget::prepaint()
 {
     if (m_fillColor.alpha() > 0) {
-        m_painter->setFillStyle(QNanoColor::fromQColor(m_fillColor));
-        m_painter->fillRect(0, 0, width(), height());
-        m_painter->setFillStyle(QNanoColor::fromQColor(Qt::transparent));
+        QOpenGLFunctions glF(QOpenGLContext::currentContext());
+        glF.glClearColor(GLclampf(m_fillColor.redF()),
+                         GLclampf(m_fillColor.greenF()),
+                         GLclampf(m_fillColor.blueF()),
+                         GLclampf(m_fillColor.alphaF()));
+        glF.glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     }
 
     nvgBeginFrame(m_painter->nvgCtx(), width(), height(), devicePixelRatio());

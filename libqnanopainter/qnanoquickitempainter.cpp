@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QQuickWindow>
 #include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLFunctions>
 #include <QtMath>
 
 /*!
@@ -252,11 +253,13 @@ void QNanoQuickItemPainter::paint(QNanoPainter *painter)
 void QNanoQuickItemPainter::prepaint()
 {
 #ifndef QNANO_USE_RENDERNODE
-    glClearColor(static_cast<float>(m_fillColor.redF()),
-                 static_cast<float>(m_fillColor.greenF()),
-                 static_cast<float>(m_fillColor.blueF()),
-                 static_cast<float>(m_fillColor.alphaF()));
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    QOpenGLFunctions glF(QOpenGLContext::currentContext());
+    glF.glClearColor(GLclampf(m_fillColor.redF()),
+                     GLclampf(m_fillColor.greenF()),
+                     GLclampf(m_fillColor.blueF()),
+                     GLclampf(m_fillColor.alphaF()));
+    glF.glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+
 #endif
     // Note: Last parameter can be used to render in lower resolution
 #ifdef QNANO_USE_RENDERNODE
