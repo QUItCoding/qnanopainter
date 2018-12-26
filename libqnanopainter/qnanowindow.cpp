@@ -28,7 +28,12 @@ QNanoWindow::QNanoWindow(UpdateBehavior updateBehavior, QWindow *parent)
     , m_painter(nullptr)
     , m_setupDone(false)
 {
-
+    QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
+    if (fmt.stencilBufferSize() <= 0) {
+        // Make sure there is stencil buffer as NanoVG requires it
+        fmt.setStencilBufferSize(8);
+        setFormat(fmt);
+    }
 }
 
 /*!
