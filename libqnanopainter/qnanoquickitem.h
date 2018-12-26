@@ -104,6 +104,10 @@ protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) Q_DECL_OVERRIDE Q_DECL_FINAL;
 #endif
 
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+    void touchEvent(QTouchEvent *event) Q_DECL_OVERRIDE;
+#endif
+
 Q_SIGNALS:
     void contextNameChanged();
     void backendNameChanged();
@@ -116,6 +120,8 @@ Q_SIGNALS:
     void mouseHoverEventsEnabledChanged();
     void textureWidthChanged();
     void textureHeightChanged();
+
+    void touchSignal(QTouchEvent *event);
 
 private:
 

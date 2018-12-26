@@ -123,3 +123,10 @@ void QNanoWindow::postpaint()
 
     nvgEndFrame(m_painter->nvgCtx());
 }
+
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+void QNanoWindow::touchEvent(QTouchEvent *event)
+{
+    emit touchSignal(event);
+}
+#endif

@@ -27,7 +27,9 @@ QNanoWidget::QNanoWidget(QWidget *parent)
     , m_painter(nullptr)
     , m_setupDone(false)
 {
-
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+    setAttribute(Qt::WA_AcceptTouchEvents);
+#endif
 }
 
 /*!
@@ -122,3 +124,22 @@ void QNanoWidget::postpaint()
 
     nvgEndFrame(m_painter->nvgCtx());
 }
+
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+bool QNanoWidget::event(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::TouchBegin:
+    case QEvent::TouchEnd:
+    case QEvent::TouchCancel:
+    case QEvent::TouchUpdate: {
+        QTouchEvent *tEvent = static_cast<QTouchEvent *>(event);
+        emit touchSignal(tEvent);
+        return event->isAccepted();
+    }
+    default:
+        break;
+    }
+    return QWidget::event(event);
+}
+#endif

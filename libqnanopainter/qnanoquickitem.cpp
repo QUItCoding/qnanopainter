@@ -614,3 +614,11 @@ QSGNode *QNanoQuickItem::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintN
     return QQuickFramebufferObject::updatePaintNode(node, nodeData);
 }
 #endif
+
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+void QNanoQuickItem::touchEvent(QTouchEvent *event)
+{
+    event->setAccepted(false);
+    emit touchSignal(event);
+}
+#endif
