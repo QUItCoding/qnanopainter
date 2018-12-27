@@ -23,6 +23,8 @@
 #define QNANOQUICKITEM_H
 
 #include <QtQuick/QQuickFramebufferObject>
+#include <QObject>
+#include <QColor>
 
 class QNanoQuickItemPainter;
 
