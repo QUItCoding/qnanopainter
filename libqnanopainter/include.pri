@@ -29,6 +29,10 @@ DEFINES += QNANO_ENABLE_GLES3
 # Can be useful when using view/widget classes directly
 #DEFINES += QNANO_ENABLE_TOUCH_SIGNALS
 
+# This will enable signalling paint events
+# Can be useful when using view/widget classes directly
+#DEFINES += QNANO_ENABLE_PAINT_SIGNALS
+
 equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 7) {
     message("Building with Qt at least 5.8 so may enabled QNANO_USE_RENDERNODE")
     # Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject

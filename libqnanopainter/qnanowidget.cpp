@@ -102,7 +102,11 @@ void QNanoWidget::paintGL()
 
 void QNanoWidget::paint(QNanoPainter *painter)
 {
+#ifdef QNANO_ENABLE_PAINT_SIGNALS
+    emit paintSignal(painter);
+#else
     Q_UNUSED(painter);
+#endif
 }
 
 // Initializations to OpenGL and vg context before paint()

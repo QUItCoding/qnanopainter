@@ -42,6 +42,7 @@ public:
 
 Q_SIGNALS:
     void touchSignal(QTouchEvent *event);
+    void paintSignal(QNanoPainter *painter);
 
 protected:
     virtual void paint(QNanoPainter *painter);
