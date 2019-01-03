@@ -102,14 +102,14 @@ QNanoQuickItemPainter::~QNanoQuickItemPainter()
     \fn void QNanoQuickItemPainter::synchronize(QNanoQuickItem *item)
 
     Reimplement this method to synchronize data between \a item and
-    item painter instances. This will be called before point() each
+    item painter instances. This will be called before paint() each
     time item needs to be repainted.
 
     This method is the only place where it is safe for the painter and the
     item to read and write each others variables.
 
-    Usually you should cast \a item to your real item type, check that
-    it is not null and then exchange the data.
+    Usually you should static_cast \a item to your real item type, and then
+    exchange the data.
 */
 
 void QNanoQuickItemPainter::synchronize(QNanoQuickItem *item)

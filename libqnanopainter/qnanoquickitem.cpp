@@ -28,9 +28,9 @@
 /*!
     \enum QNanoQuickItem::PixelAlign
 
-    PixelAlign is used to defining if painting or text should be aligned to pixels.
+    PixelAlign is used to define if painting or text should be aligned to pixels.
 
-    \value PixelAlignNone (default) Don't do any alignment.
+    \value PixelAlignNone (default) Do not do any alignment.
 
     \value PixelAlignHalf Align to half pixels. This will make painting appear sharp when line width is odd.
 

@@ -26,7 +26,7 @@
 
 /*!
     \class QNanoColor
-    \brief QNanoColor is a brush for radial gradient painting.
+    \brief QNanoColor is a brush for solid color painting.
     \inmodule QNanoPainter
 
     TODO: Write more documentation here.
@@ -63,7 +63,7 @@ QNanoColor::QNanoColor(int r, int g, int b, int a)
 
     Constructs a color with the 0xAARRGGBB format from \a hex.
     Parameter \a hex is unsigned integer so when assigning
-    value into it as hexadesimal, precede it with 0x or 0X.
+    value into it as hexadecimal, precede it with 0x or 0X.
     Each color pair should be a hex value between 00 (0) and FF (255).
 
     Correct format is not checked. Select this constructor over char
@@ -100,7 +100,7 @@ QNanoColor::QNanoColor(const char *hex)
 
     Set the color with 0xAARRGGBB format from \a hex.
     Parameter \a hex is unsigned integer so when assigning
-    value into it as hexadesimal precede it with 0x or 0X.
+    value into it as hexadecimal precede it with 0x or 0X.
     Each color pair should be a hex value between 00 (0) and FF (255).
 
     Correct format is not checked. Select this constructor over char

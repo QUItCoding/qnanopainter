@@ -40,7 +40,7 @@
     \enum QNanoFont::FontId
 
     FontId is used to load a default fonts. These fonts cover the normal use needs
-    so that applications don't necessarily need to include own TrueType font files.
+    so that applications do not necessarily need to include own TrueType font files.
     Fonts are differentiated by their weight (thickness) and normal or italic style.
     \value DEFAULT_FONT_THIN Thin font.
     \value DEFAULT_FONT_THIN_ITALIC Thin italic font.

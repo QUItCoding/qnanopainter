@@ -54,7 +54,7 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 /*!
     \enum QNanoPainter::LineCap
 
-    LineCap is used to defining how the end of the line (cap) is drawn.
+    LineCap is used to define how the end of the line (cap) is drawn.
 
     \value CAP_BUTT (default) Square line ending that does not cover the end point of the line.
 
@@ -68,7 +68,7 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 /*!
     \enum QNanoPainter::LineJoin
 
-    LineJoin is used to defining how the joins between two connected lines are drawn.
+    LineJoin is used to define how the joins between two connected lines are drawn.
 
     \value JOIN_ROUND Circular arc between the two lines is filled.
 
@@ -82,7 +82,7 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 /*!
     \enum QNanoPainter::TextAlign
 
-    TextAlign is used to defining how the text is aligned horizontally.
+    TextAlign is used to define how the text is aligned horizontally.
 
     \value ALIGN_LEFT (default) Align the left side of the text horizontally to the specified position.
 
@@ -96,7 +96,7 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 /*!
     \enum QNanoPainter::TextBaseline
 
-    TextBaseline is used to defining how the text is aligned (baselined) vertically.
+    TextBaseline is used to define how the text is aligned (baselined) vertically.
 
     \value BASELINE_TOP Align the top of the text vertically to the specified position.
 
@@ -112,9 +112,9 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 /*!
     \enum QNanoPainter::PixelAlign
 
-    PixelAlign is used to defining if painting or text should be aligned to pixels.
+    PixelAlign is used to define if painting or text should be aligned to pixels.
 
-    \value PIXEL_ALIGN_NONE (default) Don't do any alignment.
+    \value PIXEL_ALIGN_NONE (default) Do not do any alignment.
 
     \value PIXEL_ALIGN_HALF Align to half pixels. This will make painting appear sharp when line width is odd.
 
