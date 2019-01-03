@@ -104,7 +104,7 @@ contains(QT, widgets) {
 android | ios | linux-rasp-* | windows {
     CONFIG += build_gles_backends
 }
-!CONFIG(build_gles_backends) | windows {
+!CONFIG(build_gles_backends) | windows:!wince {
     CONFIG += build_gl_backends
 }
 
