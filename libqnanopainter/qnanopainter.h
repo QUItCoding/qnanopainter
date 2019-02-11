@@ -185,7 +185,7 @@ public:
     void setAntialias(float antialias);
     void setPixelAlign(PixelAlign align);
     void setPixelAlignText(PixelAlign align);
-    double devicePixelRatio() const;
+    float devicePixelRatio() const;
 
     // ***** Static methods *****
 
@@ -232,9 +232,9 @@ private:
     void enableHighQualityRendering(bool enable);
 
     void _checkFont();
-    void _checkAlignPixelsAdjust(float *a, float *b = NULL, float *c = NULL, float *d = NULL);
-    void _checkAlignPixels(float *a, float *b = NULL, float *c = NULL, float *d = NULL);
-    void _checkAlignPixelsText(float *a, float *b = NULL);
+    void _checkAlignPixelsAdjust(float *a, float *b = nullptr, float *c = nullptr, float *d = nullptr);
+    void _checkAlignPixels(float *a, float *b = nullptr, float *c = nullptr, float *d = nullptr);
+    void _checkAlignPixelsText(float *a, float *b = nullptr);
     void _checkAlignPixelsAdjustOne(float *a);
 
     // TODO: Consider implementing QNanoDataCache class with methods instead of this
@@ -246,7 +246,7 @@ private:
 
     QNanoPainter::TextAlign m_textAlign;
     QNanoPainter::TextBaseline m_textBaseline;
-    double m_devicePixelRatio;
+    float m_devicePixelRatio;
     bool m_fontSet;
     QNanoPainter::PixelAlign m_pixelAlign;
     QNanoPainter::PixelAlign m_pixelAlignText;

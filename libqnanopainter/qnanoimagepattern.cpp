@@ -87,10 +87,10 @@ QNanoImagePattern::QNanoImagePattern(const QNanoImage &image)
 
 QNanoImagePattern::QNanoImagePattern(const QNanoImage &image, const QRectF &rect, float angle, float alpha)
     : m_changed(true)
-    , m_x(rect.x())
-    , m_y(rect.y())
-    , m_width(rect.width())
-    , m_height(rect.height())
+    , m_x(static_cast<float>(rect.x()))
+    , m_y(static_cast<float>(rect.y()))
+    , m_width(static_cast<float>(rect.width()))
+    , m_height(static_cast<float>(rect.height()))
     , m_angle(angle)
     , m_alpha(alpha)
 {
@@ -146,7 +146,8 @@ void QNanoImagePattern::setStartPosition(float x, float y)
 
 void QNanoImagePattern::setStartPosition(const QPointF &point)
 {
-    setStartPosition(point.x(), point.y());
+    setStartPosition(static_cast<float>(point.x()),
+                     static_cast<float>(point.y()));
     m_changed = true;
 }
 
@@ -171,7 +172,8 @@ void QNanoImagePattern::setImageSize(float width, float height)
 
 void QNanoImagePattern::setImageSize(const QSizeF &size)
 {
-    setImageSize(size.width(), size.height());
+    setImageSize(static_cast<float>(size.width()),
+                 static_cast<float>(size.height()));
     m_changed = true;
 }
 

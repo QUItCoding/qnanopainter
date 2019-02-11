@@ -16,7 +16,7 @@ win32  {
     }
 }
 
-# Enable this to get drawind debug information
+# Enable this to get drawing debug information
 #DEFINES += QNANO_DEBUG
 
 # Enable this to let Qt include OpenGL headers
@@ -24,6 +24,14 @@ DEFINES += QNANO_QT_GL_INCLUDE
 
 # This will enable GLES3 (disable to force GLES2)
 DEFINES += QNANO_ENABLE_GLES3
+
+# This will enable signalling touch events
+# Can be useful when using view/widget classes directly
+#DEFINES += QNANO_ENABLE_TOUCH_SIGNALS
+
+# This will enable signalling paint events
+# Can be useful when using view/widget classes directly
+#DEFINES += QNANO_ENABLE_PAINT_SIGNALS
 
 equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 7) {
     message("Building with Qt at least 5.8 so may enabled QNANO_USE_RENDERNODE")
@@ -33,7 +41,7 @@ equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 7) {
 
 # Configure the amount of logging in release build
 CONFIG(release, debug|release) {
-    message("QNanoPainter Relase build")
+    message("QNanoPainter Release build")
     #DEFINES += QT_NO_WARNING_OUTPUT
     DEFINES += QT_NO_DEBUG_OUTPUT
     DEFINES += QT_NO_INFO_OUTPUT
@@ -93,7 +101,14 @@ contains(QT, widgets) {
 
 # Note: Due to Angle, windows might use either OpenGL (desktop) or
 #       openGL ES (angle) backend.
-android | ios | windows {
+android | ios | linux-rasp-* | windows {
+    CONFIG += build_gles_backends
+}
+!CONFIG(build_gles_backends) | windows:!wince {
+    CONFIG += build_gl_backends
+}
+
+CONFIG(build_gles_backends) {
     message("Including QNanoPainter OpenGL ES backends")
 HEADERS += \
     $$PWD/private/qnanobackendgles2.h \
@@ -103,7 +118,7 @@ SOURCES +=  \
     $$PWD/private/qnanobackendgles3.cpp
 }
 
-osx | linux:!android | windows {
+CONFIG(build_gl_backends) {
     message("Including QNanoPainter OpenGL backends")
 HEADERS += \
     $$PWD/private/qnanobackendgl2.h \

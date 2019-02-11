@@ -79,10 +79,10 @@ QNanoLinearGradient::QNanoLinearGradient(float startX, float startY, float endX,
 
 QNanoLinearGradient::QNanoLinearGradient(const QPointF &start, const QPointF &end)
     : m_changed(true)
-    , m_sx(start.x())
-    , m_sy(start.y())
-    , m_ex(end.x())
-    , m_ey(end.y())
+    , m_sx(static_cast<float>(start.x()))
+    , m_sy(static_cast<float>(start.y()))
+    , m_ex(static_cast<float>(end.x()))
+    , m_ey(static_cast<float>(end.y()))
 {
     m_icol = nvgRGB(255, 255, 255);
     m_ocol = nvgRGBA(0, 0, 0, 0);
@@ -128,7 +128,8 @@ void QNanoLinearGradient::setStartPosition(float x, float y)
 
 void QNanoLinearGradient::setStartPosition(const QPointF &start)
 {
-    setStartPosition(start.x(), start.y());
+    setStartPosition(static_cast<float>(start.x()),
+                     static_cast<float>(start.y()));
     m_changed = true;
 }
 
@@ -153,7 +154,8 @@ void QNanoLinearGradient::setEndPosition(float x, float y)
 
 void QNanoLinearGradient::setEndPosition(const QPointF &end)
 {
-    setEndPosition(end.x(), end.y());
+    setEndPosition(static_cast<float>(end.x()),
+                   static_cast<float>(end.y()));
     m_changed = true;
 }
 

@@ -18,7 +18,7 @@ DemoQNanoItemPainter::DemoQNanoItemPainter()
     m_color2 = QNanoColor(255,255,255,150);
     m_color3 = QNanoColor(255,255,255,80);
 
-    QNanoImage::ImageFlags imageFlags = 0;
+    QNanoImage::ImageFlags imageFlags = nullptr;
 #ifndef Q_OS_WIN
     // Windows ANGLE seems to have issues with mipmaps, use those in all other platforms.
     // See: https://github.com/QUItCoding/qnanopainter/issues/19
@@ -90,7 +90,7 @@ void DemoQNanoItemPainter::paint(QNanoPainter *painter)
         }
 
         // Increase animation time when m_testCount > 1
-        t += 0.3;
+        t += 0.3f;
     }
 }
 
@@ -187,7 +187,7 @@ void DemoQNanoItemPainter::drawGraphCircles(float x, float y, float w, float h, 
     int i;
 
     // Setup values
-    float a1 = -M_PI/2;
+    float a1 = -(float)M_PI/2;
     QVarLengthArray<float, 1024> a0(items);
     for (i=0; i<items; i++) {
         a0[i] = -M_PI/2 + 2*M_PI*(((float)items-i)/items)*showAnimationProgress;

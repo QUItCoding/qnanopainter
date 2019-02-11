@@ -35,6 +35,8 @@ public:
         m_parentPainter = nullptr;
     }
 
+    virtual ~QNanoBrush() {}
+
 protected:
 
     // Reimplement this in Brush sub-classes

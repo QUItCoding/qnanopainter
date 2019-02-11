@@ -45,23 +45,23 @@ class QNanoQuickItemPainter : public QQuickFramebufferObject::Renderer, protecte
 {
 
     struct ItemData {
-        double x, y, width, height;
-        double devicePixelRatio;
-        double rotation;
-        double scale;
-        double opacity;
+        float x, y, width, height;
+        float devicePixelRatio;
+        float rotation;
+        float scale;
+        float opacity;
         QQuickItem::TransformOrigin transformOrigin;
         bool clip;
         ItemData()
         {
-            x = 0.0;
-            y = 0.0;
-            width = 0.0;
-            height = 0.0;
-            devicePixelRatio = 1.0;
-            rotation = 0.0;
-            scale = 1.0;
-            opacity = 1.0;
+            x = 0.0f;
+            y = 0.0f;
+            width = 0.0f;
+            height = 0.0f;
+            devicePixelRatio = 1.0f;
+            rotation = 0.0f;
+            scale = 1.0f;
+            opacity = 1.0f;
             transformOrigin = QQuickItem::Center;
             clip = false;
         }
@@ -69,7 +69,7 @@ class QNanoQuickItemPainter : public QQuickFramebufferObject::Renderer, protecte
 
 public:
     explicit QNanoQuickItemPainter();
-    virtual ~QNanoQuickItemPainter();
+    virtual ~QNanoQuickItemPainter() Q_DECL_OVERRIDE;
 
     QColor fillColor() const;
     inline QNanoPainter *painter() const

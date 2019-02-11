@@ -28,9 +28,9 @@
 /*!
     \enum QNanoQuickItem::PixelAlign
 
-    PixelAlign is used to defining if painting or text should be aligned to pixels.
+    PixelAlign is used to define if painting or text should be aligned to pixels.
 
-    \value PixelAlignNone (default) Don't do any alignment.
+    \value PixelAlignNone (default) Do not do any alignment.
 
     \value PixelAlignHalf Align to half pixels. This will make painting appear sharp when line width is odd.
 
@@ -612,5 +612,13 @@ QSGNode *QNanoQuickItem::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintN
         return node;
     }
     return QQuickFramebufferObject::updatePaintNode(node, nodeData);
+}
+#endif
+
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+void QNanoQuickItem::touchEvent(QTouchEvent *event)
+{
+    event->setAccepted(false);
+    emit touchSignal(event);
 }
 #endif

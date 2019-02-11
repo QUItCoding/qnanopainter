@@ -23,6 +23,7 @@
 #define QNANOWIDGET_H
 
 #include <QOpenGLWidget>
+#include <QTouchEvent>
 #include <QColor>
 #include "qnanopainter.h"
 #ifdef QNANO_DEBUG
@@ -34,9 +35,14 @@ class QNanoWidget : public QOpenGLWidget
     Q_OBJECT
 public:
     explicit QNanoWidget(QWidget *parent = nullptr);
+    virtual ~QNanoWidget() Q_DECL_OVERRIDE {}
 
     QColor fillColor() const;
     void setFillColor(const QColor &color);
+
+Q_SIGNALS:
+    void touchSignal(QTouchEvent *event);
+    void paintSignal(QNanoPainter *painter);
 
 protected:
     virtual void paint(QNanoPainter *painter);
@@ -44,6 +50,10 @@ protected:
     // Reimplemented from QOpenGLWidget
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
+
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+    bool event(QEvent *event) Q_DECL_OVERRIDE;
+#endif
 
 private:
     // These are internal

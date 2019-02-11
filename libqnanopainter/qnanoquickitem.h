@@ -23,6 +23,8 @@
 #define QNANOQUICKITEM_H
 
 #include <QtQuick/QQuickFramebufferObject>
+#include <QObject>
+#include <QColor>
 
 class QNanoQuickItemPainter;
 
@@ -54,8 +56,8 @@ public:
         PixelAlignFull = 2
     };
 
-    QNanoQuickItem(QQuickItem *parent = 0);
-    ~QNanoQuickItem();
+    QNanoQuickItem(QQuickItem *parent = nullptr);
+    ~QNanoQuickItem() Q_DECL_OVERRIDE;
 
     QString contextName() const;
 
@@ -104,6 +106,10 @@ protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) Q_DECL_OVERRIDE Q_DECL_FINAL;
 #endif
 
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+    void touchEvent(QTouchEvent *event) Q_DECL_OVERRIDE;
+#endif
+
 Q_SIGNALS:
     void contextNameChanged();
     void backendNameChanged();
@@ -116,6 +122,8 @@ Q_SIGNALS:
     void mouseHoverEventsEnabledChanged();
     void textureWidthChanged();
     void textureHeightChanged();
+
+    void touchSignal(QTouchEvent *event);
 
 private:
 

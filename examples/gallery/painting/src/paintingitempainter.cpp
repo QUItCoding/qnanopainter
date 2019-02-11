@@ -62,7 +62,7 @@ void PaintingItemPainter::paint(QNanoPainter *painter)
     grad.setStartColor("#808080");
     grad.setEndColor("#606060");
     grad.setCenterPosition(width()/2, height()/2);
-    grad.setOuterRadius(qMax(width(), height())*0.6);
+    grad.setOuterRadius(qMax(width(), height())*0.6f);
     painter->setFillStyle(grad);
     painter->setStrokeStyle("#F0F0F0");
     painter->setLineWidth(1);

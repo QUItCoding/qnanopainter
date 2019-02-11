@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QQuickWindow>
 #include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLFunctions>
 #include <QtMath>
 
 /*!
@@ -101,14 +102,14 @@ QNanoQuickItemPainter::~QNanoQuickItemPainter()
     \fn void QNanoQuickItemPainter::synchronize(QNanoQuickItem *item)
 
     Reimplement this method to synchronize data between \a item and
-    item painter instances. This will be called before point() each
+    item painter instances. This will be called before paint() each
     time item needs to be repainted.
 
     This method is the only place where it is safe for the painter and the
     item to read and write each others variables.
 
-    Usually you should cast \a item to your real item type, check that
-    it is not null and then exchange the data.
+    Usually you should static_cast \a item to your real item type, and then
+    exchange the data.
 */
 
 void QNanoQuickItemPainter::synchronize(QNanoQuickItem *item)
@@ -159,8 +160,8 @@ QOpenGLFramebufferObject *QNanoQuickItemPainter::createFramebufferObject(const Q
     QOpenGLFramebufferObjectFormat format;
     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
     QSize fboSize(size);
-    if (m_textureWidth > -1) fboSize.setWidth(m_textureWidth*m_itemData.devicePixelRatio);
-    if (m_textureHeight > -1) fboSize.setHeight(m_textureHeight*m_itemData.devicePixelRatio);
+    if (m_textureWidth > -1) fboSize.setWidth(static_cast<int>(m_textureWidth*m_itemData.devicePixelRatio));
+    if (m_textureHeight > -1) fboSize.setHeight(static_cast<int>(m_textureHeight*m_itemData.devicePixelRatio));
     return new QOpenGLFramebufferObject(fboSize, format);
 }
 #endif
@@ -180,19 +181,19 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
         return;
 
     QPointF origoPoint = realItem->mapToScene(QPointF(0, 0));
-    m_itemData.x = origoPoint.x();
-    m_itemData.y = origoPoint.y();
-    m_itemData.width = realItem->width();
-    m_itemData.height = realItem->height();
+    m_itemData.x = static_cast<float>(origoPoint.x());
+    m_itemData.y = static_cast<float>(origoPoint.y());
+    m_itemData.width = static_cast<float>(realItem->width());
+    m_itemData.height = static_cast<float>(realItem->height());
 #ifdef QNANO_USE_RENDERNODE
     if ((m_viewWidth != m_window->width()) || (m_viewHeight != m_window->height())) {
         setViewSize(m_window->width(), m_window->height());
         sizeChanged(m_window->width(), m_window->height());
     }
     m_itemData.transformOrigin = realItem->transformOrigin();
-    m_itemData.rotation = realItem->rotation();
-    m_itemData.scale = realItem->scale();
-    m_itemData.opacity = this->inheritedOpacity();
+    m_itemData.rotation = static_cast<float>(realItem->rotation());
+    m_itemData.scale = static_cast<float>(realItem->scale());
+    m_itemData.opacity = static_cast<float>(this->inheritedOpacity());
     m_itemData.clip = realItem->clip();
 #else
     // See if user has adjusted manual texture size
@@ -219,7 +220,7 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     m_pixelAlign = realItem->pixelAlign();
     m_pixelAlignText = realItem->pixelAlignText();
     m_fillColor = realItem->fillColor();
-    m_itemData.devicePixelRatio = realItem->window()->devicePixelRatio();
+    m_itemData.devicePixelRatio = static_cast<float>(realItem->window()->devicePixelRatio());
     bool hqr = realItem->highQualityRendering();
     if (hqr != m_highQualityRendering) {
         m_highQualityRendering = hqr;
@@ -252,14 +253,22 @@ void QNanoQuickItemPainter::paint(QNanoPainter *painter)
 void QNanoQuickItemPainter::prepaint()
 {
 #ifndef QNANO_USE_RENDERNODE
-    glClearColor(m_fillColor.redF(), m_fillColor.greenF(), m_fillColor.blueF(), m_fillColor.alphaF());
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    QOpenGLFunctions glF(QOpenGLContext::currentContext());
+    glF.glClearColor(GLclampf(m_fillColor.redF()),
+                     GLclampf(m_fillColor.greenF()),
+                     GLclampf(m_fillColor.blueF()),
+                     GLclampf(m_fillColor.alphaF()));
+    glF.glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+
 #endif
     // Note: Last parameter can be used to render in lower resolution
 #ifdef QNANO_USE_RENDERNODE
     nvgBeginFrameAt(m_painter->nvgCtx(), m_itemData.x, m_itemData.y, m_viewWidth, m_viewHeight, m_itemData.devicePixelRatio);
 #else
-    nvgBeginFrame(m_painter->nvgCtx(), m_itemData.width, m_itemData.height, m_itemData.devicePixelRatio);
+    nvgBeginFrame(m_painter->nvgCtx(),
+                  static_cast<float>(m_itemData.width),
+                  static_cast<float>(m_itemData.height),
+                  static_cast<float>(m_itemData.devicePixelRatio));
 #endif
 
 #ifdef QNANO_USE_RENDERNODE
@@ -268,7 +277,11 @@ void QNanoQuickItemPainter::prepaint()
     auto cList = clipList();
     if (cList) {
         QRectF clipRect = cList->clipRect();
-        nvgScissor(m_painter->nvgCtx(), clipRect.x(), clipRect.y(), clipRect.width(), clipRect.height());
+        nvgScissor(m_painter->nvgCtx(),
+                   static_cast<float>(clipRect.x()),
+                   static_cast<float>(clipRect.y()),
+                   static_cast<float>(clipRect.width()),
+                   static_cast<float>(clipRect.height()));
     }
 
     nvgGlobalAlpha(m_painter->nvgCtx(), m_itemData.opacity);
@@ -335,37 +348,28 @@ void QNanoQuickItemPainter::setViewSize(int width, int height)
 
 QPointF QNanoQuickItemPainter::itemTransformOrigin() const
 {
-    double w = m_itemData.width;
-    double h = m_itemData.height;
+    double w = static_cast<double>(m_itemData.width);
+    double h = static_cast<double>(m_itemData.height);
     switch (m_itemData.transformOrigin) {
     case QQuickItem::TopLeft:
         return QPointF(0,0);
-        break;
     case QQuickItem::Top:
         return QPointF(w/2,0);
-        break;
     case QQuickItem::TopRight:
         return QPointF(w,0);
-        break;
     case QQuickItem::Left:
         return QPointF(0,h/2);
-        break;
-    default:
     case QQuickItem::Center:
         return QPointF(w/2,h/2);
-        break;
     case QQuickItem::Right:
         return QPointF(w,h/2);
-        break;
     case QQuickItem::BottomLeft:
         return QPointF(0,h);
-        break;
     case QQuickItem::Bottom:
         return QPointF(w/2,h);
-        break;
     case QQuickItem::BottomRight:
         return QPointF(w,h);
-        break;
     }
+    return QPointF(w/2,h/2);
 }
 

@@ -20,6 +20,7 @@
 **********************************************************/
 
 #include "qnanowidget.h"
+#include <QOpenGLFunctions>
 
 QNanoWidget::QNanoWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -27,7 +28,9 @@ QNanoWidget::QNanoWidget(QWidget *parent)
     , m_painter(nullptr)
     , m_setupDone(false)
 {
-
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+    setAttribute(Qt::WA_AcceptTouchEvents);
+#endif
 }
 
 /*!
@@ -99,16 +102,23 @@ void QNanoWidget::paintGL()
 
 void QNanoWidget::paint(QNanoPainter *painter)
 {
+#ifdef QNANO_ENABLE_PAINT_SIGNALS
+    emit paintSignal(painter);
+#else
     Q_UNUSED(painter);
+#endif
 }
 
 // Initializations to OpenGL and vg context before paint()
 void QNanoWidget::prepaint()
 {
     if (m_fillColor.alpha() > 0) {
-        m_painter->setFillStyle(QNanoColor::fromQColor(m_fillColor));
-        m_painter->fillRect(0, 0, width(), height());
-        m_painter->setFillStyle(QNanoColor::fromQColor(Qt::transparent));
+        QOpenGLFunctions glF(QOpenGLContext::currentContext());
+        glF.glClearColor(GLclampf(m_fillColor.redF()),
+                         GLclampf(m_fillColor.greenF()),
+                         GLclampf(m_fillColor.blueF()),
+                         GLclampf(m_fillColor.alphaF()));
+        glF.glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     }
 
     nvgBeginFrame(m_painter->nvgCtx(), width(), height(), devicePixelRatio());
@@ -122,3 +132,22 @@ void QNanoWidget::postpaint()
 
     nvgEndFrame(m_painter->nvgCtx());
 }
+
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+bool QNanoWidget::event(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::TouchBegin:
+    case QEvent::TouchEnd:
+    case QEvent::TouchCancel:
+    case QEvent::TouchUpdate: {
+        QTouchEvent *tEvent = static_cast<QTouchEvent *>(event);
+        emit touchSignal(tEvent);
+        return event->isAccepted();
+    }
+    default:
+        break;
+    }
+    return QWidget::event(event);
+}
+#endif

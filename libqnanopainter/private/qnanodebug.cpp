@@ -48,15 +48,15 @@ void QNanoDebug::paintDrawDebug(QNanoPainter *painter, float width, float height
     const int UPDATE_FREQUENCY_MS = 1000;
     if (m_debugUpdateTimer.elapsed() >= UPDATE_FREQUENCY_MS) {
         qint64 ms = 1000000;
-        double msElapsed = (double)m_debugNsElapsed/(ms*m_debugCounter);
+        double msElapsed = static_cast<double>(m_debugNsElapsed)/(ms*m_debugCounter);
         m_debugMsElapsed = QString::number(msElapsed, 'f', 3);
         m_debugNsElapsed = 0;
         m_debugCounter = 0;
         m_debugUpdateTimer.start();
     }
-    float fontSize = qMin((double)QNanoPainter::ptToPx(14), width*0.05);
-    int debugHeight = fontSize*2;
-    int debugY = height - debugHeight;
+    float fontSize = qMin(QNanoPainter::ptToPx(14), width*0.05f);
+    float debugHeight = fontSize*2;
+    float debugY = height - debugHeight;
     painter->reset();
 
     // Background
@@ -71,8 +71,8 @@ void QNanoDebug::paintDrawDebug(QNanoPainter *painter, float width, float height
     painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
     painter->setTextBaseline(QNanoPainter::BASELINE_TOP);
     painter->setPixelAlignText(QNanoPainter::PIXEL_ALIGN_HALF);
-    int textY = debugY;
-    int textWidth = width/6;
+    float textY = debugY;
+    float textWidth = width/6;
     QString debugText1 = QString("TIME\n%1").arg(m_debugMsElapsed);
     painter->fillText(debugText1, 0, textY, textWidth);
     QString debugText2 = QString("DCC\n%1").arg(m_drawDebug.drawCallCount);

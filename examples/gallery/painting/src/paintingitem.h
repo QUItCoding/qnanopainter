@@ -10,7 +10,7 @@ class PaintingItem: public QNanoQuickItem
 {
     Q_OBJECT
 public:
-    PaintingItem(QQuickItem *parent = 0);
+    PaintingItem(QQuickItem *parent = nullptr);
 
     // Reimplement
     QNanoQuickItemPainter *createItemPainter() const Q_DECL_OVERRIDE Q_DECL_FINAL;

@@ -31,11 +31,17 @@
 
 class QNanoWindow : public QOpenGLWindow
 {
+    Q_OBJECT
 public:
-    QNanoWindow();
+    QNanoWindow(QOpenGLWindow::UpdateBehavior updateBehavior = NoPartialUpdate,
+                QWindow *parent = nullptr);
 
     QColor fillColor() const;
     void setFillColor(const QColor &color);
+
+Q_SIGNALS:
+    void touchSignal(QTouchEvent *event);
+    void paintSignal(QNanoPainter *painter);
 
 protected:
     virtual void paint(QNanoPainter *painter);
@@ -43,6 +49,9 @@ protected:
     // Reimplemented from QOpenGLWindow
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
+#ifdef QNANO_ENABLE_TOUCH_SIGNALS
+    void touchEvent(QTouchEvent *event) Q_DECL_OVERRIDE;
+#endif
 
 private:
     // These are internal
