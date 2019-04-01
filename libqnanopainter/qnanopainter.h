@@ -78,6 +78,13 @@ public:
         PIXEL_ALIGN_FULL = 2
     };
 
+    // *** Frame controls ***
+
+    void beginFrame(float width, float height);
+    void beginFrameAt(float x, float y, float width, float height);
+    void endFrame();
+    void cancelFrame();
+
     // *** State Handling ***
 
     void save();
@@ -230,6 +237,8 @@ private:
 
     void enableAntialiasing(bool enable);
     void enableHighQualityRendering(bool enable);
+
+    void drawImageId(int imageId, float x, float y, float width, float height);
 
     void _checkFont();
     void _checkAlignPixelsAdjust(float *a, float *b = nullptr, float *c = nullptr, float *d = nullptr);

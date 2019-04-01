@@ -84,6 +84,9 @@ public:
     {
         return m_itemData.height;
     }
+    inline const ItemData itemData() const {
+        return m_itemData;
+    }
 
 protected:
 

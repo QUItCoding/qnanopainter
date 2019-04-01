@@ -42,6 +42,7 @@ public:
     virtual const QString backendName() = 0;
     virtual NVGcontext* nvgCreate(int flags) = 0;
     virtual void nvgDelete(NVGcontext* nvgCtx) = 0;
+    virtual int nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags) = 0;
     virtual NVGparams *internalParams(NVGcontext* nvgCtx) = 0;
     virtual void setFlag(NVGcontext* nvgCtx, int flag, bool enable) = 0;
 

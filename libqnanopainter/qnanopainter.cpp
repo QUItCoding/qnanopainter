@@ -27,6 +27,7 @@
 #include <QScreen>
 #include <QGuiApplication>
 #include <QOpenGLContext>
+#include <QOpenGLFunctions>
 
 Q_GLOBAL_STATIC(QNanoPainter, instance)
 
@@ -173,6 +174,78 @@ QNanoPainter::~QNanoPainter()
     }
 
     qDeleteAll(m_dataCache);
+}
+
+/*!
+    \fn void QNanoPainter::beginFrame(float width, float height)
+
+    Initializes QNanoPainter frame painting. All QNanoPainting calls should
+    be in between beginFrame() and endFrame(). This is called automatically
+    before entering into paint() -method, so users don't usually need to
+    call it. But when utilizing FBOs, call this after binding the FBO to
+    start painting with QNanoPainter into it. Also sets glViewport to
+    match the frame position & size.
+
+    QNanoPainter frame position will be 0, 0 and size \a width, \a height.
+
+    \sa endFrame()
+*/
+
+void QNanoPainter::beginFrame(float width, float height)
+{
+    beginFrameAt(0, 0, width, height);
+}
+
+/*!
+    \fn void QNanoPainter::beginFrame(float x, float y, float width, float height)
+
+    Initializes QNanoPainter frame painting. All QNanoPainting calls should
+    be in between beginFrame() and endFrame(). This is called automatically
+    before entering into paint() -method, so users don't usually need to
+    call it. But when utilizing FBOs, call this after binding the FBO to
+    start painting with QNanoPainter into it. Also sets glViewport to
+    match the frame position & size.
+
+    QNanoPainter frame position will be x, y and size \a width, \a height.
+
+    \sa endFrame()
+*/
+
+void QNanoPainter::beginFrameAt(float x, float y, float width, float height)
+{
+    nvgBeginFrameAt(nvgCtx(), x, y, width, height, m_devicePixelRatio);
+    QOpenGLFunctions glF(QOpenGLContext::currentContext());
+    glF.glViewport(int(x), int(y), int(width), int(height));
+}
+
+/*!
+    \fn void QNanoPainter::endFrame()
+
+    Finalizes QNanoPainter frame painting. This is called automatically
+    after exiting paint() -method, so users don't usually need to call it.
+    But when utilizing FBOs, call this before binding the FBO to end default
+    frame painting as well as after you have painted into FBO.
+
+    \sa beginFrame()
+*/
+
+void QNanoPainter::endFrame()
+{
+    nvgEndFrame(nvgCtx());
+}
+
+/*!
+    \fn void QNanoPainter::cancelFrame()
+
+    Cancel all painting to current frame. This can be called if you wish to
+    not draw the frame.
+
+    \sa beginFrame()
+*/
+
+void QNanoPainter::cancelFrame()
+{
+    nvgCancelFrame(nvgCtx());
 }
 
 // *** State Handling ***
@@ -1052,9 +1125,9 @@ void QNanoPainter::drawImage(QNanoImage &image, float x, float y)
 {
     _checkAlignPixelsAdjust(&x, &y);
     image.setParentPainter(this);
-    // Note: Required here just to get width&height of image updated
-    image.getID(nvgCtx());
-    drawImage(image, x, y, image.width(), image.height());
+    // Note: This will also update image width & height values
+    int id = image.getID(nvgCtx());
+    drawImageId(id, x, y, image.width(), image.height());
 }
 
 /*!
@@ -1069,13 +1142,7 @@ void QNanoPainter::drawImage(QNanoImage &image, float x, float y, float width, f
     _checkAlignPixelsAdjust(&x, &y);
     _checkAlignPixels(&width, &height);
     image.setParentPainter(this);
-    NVGpaint ip = nvgImagePattern(nvgCtx(), x, y, width, height, 0.0f, image.getID(nvgCtx()), 1.0f);
-    nvgSave(nvgCtx());
-    nvgBeginPath(nvgCtx());
-    nvgRect(nvgCtx(), x, y, width, height);
-    nvgFillPaint(nvgCtx(), ip);
-    nvgFill(nvgCtx());
-    nvgRestore(nvgCtx());
+    drawImageId(image.getID(nvgCtx()), x, y, width, height);
 }
 
 /*!
@@ -1121,7 +1188,7 @@ void QNanoPainter::drawImage(QNanoImage &image, const QRectF sourceRect, const Q
     NVGpaint ip = nvgImagePattern(nvgCtx(), startX, startY, endX, endY, 0.0f, image.getID(nvgCtx()), 1.0f);
     nvgSave(nvgCtx());
     nvgBeginPath(nvgCtx());
-    rect(dx, dy, dw, dh);
+    nvgRect(nvgCtx(), dx, dy, dw, dh);
     nvgFillPaint(nvgCtx(), ip);
     nvgFill(nvgCtx());
     nvgRestore(nvgCtx());
@@ -1424,6 +1491,18 @@ void QNanoPainter::enableAntialiasing(bool enable)
 void QNanoPainter::enableHighQualityRendering(bool enable)
 {
     m_backend->setFlag(nvgCtx(), NVG_STENCIL_STROKES, enable);
+}
+
+
+void QNanoPainter::drawImageId(int imageId, float x, float y, float width, float height)
+{
+    NVGpaint ip = nvgImagePattern(nvgCtx(), x, y, width, height, 0.0f, imageId, 1.0f);
+    nvgSave(nvgCtx());
+    nvgBeginPath(nvgCtx());
+    nvgRect(nvgCtx(), x, y, width, height);
+    nvgFillPaint(nvgCtx(), ip);
+    nvgFill(nvgCtx());
+    nvgRestore(nvgCtx());
 }
 
 void QNanoPainter::_checkFont() {

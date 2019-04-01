@@ -33,6 +33,11 @@ void QNanoBackendGL2::nvgDelete(NVGcontext* nvgCtx)
     nvgDeleteGL2(nvgCtx);
 }
 
+int QNanoBackendGL2::nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags)
+{
+    return nvglCreateImageFromHandleGL2(ctx, textureId, w, h, imageFlags);
+}
+
 NVGparams *QNanoBackendGL2::internalParams(NVGcontext* nvgCtx) {
     return nvgInternalParams(nvgCtx);
 }

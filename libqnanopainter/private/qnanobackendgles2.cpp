@@ -22,6 +22,11 @@ void QNanoBackendGLES2::nvgDelete(NVGcontext* nvgCtx)
     nvgDeleteGLES2(nvgCtx);
 }
 
+int QNanoBackendGLES2::nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags)
+{
+    return nvglCreateImageFromHandleGLES2(ctx, textureId, w, h, imageFlags);
+}
+
 NVGparams *QNanoBackendGLES2::internalParams(NVGcontext* nvgCtx) {
     return nvgInternalParams(nvgCtx);
 }

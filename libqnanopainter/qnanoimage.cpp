@@ -22,6 +22,7 @@
 #include "qnanoimage.h"
 #include "qnanopainter.h"
 #include <QDir>
+#include <QFile>
 
 /*!
     \class QNanoImage
@@ -96,14 +97,6 @@ QNanoImage::QNanoImage(const QString &filename, ImageFlags flags)
 }
 
 /*!
-    Destroys the QNanoImage.
-*/
-
-QNanoImage::~QNanoImage()
-{
-}
-
-/*!
     \fn void QNanoImage::setFilename(const QString &filename)
 
     Sets to load an image with a \a filename.
@@ -114,6 +107,27 @@ void QNanoImage::setFilename(const QString &filename)
     if (m_filename == filename)
         return;
     m_filename = filename;
+    m_textureId = 0;
+    updateUniqueKey();
+}
+
+/*!
+    \fn void QNanoImage::setFrameBuffer(const QOpenGLFramebufferObject *fbo)
+
+    Sets to grab an image from a \a fbo. Also automatically sets flags
+    to QNanoImage::FLIPY to have image in correct orientation.
+*/
+
+void QNanoImage::setFrameBuffer(const QOpenGLFramebufferObject *fbo)
+{
+    Q_ASSERT(fbo);
+    delete m_imageData;
+    m_imageData = new QNanoDataElement();
+    m_imageData->width = fbo->width();
+    m_imageData->height = fbo->height();
+    m_textureId = fbo->texture();
+    m_flags |= QNanoImage::FLIPY;
+    m_filename.clear();
     updateUniqueKey();
 }
 
@@ -155,6 +169,31 @@ int QNanoImage::height() const
     return m_imageData->height;
 }
 
+/*!
+    \fn QNanoImage QNanoImage::fromFrameBuffer(const QOpenGLFramebufferObject *fbo)
+
+    Static convenience function that returns a image constructed
+    from QOpenGLFramebufferObject \a fbo. Optional \a flags paramater
+    can be used to set specific flags, by default it is set to QNanoImage::FLIP
+    so that image will be in correct orientation. Image size will match to
+    fbo size.
+
+    See https://doc.qt.io/qt-5/qopenglframebufferobject.html
+*/
+
+QNanoImage QNanoImage::fromFrameBuffer(const QOpenGLFramebufferObject *fbo, ImageFlags flags)
+{
+    Q_ASSERT(fbo);
+    QNanoImage image;
+    image.m_imageData = new QNanoDataElement();
+    image.m_imageData->width = fbo->width();
+    image.m_imageData->height = fbo->height();
+    image.m_textureId = fbo->texture();
+    image.m_flags = flags;
+    image.updateUniqueKey();
+    return image;
+}
+
 // ***** Private *****
 
 /*!
@@ -169,6 +208,11 @@ int QNanoImage::getID(NVGcontext* nvg)
     if (dataCache->contains(m_uniqueKey)) {
         // Image is in cache
         m_imageData = dataCache->value(m_uniqueKey);
+    } else if (m_imageData && m_textureId > 0) {
+        m_imageData->id = m_parentPainter->m_backend->nvglCreateImageFromHandle(m_parentPainter->nvgCtx(), m_textureId,
+                                                                                m_imageData->width, m_imageData->height,
+                                                                                m_flags);
+        dataCache->insert(m_uniqueKey, m_imageData);
     } else {
         // Image is not yet in cache, so load and add it
         QFile file(m_filename);
@@ -195,6 +239,10 @@ void QNanoImage::setParentPainter(QNanoPainter *parentPainter)
 
 void QNanoImage::updateUniqueKey()
 {
-    m_uniqueKey = m_filename;
+    if (m_textureId > 0)
+        m_uniqueKey = QString("%1_").arg(QString::number(m_textureId));
+    else
+        m_uniqueKey = m_filename;
+
     m_uniqueKey.append(QString::number(m_flags));
 }
