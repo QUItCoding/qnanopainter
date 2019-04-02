@@ -30,6 +30,9 @@ Item {
         case 6:
             title = "Images";
             break;
+        case 7:
+            title = "Frame Buffers";
+            break;
         }
     }
 

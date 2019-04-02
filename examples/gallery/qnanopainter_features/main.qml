@@ -70,7 +70,7 @@ Item {
         highlightRangeMode: ListView.StrictlyEnforceRange
         maximumFlickVelocity: 10000
         highlightMoveDuration: 2500
-        model: 7
+        model: 8
         delegate: GalleryItem {
             width: listView.width
             height: listView.height

@@ -7,6 +7,7 @@
 #include "qnanofont.h"
 
 #include <QQuickItem>
+#include <QOpenGLFramebufferObject>
 
 class GalleryItemPainter : public QNanoQuickItemPainter
 {
@@ -42,7 +43,11 @@ private:
     void drawTextsFonts();
     void drawTextsAlignments();
 
+    // View - Images
     void drawImages();
+
+    // View - Frame Buffers
+    void drawFrameBuffers();
 
     void drawRect(float x, float y, float w, float h);
 
@@ -55,6 +60,8 @@ private:
     QNanoImage m_patternImage;
     QNanoImage m_patternImage2;
     QNanoImage m_patternImage3;
+    QOpenGLFramebufferObject *m_fbo1 = nullptr;
+    QOpenGLFramebufferObject *m_fbo2 = nullptr;
 };
 
 #endif // GALLERYITEMPAINTER_H

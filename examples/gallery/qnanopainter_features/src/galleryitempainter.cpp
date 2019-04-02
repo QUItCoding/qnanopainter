@@ -15,6 +15,8 @@ GalleryItemPainter::GalleryItemPainter()
 
 GalleryItemPainter::~GalleryItemPainter()
 {
+    delete m_fbo1;
+    delete m_fbo2;
 }
 
 void GalleryItemPainter::synchronize(QNanoQuickItem *item)
@@ -60,6 +62,9 @@ void GalleryItemPainter::paint(QNanoPainter *painter)
         break;
     case 6:
         drawImages();
+        break;
+    case 7:
+        drawFrameBuffers();
         break;
     default:
         break;
@@ -869,4 +874,148 @@ void GalleryItemPainter::drawImages() {
     painter()->setFont(font);
     painter()->fillText(offString, cx, text1PosY);
     painter()->fillText(onString, cx, text2PosY);
+}
+
+void GalleryItemPainter::drawFrameBuffers()
+{
+    int rects = 2;
+    float margin = width()*0.1f;
+    float w = (width() / rects) - margin;
+    float posX = margin/2;
+    float posY = margin;
+    float lineWidth = 2;
+    QOpenGLFunctions glF(QOpenGLContext::currentContext());
+
+    // Cancel current frame as we will instead paint into fbo.
+    // We can do this instead of endFrame() as there hasn't
+    // been QNanoPainter commands for this item yet.
+    painter()->cancelFrame();
+
+    // Create and bind fbo1 into use
+    if (!m_fbo1) {
+        QOpenGLFramebufferObjectFormat format;
+        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+        m_fbo1 = new QOpenGLFramebufferObject(w, w, format);
+        // Clear fbo intially
+        m_fbo1->bind();
+        glF.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glF.glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    }
+    m_fbo1->bind();
+
+    // Begin QNanoPainter frame for fbo1
+    painter()->beginFrame(m_fbo1->width(), m_fbo1->height());
+
+    // Paint borders
+    QRectF rect1(lineWidth/2, lineWidth/2, w-lineWidth, w-lineWidth);
+    painter()->setStrokeStyle("#ffffff");
+    painter()->setLineWidth(2);
+    painter()->strokeRect(rect1);
+
+    // Paint random circles inside rect
+    painter()->beginPath();
+    float cR = w * 0.1f;
+    float cX = cR + lineWidth + rand() % int(w-cR*2-lineWidth*2);
+    float cY = cR + lineWidth + rand() % int(w-cR*2-lineWidth*2);
+    QNanoColor cColor = QNanoColor(50 + rand() % 200, 50, 50, 100);
+    QPointF circlePos = QPointF(cX, cY);
+    painter()->circle(circlePos, cR);
+    painter()->setStrokeStyle("#000000");
+    painter()->setFillStyle(cColor);
+    painter()->fill();
+    painter()->stroke();
+
+    // Paint rect + text
+    painter()->setFillStyle("#202020");
+    painter()->fillRect(w*0.1, w*0.35, w*0.8, w*0.3);
+    QNanoFont f(QNanoFont::DEFAULT_FONT_NORMAL);
+    f.setPointSize(20);
+    painter()->setFont(f);
+    painter()->setFillStyle("#ffffff");
+    painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
+    painter()->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
+    painter()->fillText("FBO #1", w/2, w/2);
+
+    // We are done with fbo1, so end frame and unbind it
+    painter()->endFrame();
+    m_fbo1->release();
+
+    // Create and bind fbo2 into use
+    if (!m_fbo2) {
+        QOpenGLFramebufferObjectFormat format;
+        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+        m_fbo2 = new QOpenGLFramebufferObject(w*2 + margin, w, format);
+    }
+    m_fbo2->bind();
+
+    // Clear fbo, let's not overdraw this time
+    glF.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glF.glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+
+    // Begin QNanoPainter frame for fbo2
+    painter()->beginFrame(m_fbo2->width(), m_fbo2->height());
+
+    // Blit fbo1 into fbo2 few times
+    QRect blitSourceRect = QRect(0,0,m_fbo1->width(),m_fbo1->height());
+    float centerX = m_fbo2->width()/2 - w/4;
+    int blits = 5;
+    for (int i=0; i<blits; i++) {
+        float range = (float(i+1) / blits) * (m_animationSine - 0.5);
+        float blitPosX = centerX + (range * m_fbo2->width());
+        QRect blitTargetRect(blitPosX, lineWidth*2, m_fbo1->width()/2, m_fbo1->height()/2);
+        QOpenGLFramebufferObject::blitFramebuffer(m_fbo2, blitTargetRect,
+                                                  m_fbo1, blitSourceRect,
+                                                  GL_COLOR_BUFFER_BIT,
+                                                  GL_LINEAR);
+    }
+
+    // Paint rect + text
+    QRectF rect2(lineWidth/2, lineWidth/2, m_fbo2->width() - lineWidth, m_fbo2->height() - lineWidth);
+    painter()->setStrokeStyle("#ffffff");
+    painter()->setLineWidth(2);
+    painter()->strokeRect(rect2);
+    f.setPointSize(20);
+    painter()->setFont(f);
+    painter()->setFillStyle("#ffffff");
+    painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
+    painter()->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
+    painter()->fillText("FBO #2 - Blitting", m_fbo2->width()/2, m_fbo2->height()/4);
+
+    // We are done with fbo2, so end frame and unbind it
+    painter()->endFrame();
+    m_fbo2->release();
+
+    // Bind default QtQuick FBO back
+    // Handled a bit differently with RENDERNODE
+    // TODO: Consider creating helper for these
+#ifdef QNANO_USE_RENDERNODE
+    QOpenGLFramebufferObject::bindDefault();
+    painter()->beginFrameAt(itemData().x, itemData().y, width(), height());
+    glF.glViewport(0, int(itemData().y), int(width()), int(height()));
+#else
+    framebufferObject()->bind();
+    painter()->beginFrameAt(0, 0, width(), height());
+#endif
+
+    // Draw fbo1 as image
+    QNanoImage fbo1Image = QNanoImage::fromFrameBuffer(m_fbo1);
+    painter()->drawImage(fbo1Image, posX, posY);
+
+    // Draw rotating & scaling fbo1
+    posX += w + margin;
+    float r = w * 0.5f + m_animationSine * w * 0.5f;
+    QRectF rect(posX + w/2 - r/2, posY + w/2 - r/2, r, r);
+    QPointF c(rect.x() + rect.width()/2, rect.y() + rect.height()/2);
+    painter()->save();
+    painter()->translate(c);
+    painter()->rotate(m_animationTime);
+    painter()->translate(-c);
+    painter()->drawImage(fbo1Image, rect);
+    painter()->restore();
+
+    // Draw fbo2 as image
+    posY += w + margin;
+    posX = margin/2;
+    QNanoImage fbo2Image = QNanoImage::fromFrameBuffer(m_fbo2);
+    painter()->drawImage(fbo2Image, posX, posY);
 }
