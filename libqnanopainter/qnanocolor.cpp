@@ -353,7 +353,7 @@ void QNanoColor::setAlphaF(float alpha)
 
 QNanoColor QNanoColor::fromHSLA(int hue, int saturation, int lightness, int alpha)
 {
-    return QNanoColor::fromNVGColor(nvgHSLA(hue/359.0f, saturation/255.0f, lightness/255.0f, alpha));
+    return QNanoColor::fromNVGColor(nvgHSLA(hue/359.0f, saturation/255.0f, lightness/255.0f, static_cast<uchar>(alpha)));
 }
 
 /*!
@@ -386,5 +386,5 @@ QNanoColor QNanoColor::fromMix(const QNanoColor &color1, const QNanoColor &color
 
 QNanoColor QNanoColor::fromNVGColor(NVGcolor c0)
 {
-    return QNanoColor(c0.r*255, c0.g*255, c0.b*255, c0.a*255);
+    return QNanoColor(static_cast<int>(c0.r*255), static_cast<int>(c0.g*255), static_cast<int>(c0.b*255), static_cast<int>(c0.a*255));
 }

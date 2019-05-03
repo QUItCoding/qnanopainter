@@ -280,7 +280,7 @@ int QNanoFont::getID(NVGcontext* nvg)
         } else {
             size_t length = static_cast<size_t>(file.bytesAvailable());
             char * data = static_cast<char*>(malloc(length));
-            file.read(data, length);
+            file.read(data, static_cast<qint64>(length));
             m_id = nvgCreateFontMem(nvg, m_filename.toUtf8().constData(),
                                     reinterpret_cast<unsigned char*>(data),
                                     static_cast<int>(length), 1);
