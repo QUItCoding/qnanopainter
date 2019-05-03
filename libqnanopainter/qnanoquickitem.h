@@ -152,7 +152,7 @@ Q_SIGNALS: \
 public: \
     type const& getter() const { return variable; } \
 public Q_SLOTS: \
-    void setter(type const &v) { if(v == variable) return; variable = v; emit getter##Changed(); update(); } \
+    void setter(type const &v) { if(v == variable) return; variable = v; Q_EMIT getter##Changed(); update(); } \
 private: \
     type variable;
 

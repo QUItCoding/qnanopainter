@@ -106,7 +106,7 @@ void QNanoWindow::paintGL()
 void QNanoWindow::paint(QNanoPainter *painter)
 {
 #ifdef QNANO_ENABLE_PAINT_SIGNALS
-    emit paintSignal(painter);
+    Q_EMIT paintSignal(painter);
 #else
     Q_UNUSED(painter);
 #endif
@@ -140,6 +140,6 @@ void QNanoWindow::postpaint()
 #ifdef QNANO_ENABLE_TOUCH_SIGNALS
 void QNanoWindow::touchEvent(QTouchEvent *event)
 {
-    emit touchSignal(event);
+    Q_EMIT touchSignal(event);
 }
 #endif
