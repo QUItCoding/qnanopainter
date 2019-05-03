@@ -267,7 +267,7 @@ void QNanoQuickItem::setPixelAlign(QNanoQuickItem::PixelAlign align)
     if (m_pixelAlign == align)
         return;
     m_pixelAlign = align;
-    emit pixelAlignChanged();
+    Q_EMIT pixelAlignChanged();
     update();
 }
 
@@ -304,7 +304,7 @@ void QNanoQuickItem::setPixelAlignText(QNanoQuickItem::PixelAlign align)
     if (m_pixelAlignText == align)
         return;
     m_pixelAlignText = align;
-    emit pixelAlignTextChanged();
+    Q_EMIT pixelAlignTextChanged();
     update();
 }
 
@@ -337,7 +337,7 @@ void QNanoQuickItem::setHighQualityRendering(bool value)
     if (m_highQualityRendering == value)
         return;
     m_highQualityRendering = value;
-    emit highQualityRenderingChanged();
+    Q_EMIT highQualityRenderingChanged();
     update();
 }
 
@@ -369,7 +369,7 @@ void QNanoQuickItem::setFillColor(const QColor &color)
         return;
     m_fillColor = color;
 
-    emit fillColorChanged();
+    Q_EMIT fillColorChanged();
     update();
 }
 
@@ -406,7 +406,7 @@ void QNanoQuickItem::setMouseEventsEnabled(bool enabled)
     } else {
         setAcceptedMouseButtons(Qt::NoButton);
     }
-    emit mouseEventsEnabledChanged();
+    Q_EMIT mouseEventsEnabledChanged();
 }
 
 /*!
@@ -438,7 +438,7 @@ void QNanoQuickItem::setMouseHoverEventsEnabled(bool enabled)
     if (acceptHoverEvents() == enabled)
         return;
     setAcceptHoverEvents(enabled);
-    emit mouseHoverEventsEnabledChanged();
+    Q_EMIT mouseHoverEventsEnabledChanged();
 }
 
 /*!
@@ -471,7 +471,7 @@ void QNanoQuickItem::setAcceptedButtons(Qt::MouseButtons buttons)
     if (m_mouseEnabled) {
         setAcceptedMouseButtons(m_acceptedMouseButtons);
     }
-    emit acceptedButtonsChanged();
+    Q_EMIT acceptedButtonsChanged();
 }
 
 /*!
@@ -503,7 +503,7 @@ void QNanoQuickItem::setTextureWidth(int width)
     if (m_textureWidth == width)
         return;
     m_textureWidth = width;
-    emit textureWidthChanged();
+    Q_EMIT textureWidthChanged();
     update();
 }
 
@@ -536,7 +536,7 @@ void QNanoQuickItem::setTextureHeight(int height)
     if (m_textureHeight == height)
         return;
     m_textureHeight = height;
-    emit textureHeightChanged();
+    Q_EMIT textureHeightChanged();
     update();
 }
 
@@ -559,7 +559,7 @@ void QNanoQuickItem::setContextName(const QString &name)
 {
     if (m_contextName != name) {
         m_contextName = name;
-        emit contextNameChanged();
+        Q_EMIT contextNameChanged();
     }
 }
 
@@ -571,7 +571,7 @@ void QNanoQuickItem::setBackendName(const QString &name)
 {
     if (m_backendName != name) {
         m_backendName = name;
-        emit backendNameChanged();
+        Q_EMIT backendNameChanged();
     }
 }
 
@@ -619,6 +619,6 @@ QSGNode *QNanoQuickItem::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintN
 void QNanoQuickItem::touchEvent(QTouchEvent *event)
 {
     event->setAccepted(false);
-    emit touchSignal(event);
+    Q_EMIT touchSignal(event);
 }
 #endif
