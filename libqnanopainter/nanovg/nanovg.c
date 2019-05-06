@@ -594,18 +594,18 @@ void nvgTransformPremultiply(float* t, const float* s)
 
 int nvgTransformInverse(float* inv, const float* t)
 {
-	double invdet, det = (double)t[0] * t[3] - (double)t[2] * t[1];
+	double invdet, det = (double)t[0] * (double)t[3] - (double)t[2] * (double)t[1];
 	if (det > -1e-6 && det < 1e-6) {
 		nvgTransformIdentity(inv);
 		return 0;
 	}
 	invdet = 1.0 / det;
-	inv[0] = (float)(t[3] * invdet);
-	inv[2] = (float)(-t[2] * invdet);
-	inv[4] = (float)(((double)t[2] * t[5] - (double)t[3] * t[4]) * invdet);
-	inv[1] = (float)(-t[1] * invdet);
-	inv[3] = (float)(t[0] * invdet);
-	inv[5] = (float)(((double)t[1] * t[4] - (double)t[0] * t[5]) * invdet);
+	inv[0] = (float)((double)t[3] * invdet);
+	inv[2] = (float)((double)-t[2] * invdet);
+	inv[4] = (float)(((double)t[2] * (double)t[5] - (double)t[3] * (double)t[4]) * invdet);
+	inv[1] = (float)((double)-t[1] * invdet);
+	inv[3] = (float)((double)t[0] * invdet);
+	inv[5] = (float)(((double)t[1] * (double)t[4] - (double)t[0] * (double)t[5]) * invdet);
 	return 1;
 }
 
@@ -1092,7 +1092,7 @@ static void nvg__appendCommands(NVGcontext* ctx, float* vals, int nvals)
 	if (ctx->ncommands+nvals > ctx->ccommands) {
 		float* commands;
 		int ccommands = ctx->ncommands+nvals + ctx->ccommands/2;
-		commands = (float*)realloc(ctx->commands, sizeof(float)*ccommands);
+		commands = (float*)realloc(ctx->commands, sizeof(float)*(size_t)ccommands);
 		if (commands == NULL) return;
 		ctx->commands = commands;
 		ctx->ccommands = ccommands;
@@ -1133,7 +1133,7 @@ static void nvg__appendCommands(NVGcontext* ctx, float* vals, int nvals)
 		}
 	}
 
-	memcpy(&ctx->commands[ctx->ncommands], vals, nvals*sizeof(float));
+	memcpy(&ctx->commands[ctx->ncommands], vals, (size_t)nvals*sizeof(float));
 
 	ctx->ncommands += nvals;
 }
@@ -1158,7 +1158,7 @@ static void nvg__addPath(NVGcontext* ctx)
 	if (ctx->cache->npaths+1 > ctx->cache->cpaths) {
 		NVGpath* paths;
 		int cpaths = ctx->cache->npaths+1 + ctx->cache->cpaths/2;
-		paths = (NVGpath*)realloc(ctx->cache->paths, sizeof(NVGpath)*cpaths);
+		paths = (NVGpath*)realloc(ctx->cache->paths, sizeof(NVGpath)*(size_t)cpaths);
 		if (paths == NULL) return;
 		ctx->cache->paths = paths;
 		ctx->cache->cpaths = cpaths;
@@ -1195,7 +1195,7 @@ static void nvg__addPoint(NVGcontext* ctx, float x, float y, int flags)
 	if (ctx->cache->npoints+1 > ctx->cache->cpoints) {
 		NVGpoint* points;
 		int cpoints = ctx->cache->npoints+1 + ctx->cache->cpoints/2;
-		points = (NVGpoint*)realloc(ctx->cache->points, sizeof(NVGpoint)*cpoints);
+		points = (NVGpoint*)realloc(ctx->cache->points, sizeof(NVGpoint)*(size_t)cpoints);
 		if (points == NULL) return;
 		ctx->cache->points = points;
 		ctx->cache->cpoints = cpoints;
@@ -1237,7 +1237,7 @@ static NVGvertex* nvg__allocTempVerts(NVGcontext* ctx, int nverts)
 	if (nverts > ctx->cache->cverts) {
 		NVGvertex* verts;
 		int cverts = (nverts + 0xff) & ~0xff; // Round up to prevent allocations when things change just slightly.
-		verts = (NVGvertex*)realloc(ctx->cache->verts, sizeof(NVGvertex)*cverts);
+		verts = (NVGvertex*)realloc(ctx->cache->verts, sizeof(NVGvertex)*(size_t)cverts);
 		if (verts == NULL) return NULL;
 		ctx->cache->verts = verts;
 		ctx->cache->cverts = cverts;
@@ -1435,7 +1435,7 @@ static void nvg__flattenPaths(NVGcontext* ctx)
 static int nvg__curveDivs(float r, float arc, float tol)
 {
 	float da = acosf(r / (r + tol)) * 2.0f;
-	return nvg__maxi(2, (int)ceilf(arc / da));
+	return nvg__maxi(2, (int)(ceilf(arc / da)));
 }
 
 static void nvg__chooseBevel(int bevel, NVGpoint* p0, NVGpoint* p1, float w,
@@ -1475,7 +1475,7 @@ static NVGvertex* nvg__roundJoin(NVGvertex* dst, NVGpoint* p0, NVGpoint* p1,
 		nvg__vset(dst, lx0, ly0, lu,1); dst++;
 		nvg__vset(dst, p1->x - dlx0*rw, p1->y - dly0*rw, ru,1); dst++;
 
-		n = nvg__clampi((int)ceilf(((a0 - a1) / NVG_PI) * ncap), 2, ncap);
+		n = nvg__clampi((int)(ceilf(((a0 - a1) / NVG_PI) * ncap)), 2, ncap);
 		for (i = 0; i < n; i++) {
 			float u = i/(float)(n-1);
 			float a = a0 + u*(a1-a0);
@@ -1498,7 +1498,7 @@ static NVGvertex* nvg__roundJoin(NVGvertex* dst, NVGpoint* p0, NVGpoint* p1,
 		nvg__vset(dst, p1->x + dlx0*rw, p1->y + dly0*rw, lu,1); dst++;
 		nvg__vset(dst, rx0, ry0, ru,1); dst++;
 
-		n = nvg__clampi((int)ceilf(((a1 - a0) / NVG_PI) * ncap), 2, ncap);
+		n = nvg__clampi((int)(ceilf(((a1 - a0) / NVG_PI) * ncap)), 2, ncap);
 		for (i = 0; i < n; i++) {
 			float u = i/(float)(n-1);
 			float a = a0 + u*(a1-a0);
@@ -2227,12 +2227,12 @@ void nvgDebugDumpPathCache(NVGcontext* ctx)
 		if (path->nfill) {
 			printf("   - fill: %d\n", path->nfill);
 			for (j = 0; j < path->nfill; j++)
-				printf("%f\t%f\n", path->fill[j].x, path->fill[j].y);
+				printf("%f\t%f\n", (double)path->fill[j].x, (double)path->fill[j].y);
 		}
 		if (path->nstroke) {
 			printf("   - stroke: %d\n", path->nstroke);
 			for (j = 0; j < path->nstroke; j++)
-				printf("%f\t%f\n", path->stroke[j].x, path->stroke[j].y);
+				printf("%f\t%f\n", (double)path->stroke[j].x, (double)path->stroke[j].y);
 		}
 	}
 }
