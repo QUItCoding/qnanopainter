@@ -20,11 +20,11 @@ public:
     }
     void setOpacity(float opacity) {
         m_opacity = opacity;
-        emit opacityChanged();
+        Q_EMIT opacityChanged();
     }
 
 
-signals:
+Q_SIGNALS:
     void opacityChanged();
 
 private:
@@ -44,7 +44,7 @@ public:
     void synchronize(QNanoQuickItem *item);
     void paint(QNanoPainter *painter);
 
-signals:
+Q_SIGNALS:
     void update();
 
 private:

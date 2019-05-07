@@ -103,7 +103,7 @@ void QNanoWidget::paintGL()
 void QNanoWidget::paint(QNanoPainter *painter)
 {
 #ifdef QNANO_ENABLE_PAINT_SIGNALS
-    emit paintSignal(painter);
+    Q_EMIT paintSignal(painter);
 #else
     Q_UNUSED(painter);
 #endif
@@ -142,7 +142,7 @@ bool QNanoWidget::event(QEvent *event)
     case QEvent::TouchCancel:
     case QEvent::TouchUpdate: {
         QTouchEvent *tEvent = static_cast<QTouchEvent *>(event);
-        emit touchSignal(tEvent);
+        Q_EMIT touchSignal(tEvent);
         return event->isAccepted();
     }
     default:

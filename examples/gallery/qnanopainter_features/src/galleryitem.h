@@ -30,7 +30,7 @@ public:
         if (qFuzzyCompare(value, m_animationTime))
             return;
         m_animationTime = value;
-        emit animationTimeChanged();
+        Q_EMIT animationTimeChanged();
         update();
     }
 
@@ -38,7 +38,7 @@ public:
         if (qFuzzyCompare(value, m_animationSine))
             return;
         m_animationSine = value;
-        emit animationSineChanged();
+        Q_EMIT animationSineChanged();
         update();
     }
 

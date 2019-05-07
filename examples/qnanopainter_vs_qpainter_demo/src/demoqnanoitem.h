@@ -26,7 +26,7 @@ public:
         if (qFuzzyCompare(value, m_animationTime))
             return;
         m_animationTime = value;
-        emit animationTimeChanged();
+        Q_EMIT animationTimeChanged();
         update();
     }
 
@@ -34,7 +34,7 @@ public:
         if (value == m_enabledTests)
             return;
         m_enabledTests = value;
-        emit enabledTestsChanged();
+        Q_EMIT enabledTestsChanged();
         update();
     }
 
@@ -42,7 +42,7 @@ public:
         if (value == m_testCount)
             return;
         m_testCount = value;
-        emit testCountChanged();
+        Q_EMIT testCountChanged();
         update();
     }
 

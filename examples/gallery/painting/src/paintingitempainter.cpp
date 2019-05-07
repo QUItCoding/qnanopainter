@@ -96,7 +96,7 @@ void PaintingItemPainter::paint(QNanoPainter *painter)
 
                 // If animation is still running, update
                 if (item->m_hideAnimation.state() == QAbstractAnimation::Running) {
-                    emit update();
+                    Q_EMIT update();
                 }
             }
         }
