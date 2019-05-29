@@ -2,10 +2,14 @@
 #define QNANOBACKEND_H
 
 #if defined(QNANO_QT_GL_INCLUDE)
-// Let the Qt include OpenGL headers
+// Let Qt include OpenGL headers
 
 #define GL_GLEXT_PROTOTYPES
 #include <QtGui/qopengl.h>
+
+#if defined(QNANO_RASPBIAN_QUIRKS)
+#include <QtGui/qopengles2ext.h>
+#endif //QNANO_RASPBIAN_QUIRKS
 
 #else
 // Manually include OpenGL headers

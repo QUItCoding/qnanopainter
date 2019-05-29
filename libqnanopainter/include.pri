@@ -22,8 +22,16 @@ win32  {
 # Enable this to let Qt include OpenGL headers
 DEFINES += QNANO_QT_GL_INCLUDE
 
-# This will enable GLES3 (disable to force GLES2)
-DEFINES += QNANO_ENABLE_GLES3
+# Test for Raspebery Pi GPU's proprietary Broadcomm Headers 
+exists("/opt/vc/include") {
+    message("libqnanopainter: defining QNANO_RASPBIAN_QUIRKS; QNANO_ENABLE_GLES3 unsupported on Raspbian ...")
+    DEFINES += QNANO_RASPBIAN_QUIRKS
+}
+else {
+    message("libqnanopainter: assuming platform supports GLES3, defining QNANO_ENABLE_GLES3 ...")
+    # This will enable GLES3 (disable to force GLES2)
+    DEFINES += QNANO_ENABLE_GLES3
+}
 
 # This will enable signalling touch events
 # Can be useful when using view/widget classes directly
@@ -99,13 +107,28 @@ contains(QT, widgets) {
         $$PWD/qnanowidget.h
 }
 
+# test for Raspebery Pi GPU's proprietary Broadcomm Headers 
+exists("/opt/vc/include") { 
+    message("libqnanopainter: building only GLES2 backend for Raspberry Pi...")
+    CONFIG += build_raspi_backends
+}
 # Note: Due to Angle, windows might use either OpenGL (desktop) or
 #       openGL ES (angle) backend.
-android | ios | linux-rasp-* | windows {
+android | ios | windows {
+    message("libqnanopainter: Building GLES backends for 'android | ios | windows'...")
     CONFIG += build_gles_backends
 }
-!CONFIG(build_gles_backends) | windows:!wince {
+!CONFIG(build_gles_backends):!CONFIG(build_raspi_backends) | windows:!wince {
+    message("libqnanopainter: Building gl backends ...")
     CONFIG += build_gl_backends
+}
+
+CONFIG(build_raspi_backends) {
+    message("Including QNanoPainter OpenGL ES2 backend for Raspberry Pi.")
+HEADERS += \
+    $$PWD/private/qnanobackendgles2.h
+SOURCES +=  \
+    $$PWD/private/qnanobackendgles2.cpp
 }
 
 CONFIG(build_gles_backends) {
