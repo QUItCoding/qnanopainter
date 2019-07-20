@@ -77,6 +77,33 @@ public:
         PIXEL_ALIGN_HALF = 1,
         PIXEL_ALIGN_FULL = 2
     };
+    // Note: Values must match to matching NanoVG enums
+    enum CompositeOperation {
+        COMPOSITE_SOURCE_OVER,
+        COMPOSITE_SOURCE_IN,
+        COMPOSITE_SOURCE_OUT,
+        COMPOSITE_ATOP,
+        COMPOSITE_DESTINATION_OVER,
+        COMPOSITE_DESTINATION_IN,
+        COMPOSITE_DESTINATION_OUT,
+        COMPOSITE_DESTINATION_ATOP,
+        COMPOSITE_LIGHTER,
+        COMPOSITE_COPY,
+        COMPOSITE_XOR
+    };
+    enum BlendFactor {
+        BLEND_ZERO = 1<<0,
+        BLEND_ONE = 1<<1,
+        BLEND_SRC_COLOR = 1<<2,
+        BLEND_ONE_MINUS_SRC_COLOR = 1<<3,
+        BLEND_DST_COLOR = 1<<4,
+        BLEND_ONE_MINUS_DST_COLOR = 1<<5,
+        BLEND_SRC_ALPHA = 1<<6,
+        BLEND_ONE_MINUS_SRC_ALPHA = 1<<7,
+        BLEND_DST_ALPHA = 1<<8,
+        BLEND_ONE_MINUS_DST_ALPHA = 1<<9,
+        BLEND_SRC_ALPHA_SATURATE = 1<<10,
+    };
 
     // *** Frame controls ***
 
@@ -103,6 +130,9 @@ public:
     void setLineCap(LineCap cap);
     void setLineJoin(LineJoin join);
     void setGlobalAlpha(float alpha);
+    void setGlobalCompositeOperation(CompositeOperation operation);
+    void setGlobalCompositeBlendFunc(BlendFactor sourceFactor, BlendFactor destinationFactor);
+    void setGlobalCompositeBlendFuncSeparate(BlendFactor sourceRGB, BlendFactor destinationRGB, BlendFactor sourceAlpha, BlendFactor destinationAlpha);
 
     // *** Transforms ***
 

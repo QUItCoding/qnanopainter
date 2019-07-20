@@ -445,6 +445,61 @@ void QNanoPainter::setGlobalAlpha(float alpha)
     nvgGlobalAlpha(nvgCtx(), alpha);
 }
 
+/*!
+    \fn void QNanoPainter::setGlobalCompositeOperation(CompositeOperation operation)
+
+    Sets the global composite operation mode to \a operation. This mode is
+    applied to all painting operations. Composite modes match to ones available in
+    HTML canvas. The default mode is COMPOSITE_SOURCE_OVER.
+
+    Note: Composite (blend) mode can be set with either HTML or OpenGL style method,
+    they override each other.
+
+    \sa setGlobalCompositeBlendFunc(), setGlobalCompositeBlendFuncSeparate()
+*/
+
+void QNanoPainter::setGlobalCompositeOperation(CompositeOperation operation)
+{
+    nvgGlobalCompositeOperation(nvgCtx(), operation);
+}
+
+/*!
+    \fn void QNanoPainter::setGlobalCompositeBlendFunc(BlendFactor sourceFactor, BlendFactor destinationFactor)
+
+    Sets the global blend modes to \a sourceFactor and \a destinationFactor. This mode is
+    applied to all painting operations. Blend modes match to ones available in
+    OpenGL. The default modes are source BLEND_ONE and destination BLEND_ZERO.
+
+    Note: Composite (blend) mode can be set with either HTML or OpenGL style method,
+    they override each other.
+
+    \sa setGlobalCompositeBlendFuncSeparate(), setGlobalCompositeOperation()
+*/
+
+void QNanoPainter::setGlobalCompositeBlendFunc(BlendFactor sourceFactor, BlendFactor destinationFactor)
+{
+    nvgGlobalCompositeBlendFunc(nvgCtx(), sourceFactor, destinationFactor);
+}
+
+/*!
+    \fn void QNanoPainter::setGlobalCompositeBlendFuncSeparate(BlendFactor sourceRGB, BlendFactor destinationRGB, BlendFactor sourceAlpha, BlendFactor destinationAlpha)
+
+    Sets the global blend modes separately for RGB and alpha to \a sourceRGB,
+    \a destinationRGB, \a sourceAlpha and \a destinationAlpha. This mode is
+    applied to all painting operations. Blend modes match to ones available in
+    OpenGL. The default modes are sourceRGB and sourceAlpha BLEND_ONE,
+    destinationRGB and destinationAlpha BLEND_ZERO.
+
+    Note: Composite (blend) mode can be set with either HTML or OpenGL style method,
+    they override each other.
+
+    \sa setGlobalCompositeBlendFunc(), setGlobalCompositeOperation()
+*/
+
+void QNanoPainter::setGlobalCompositeBlendFuncSeparate(BlendFactor sourceRGB, BlendFactor destinationRGB, BlendFactor sourceAlpha, BlendFactor destinationAlpha)
+{
+    nvgGlobalCompositeBlendFuncSeparate(nvgCtx(), sourceRGB, destinationRGB, sourceAlpha, destinationAlpha);
+}
 
 // *** Transforms ***
 
