@@ -5,17 +5,6 @@ INCLUDEPATH += $$PWD/
 # Use c++11 features
 CONFIG += c++11
 
-win32  {
-    QT_CONFIG += opengles2 angle
-    CONFIG( debug, debug|release ) {
-        # debug
-        LIBS+= -llibGLESV2d
-    } else {
-        # release
-        LIBS+= -llibGLESV2
-    }
-}
-
 # Enable this to get drawing debug information
 #DEFINES += QNANO_DEBUG
 
@@ -100,16 +89,37 @@ contains(QT, widgets) {
 }
 
 # Note: Due to Angle, windows might use either OpenGL (desktop) or
-#       openGL ES (angle) backend.
-android | ios | linux-rasp-* | windows {
-    CONFIG += build_gles_backends
-}
-!CONFIG(build_gles_backends) | windows:!wince {
-    CONFIG += build_gl_backends
+#       OpenGL ES (angle) backend. Newer Qt versions don't automatically
+#       link with OpenGL ES libraries.
+win32 {
+    equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
+        CONFIG += windows_with_gles
+        QT_CONFIG += opengles2 angle
+        CONFIG( debug, debug|release ) {
+            # debug
+            LIBS+= -llibGLESv2
+        } else {
+            # release
+            LIBS+= -llibGLESV2
+        }
+    }
 }
 
-CONFIG(build_gles_backends) {
+# Trying to autodetect suitable backeds for different environments.
+# Alternatively, define these manually:
+#    DEFINES += QNANO_BUILD_GLES_BACKENDS
+#    DEFINES += QNANO_BUILD_GL_BACKENDS
+
+android | ios | linux-rasp-* | windows:wince | CONFIG(windows_with_gles) {
+    DEFINES += QNANO_BUILD_GLES_BACKENDS
+}
+!contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) | windows:!wince {
+    DEFINES += QNANO_BUILD_GL_BACKENDS
+}
+
+contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) {
     message("Including QNanoPainter OpenGL ES backends")
+
 HEADERS += \
     $$PWD/private/qnanobackendgles2.h \
     $$PWD/private/qnanobackendgles3.h
@@ -118,7 +128,7 @@ SOURCES +=  \
     $$PWD/private/qnanobackendgles3.cpp
 }
 
-CONFIG(build_gl_backends) {
+contains(DEFINES , QNANO_BUILD_GL_BACKENDS) {
     message("Including QNanoPainter OpenGL backends")
 HEADERS += \
     $$PWD/private/qnanobackendgl2.h \

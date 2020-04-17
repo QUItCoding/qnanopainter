@@ -33,21 +33,21 @@ public:
 
         if (isGLES) {
             if (major >= 3) {
-#if defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_3)
+#if defined(QNANO_BUILD_GLES_BACKENDS) && (defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_3))
                 return new QNanoBackendGLES3();
 #endif
             } else {
-#if defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_2_ANGLE)
+#if defined(QNANO_BUILD_GLES_BACKENDS) && (defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_2_ANGLE))
                 return new QNanoBackendGLES2();
 #endif
             }
         } else {
             if (major > 3 || (major == 3 && minor >= 2)) {
-#ifdef QT_OPENGL_3
+#if defined(QNANO_BUILD_GL_BACKENDS) && defined(QT_OPENGL_3)
                 return new QNanoBackendGL3();
 #endif
             } else {
-#ifndef QT_OPENGL_ES_2
+#if defined(QNANO_BUILD_GL_BACKENDS) && !defined(QT_OPENGL_ES_2)
                 return new QNanoBackendGL2();
 #endif
             }

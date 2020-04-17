@@ -1,5 +1,6 @@
 #include "demoqpitem.h"
 #include <QPainter>
+#include <QPainterPath>
 #include <QPen>
 #include <QPointF>
 #include <QFontDatabase>
