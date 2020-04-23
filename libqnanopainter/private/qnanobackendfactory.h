@@ -1,17 +1,12 @@
 #ifndef QNANOBACKENDFACTORY_H
 #define QNANOBACKENDFACTORY_H
 
-
-#ifndef QT_OPENGL_ES_2
+#ifdef QNANO_BUILD_GL_BACKENDS
 #include "private/qnanobackendgl2.h"
-#endif
-#ifdef QT_OPENGL_3_2
 #include "private/qnanobackendgl3.h"
 #endif
-#if defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_2_ANGLE)
+#ifdef QNANO_BUILD_GLES_BACKENDS
 #include "private/qnanobackendgles2.h"
-#endif
-#if defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_3)
 #include "private/qnanobackendgles3.h"
 #endif
 
@@ -32,25 +27,21 @@ public:
         qDebug("Creating suitable QNanoBackend for %s %d.%d context", (isGLES ? "OpenGL ES" : "OpenGL"), major, minor);
 
         if (isGLES) {
+#if defined(QNANO_BUILD_GLES_BACKENDS)
             if (major >= 3) {
-#if defined(QNANO_BUILD_GLES_BACKENDS) && (defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_3))
                 return new QNanoBackendGLES3();
-#endif
             } else {
-#if defined(QNANO_BUILD_GLES_BACKENDS) && (defined(QT_OPENGL_ES_2) || defined(QT_OPENGL_ES_2_ANGLE))
                 return new QNanoBackendGLES2();
-#endif
             }
+#endif
         } else {
+#if defined(QNANO_BUILD_GL_BACKENDS)
             if (major > 3 || (major == 3 && minor >= 2)) {
-#if defined(QNANO_BUILD_GL_BACKENDS) && defined(QT_OPENGL_3)
                 return new QNanoBackendGL3();
-#endif
             } else {
-#if defined(QNANO_BUILD_GL_BACKENDS) && !defined(QT_OPENGL_ES_2)
                 return new QNanoBackendGL2();
-#endif
             }
+#endif
         }
         qWarning("Creating QNanoBackend for %s %d.%d failed!", (isGLES ? "OpenGL ES" : "OpenGL"), major, minor);
         return nullptr;

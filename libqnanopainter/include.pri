@@ -23,7 +23,6 @@ DEFINES += QNANO_ENABLE_GLES3
 #DEFINES += QNANO_ENABLE_PAINT_SIGNALS
 
 equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 7) {
-    message("Building with Qt at least 5.8 so may enabled QNANO_USE_RENDERNODE")
     # Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject
     #DEFINES += QNANO_USE_RENDERNODE
 }
@@ -97,7 +96,7 @@ win32 {
         QT_CONFIG += opengles2 angle
         CONFIG( debug, debug|release ) {
             # debug
-            LIBS+= -llibGLESv2
+            LIBS+= -llibGLESv2d
         } else {
             # release
             LIBS+= -llibGLESV2
@@ -105,16 +104,35 @@ win32 {
     }
 }
 
-# Trying to autodetect suitable backeds for different environments.
-# Alternatively, define these manually:
-#    DEFINES += QNANO_BUILD_GLES_BACKENDS
-#    DEFINES += QNANO_BUILD_GL_BACKENDS
+# When building for embedded devices you can define manually which
+# backend is supported
+#DEFINES += QNANO_BUILD_GLES_BACKENDS
+#DEFINES += QNANO_BUILD_GL_BACKENDS
 
-android | ios | linux-rasp-* | windows:wince | CONFIG(windows_with_gles) {
-    DEFINES += QNANO_BUILD_GLES_BACKENDS
+# Alternatively, trying to autodetect suitable backeds based on Qt configuration
+!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+    qtConfig(opengles2) | qtConfig(opengles3) {
+        DEFINES += QNANO_BUILD_GLES_BACKENDS
+    } else {
+        DEFINES += QNANO_BUILD_GL_BACKENDS
+    }
+    CONFIG(windows_with_gles) {
+        DEFINES += QNANO_BUILD_GLES_BACKENDS
+    }
 }
-!contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) | windows:!wince {
-    DEFINES += QNANO_BUILD_GL_BACKENDS
+
+# Or finally selecting suitable backeds for different environments.
+!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+    android | ios | linux-rasp-* | windows:wince | CONFIG(windows_with_gles) {
+        DEFINES += QNANO_BUILD_GLES_BACKENDS
+    }
+    !contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) | windows:!wince {
+        DEFINES += QNANO_BUILD_GL_BACKENDS
+    }
+}
+
+!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+    error("No QNanoPainter backends defined. Please modify libqnanopainter/include.pri")
 }
 
 contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) {
