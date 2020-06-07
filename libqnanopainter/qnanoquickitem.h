@@ -144,15 +144,26 @@ private:
     int m_textureHeight;
 };
 
+#if QT_VERSION >= 0x051000  // Qt 5.10 and later
+#  define QNANO_QUICKITEM_UPDATE QMetaObject::invokeMethod(this, &QNanoQuickItem::update);
+#else
+#  define QNANO_QUICKITEM_UPDATE QMetaObject::invokeMethod(this, "update");
+#endif
+
 #define QNANO_PROPERTY(type, variable, getter, setter) \
 private: \
     Q_PROPERTY(type getter READ getter WRITE setter NOTIFY getter##Changed) \
 Q_SIGNALS: \
-    void getter##Changed(); \
+    void getter##Changed(const type variable); \
 public: \
     type const& getter() const { return variable; } \
 public Q_SLOTS: \
-    void setter(type const &v) { if(v == variable) return; variable = v; Q_EMIT getter##Changed(); update(); } \
+    void setter(type const &v) { \
+        if(v == variable) return; \
+        variable = v; \
+        Q_EMIT getter##Changed(v); \
+        QNANO_QUICKITEM_UPDATE \
+    } \
 private: \
     type variable;
 
