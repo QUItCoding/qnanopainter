@@ -105,11 +105,18 @@ win32 {
 }
 
 # When building for embedded devices you can define manually which
-# backend is supported
+# backends are supported
 #DEFINES += QNANO_BUILD_GLES_BACKENDS
 #DEFINES += QNANO_BUILD_GL_BACKENDS
 
 # Alternatively, trying to autodetect suitable backeds based on Qt configuration
+!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+    equals(QT_ARCH,"wasm") {
+        # WebAssembly uses GLES
+        DEFINES += QNANO_BUILD_GLES_BACKENDS
+    }
+}
+
 !contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
     qtConfig(opengles2) | qtConfig(opengles3) {
         DEFINES += QNANO_BUILD_GLES_BACKENDS
