@@ -60,6 +60,9 @@ public:
     static QNanoColor fromQColor(const QColor &c0);
     static QNanoColor fromMix(const QNanoColor &color1, const QNanoColor &color2, float amount);
 
+    bool operator ==(const QNanoColor& color) const;
+    bool operator !=(const QNanoColor& color) const;
+
 private:
 
     friend class QNanoPainter;

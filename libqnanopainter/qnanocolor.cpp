@@ -380,6 +380,19 @@ QNanoColor QNanoColor::fromMix(const QNanoColor &color1, const QNanoColor &color
     return QNanoColor::fromNVGColor(nvgLerpRGBA(color1.nvgColor(), color2.nvgColor(), amount));
 }
 
+bool QNanoColor::operator ==(const QNanoColor& color) const
+{
+    return qFuzzyCompare(color.m_nvgColor.r, m_nvgColor.r) &&
+           qFuzzyCompare(color.m_nvgColor.g, m_nvgColor.g) &&
+           qFuzzyCompare(color.m_nvgColor.b, m_nvgColor.b) &&
+           qFuzzyCompare(color.m_nvgColor.a, m_nvgColor.a);
+}
+
+bool QNanoColor::operator !=(const QNanoColor& color) const
+{
+    return !operator==(color);
+}
+
 /*!
    \internal
 */
