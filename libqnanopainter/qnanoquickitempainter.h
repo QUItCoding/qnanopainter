@@ -22,7 +22,11 @@
 #ifndef QNANOQUICKITEMPAINTER_H
 #define QNANOQUICKITEMPAINTER_H
 
+#if (QT_VERSION >= 0x060000)
+#include <QtOpenGL>          //for Qt>=6.0.0 opengl compatibility module needed (QT += opengl)
+#else                        //for Qt5 -- original code.
 #include <QtGui/QOpenGLFunctions>
+#endif /* (QT_VERSION >= 0x060000) */
 #include <QtQuick/QQuickFramebufferObject>
 #include <QColor>
 #include <QElapsedTimer>

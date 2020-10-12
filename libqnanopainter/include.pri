@@ -104,6 +104,10 @@ win32 {
     }
 }
 
+equals(QT_MAJOR_VERSION, 6) { ## for Qt6 need opengl module
+    QT += opengl              ## see https://doc-snapshots.qt.io/qt6-dev/qtopengl-index.html
+}                             ## NB: "Warning: This module should not be used anymore for new code. Please use the corresponding OpenGL classes in Qt GUI." ( https://doc-snapshots.qt.io/qt6-dev/qtgui-index.html#opengl-and-opengl-es-integration )
+
 # When building for embedded devices you can define manually which
 # backends are supported
 #DEFINES += QNANO_BUILD_GLES_BACKENDS
