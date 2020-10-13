@@ -3,6 +3,10 @@
 #include <QtMath>
 #include <QCursor>
 
+#if (QT_VERSION >= 0x060000)         // Qt6 -- qrand() is gone.
+#include <QRandomGenerator>
+#endif /* (QT_VERSION >= 0x060000) */
+
 EventItem::EventItem(QQuickItem *parent)
     :  QNanoQuickItem(parent)
 {
@@ -21,7 +25,11 @@ QNanoQuickItemPainter* EventItem::createItemPainter() const
 
 void EventItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
+#if (QT_VERSION >= 0x060000) //Qt6 -- renamed to geometryChange()
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#else                        //Qt5 -- had geometryChanged()
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#endif
     if (widthValid() && heightValid()) {
         m_circleSize = 2 + int(qMin(width(), height())*0.01);
         generateRandomItems();
@@ -171,16 +179,22 @@ int EventItem::resizeItemAt(QPointF pos)
     return -1;
 }
 
+#if (QT_VERSION >= 0x060000)         // qrand() gone in Qt6
+#define QRAND() QRandomGenerator::global()->generate()
+#else
+#define QRAND() qrand()
+#endif /* (QT_VERSION >= 0x060000) */
+
 void EventItem::generateRandomItems()
 {
     m_items.clear();
     int margin = int(width()*0.05);
-    int items = 2 + qrand()%150;
+    int items = 2 + QRAND()%150;
     for (int i=0; i<items ; i++) {
-        double w = qrand() % int(width()*0.2) + margin;
-        double h = qrand() % int(height()*0.2) + margin;
-        double x = qrand() % int(width()-w-margin*2) + margin;
-        double y = qrand() % int(height()-h-margin*2) + margin;
+        double w = QRAND() % int(width()*0.2) + margin;
+        double h = QRAND() % int(height()*0.2) + margin;
+        double x = QRAND() % int(width()-w-margin*2) + margin;
+        double y = QRAND() % int(height()-h-margin*2) + margin;
         m_items << QRectF(x, y, w, h);
     }
     update();
