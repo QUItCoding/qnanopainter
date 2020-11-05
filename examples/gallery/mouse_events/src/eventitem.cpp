@@ -3,9 +3,9 @@
 #include <QtMath>
 #include <QCursor>
 
-#if (QT_VERSION >= 0x060000)         // Qt6 -- qrand() is gone.
+#if (QT_VERSION >= 0x050150)         // Qt5.15 -- qrand() deprecated ; Qt6 -- qrand() is gone.
 #include <QRandomGenerator>
-#endif /* (QT_VERSION >= 0x060000) */
+#endif /* (QT_VERSION >= 0x050150) */
 
 EventItem::EventItem(QQuickItem *parent)
     :  QNanoQuickItem(parent)
@@ -29,7 +29,7 @@ void EventItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeom
     QQuickItem::geometryChange(newGeometry, oldGeometry);
 #else                        //Qt5 -- had geometryChanged()
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
-#endif
+#endif /* (QT_VERSION >= 0x060000) */
     if (widthValid() && heightValid()) {
         m_circleSize = 2 + int(qMin(width(), height())*0.01);
         generateRandomItems();
@@ -179,11 +179,11 @@ int EventItem::resizeItemAt(QPointF pos)
     return -1;
 }
 
-#if (QT_VERSION >= 0x060000)         // qrand() gone in Qt6
+#if (QT_VERSION >= 0x050150)         // Qt5.15 -- qrand() deprecated ; Qt6 -- qrand() is gone.
 #define QRAND() QRandomGenerator::global()->generate()
 #else
 #define QRAND() qrand()
-#endif /* (QT_VERSION >= 0x060000) */
+#endif /* (QT_VERSION >= 0x050150) */
 
 void EventItem::generateRandomItems()
 {
