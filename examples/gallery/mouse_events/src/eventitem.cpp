@@ -23,7 +23,11 @@ QNanoQuickItemPainter* EventItem::createItemPainter() const
     return new EventItemPainter();
 }
 
+#if (QT_VERSION >= 0x060000)
+void EventItem::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+#else
 void EventItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+#endif
 {
 #if (QT_VERSION >= 0x060000) //Qt6 -- renamed to geometryChange()
     QQuickItem::geometryChange(newGeometry, oldGeometry);
