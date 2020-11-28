@@ -187,3 +187,5 @@ The library is licensed under [zlib license](LICENSE.txt).
   * [FitGraph NG UI prototype](http://kgronholm.blogspot.fi/2017/10/fitgraph-ng-ui-prototype.html)
   * [Qt 5.10 Rendering Benchmarks](http://kgronholm.blogspot.fi/2017/12/qt-510-rendering-benchmarks.html)
   * [Qt 5.10 Windows Rendering Benchmarks](http://kgronholm.blogspot.fi/2018/01/qt-510-windows-rendering-benchmarks.html)
+  * [Qt painting performance with 4 different embedded GPUs (Mali, Adreno, PowerVR)](http://kgronholm.blogspot.com/2019/03/qt-painting-performance-with-4.html)
+  * [Qt Quick 3D DynamicMeters demo](http://kgronholm.blogspot.com/2020/04/qt-quick-3d-dynamicmeters-demo.html)
