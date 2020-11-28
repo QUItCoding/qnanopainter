@@ -879,8 +879,11 @@ void GalleryItemPainter::drawImages() {
 void GalleryItemPainter::drawFrameBuffers()
 {
     int rects = 2;
-    float margin = width()*0.1f;
-    float w = (width() / rects) - margin;
+    float dp = painter()->devicePixelRatio();
+    float dpWidth = width() * dp;
+    float dpHeight = height() * dp;
+    float margin = dpWidth*0.1f;
+    float w = (dpWidth / rects) - margin;
     float posX = margin/2;
     float posY = margin;
     float lineWidth = 2;
@@ -990,11 +993,11 @@ void GalleryItemPainter::drawFrameBuffers()
     // TODO: Consider creating helper for these
 #ifdef QNANO_USE_RENDERNODE
     QOpenGLFramebufferObject::bindDefault();
-    painter()->beginFrameAt(itemData().x, itemData().y, width(), height());
-    glF.glViewport(0, int(itemData().y), int(width()), int(height()));
+    painter()->beginFrameAt(itemData().x*dp, itemData().y*dp, dpWidth, dpHeight);
+    glF.glViewport(0, int(itemData().y*dp), int(dpWidth), int(dpHeight));
 #else
     framebufferObject()->bind();
-    painter()->beginFrameAt(0, 0, width(), height());
+    painter()->beginFrameAt(0, 0, dpWidth, dpHeight);
 #endif
 
     // Draw fbo1 as image
