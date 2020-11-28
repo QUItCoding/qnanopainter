@@ -34,7 +34,7 @@ Item {
         'readonly property real itemWidth: root.width;' +
         'readonly property real itemHeight: root.height;' +
         'asynchronous: true;' +
-        'vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled;';
+        'vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled;\n';
 
         for (var i=0; i<items; ++i) {
             newObject += 'ShapePath {' +
@@ -45,7 +45,7 @@ Item {
                     'capStyle: ShapePath.RoundCap;';
             newObject += 'PathMove { x: itemWidth/2; y: ' + i + '*lineSpacing+lineWidth; }';
             newObject += 'PathArc { x: cx + ((itemWidth/2-' + i + '*lineSpacing-lineWidth) * Math.cos(ringProgress(' + i + '))); y: cy + ((itemWidth/2-' + i + '*lineSpacing-lineWidth) * Math.sin(ringProgress(' + i + '))); radiusX: itemWidth/2-' + i + '*lineSpacing-lineWidth; radiusY: itemWidth/2-' + i + '*lineSpacing-lineWidth; useLargeArc: useLargeArcFunc(' + i + '); }';
-            newObject += '}'; // ShapePath
+            newObject += '}\n'; // ShapePath
         }
         newObject += '}'; // Shape
 

@@ -27,7 +27,7 @@ Item {
         'readonly property real itemHeight: root.height;' +
         // Note: asynchronous disabled for now, see QTBUG-64508
         //'asynchronous: true;' +
-        'vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled;';
+        'vendorExtensionsEnabled: mainWindow.settingVendorExtensionsEnabled;\n';
 
         // Draw graph background area
         newObject += 'ShapePath {' +
@@ -38,14 +38,14 @@ Item {
                 'GradientStop { position: 1; color: m_color2 }' +
                 '}' +
                 'startX: posX(0);' +
-                'startY: itemHeight;';
-        newObject += 'PathLine { x: posX(0); y: posY(0); }';
+                'startY: itemHeight;\n';
+        newObject += 'PathLine { x: posX(0); y: posY(0); }\n';
         var i;
         for (i=1; i<items; ++i) {
-            newObject += 'PathCubic { control1X: posX(' + (i-1) + ')+dx*0.5; control1Y: posY(' + (i-1) + '); control2X: posX(' + i + ')-dx*0.5; control2Y: posY(' + i + '); x: posX(' + i + '); y: posY(' + i + ') }';
+            newObject += 'PathCubic { control1X: posX(' + (i-1) + ')+dx*0.5; control1Y: posY(' + (i-1) + '); control2X: posX(' + i + ')-dx*0.5; control2Y: posY(' + i + '); x: posX(' + i + '); y: posY(' + i + ') }\n';
         }
         newObject += 'PathLine { x: itemWidth; y: itemHeight; }';
-        newObject += '}'; // ShapePath
+        newObject += '}\n'; // ShapePath
 
         // Draw graph line
         newObject += 'ShapePath {' +
@@ -53,11 +53,11 @@ Item {
                 'strokeWidth: 1.0 + dotSize*0.2;' +
                 'fillColor: "transparent";' +
                 'startX: posX(0);' +
-                'startY: posY(0);';
+                'startY: posY(0);\n';
         for (i=1; i<items; ++i) {
-            newObject += 'PathCubic { control1X: posX(' + (i-1) + ')+dx*0.5; control1Y: posY(' + (i-1) + '); control2X: posX(' + i + ')-dx*0.5; control2Y: posY(' + i + '); x: posX(' + i + '); y: posY(' + i + ') }';
+            newObject += 'PathCubic { control1X: posX(' + (i-1) + ')+dx*0.5; control1Y: posY(' + (i-1) + '); control2X: posX(' + i + ')-dx*0.5; control2Y: posY(' + i + '); x: posX(' + i + '); y: posY(' + i + ') }\n';
         }
-        newObject += '}'; // ShapePath
+        newObject += '}\n'; // ShapePath
 
         // Draw dots
         for (i=0; i<items; ++i) {
@@ -69,7 +69,7 @@ Item {
                 'radius: height/2;' +
                 'color: m_colorWhite;' +
                 'border.color: m_colorBlack;' +
-                'border.width: dotSize*0.2; }';
+                'border.width: dotSize*0.2; }\n';
         }
 
         /*
