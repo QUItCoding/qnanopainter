@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickWindow>
 #include "qnanopainter_features/src/galleryitem.h"
 #include "mouse_events/src/eventitem.h"
 #include "painting/src/paintingitem.h"
@@ -14,6 +15,10 @@ int main(int argc, char *argv[])
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
+
+#if (QT_VERSION >= 0x060000)
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+#endif
 
     QQmlApplicationEngine engine;
     qmlRegisterType<GalleryItem>("GalleryItem", 1, 0, "GalleryItem");
