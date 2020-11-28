@@ -18,7 +18,7 @@ DemoQNanoItemPainter::DemoQNanoItemPainter()
     m_color2 = QNanoColor(255,255,255,150);
     m_color3 = QNanoColor(255,255,255,80);
 
-    QNanoImage::ImageFlags imageFlags = nullptr;
+    QNanoImage::ImageFlags imageFlags = {};
 #ifndef Q_OS_WIN
     // Windows ANGLE seems to have issues with mipmaps, use those in all other platforms.
     // See: https://github.com/QUItCoding/qnanopainter/issues/19

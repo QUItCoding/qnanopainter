@@ -75,7 +75,7 @@
 QNanoImage::QNanoImage()
     : m_parentPainter(nullptr)
     , m_imageData(nullptr)
-    , m_flags(nullptr)
+    , m_flags({})
 {
 }
 
