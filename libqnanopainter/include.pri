@@ -25,22 +25,6 @@ DEFINES += QNANO_ENABLE_GLES3
 # Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject
 #DEFINES += QNANO_USE_RENDERNODE
 
-# Configure the amount of logging in release build
-CONFIG(release, debug|release) {
-    message("QNanoPainter Release build")
-    #DEFINES += QT_NO_WARNING_OUTPUT
-    DEFINES += QT_NO_DEBUG_OUTPUT
-    DEFINES += QT_NO_INFO_OUTPUT
-}
-
-# Configure the amount of logging in debug build
-CONFIG(debug, debug|release) {
-    message("QNanoPainter Debug build")
-    #DEFINES += QT_NO_WARNING_OUTPUT
-    #DEFINES += QT_NO_DEBUG_OUTPUT
-    DEFINES += QT_NO_INFO_OUTPUT
-}
-
 SOURCES +=  \
     $$PWD/qnanopainter.cpp \
     $$PWD/qnanocolor.cpp \
