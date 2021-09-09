@@ -34,7 +34,7 @@ void EventItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeom
 #else                        //Qt5 -- had geometryChanged()
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 #endif /* (QT_VERSION >= 0x060000) */
-    if (widthValid() && heightValid()) {
+    if (width() > 0 && height() > 0) {
         m_circleSize = 2 + int(qMin(width(), height())*0.01);
         generateRandomItems();
     }
