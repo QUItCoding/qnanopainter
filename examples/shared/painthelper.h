@@ -50,7 +50,7 @@ static void paintHelloItem(QNanoPainter *p, float width, float height)
     p->fillText("HELLO", center.x(), center.y() - size*0.18);
     // QNanoPainter text
     QNanoFont font2(QNanoFont::DEFAULT_FONT_THIN);
-    font2.setPixelSize(size*0.16);
+    font2.setPixelSize(size*0.12);
     p->setFont(font2);
     p->fillText("QNanoPainter", center.x(), center.y() - size*0.08);
     // Paint heart

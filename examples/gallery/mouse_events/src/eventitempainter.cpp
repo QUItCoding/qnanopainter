@@ -66,7 +66,7 @@ void EventItemPainter::paint(QNanoPainter *p)
         p->setTextAlign(QNanoPainter::ALIGN_CENTER);
         p->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
         QNanoFont font(QNanoFont::DEFAULT_FONT_BOLD);
-        font.setPointSize(12);
+        font.setPointSize(8);
         p->setFont(font);
         p->fillText(QString::number(i+1), box.center());
     }

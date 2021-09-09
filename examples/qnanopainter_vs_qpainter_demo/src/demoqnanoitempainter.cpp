@@ -225,8 +225,7 @@ void DemoQNanoItemPainter::drawIcons(float x, float y, float w, float h, int ite
 {
     float s = std::min(width(), height());
     float size = 16.0f + s*0.05f;
-    // Note: Adjust font size to match QPainter sizing
-    float fontSize = size * 0.5f * 1.32f;
+    float fontSize = size * 0.5f;
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setFillStyle("#FFFFFF");
@@ -246,8 +245,7 @@ void DemoQNanoItemPainter::drawRuler(float x, float y, float w, float h, float t
     double space = w*0.03f + sinf(t)*w*0.02f;
     m_painter->setTextAlign(QNanoPainter::ALIGN_CENTER);
     m_painter->setTextBaseline(QNanoPainter::BASELINE_MIDDLE);
-    // Note: Adjust font size to match QPainter sizing
-    float fontSize = (10.0f + w*0.01f) * 1.32f;
+    float fontSize = (10.0f + w*0.01f);
     m_testFont.setPixelSize(fontSize);
     m_painter->setFont(m_testFont);
     m_painter->setStrokeStyle("#E0E0E0");

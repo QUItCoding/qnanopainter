@@ -708,7 +708,7 @@ void GalleryItemPainter::drawTextsFonts() {
 
     posY += 2*margin;
     QNanoFont f2 = QNanoFont(":/qnanopainter_features/fonts/Pacifico.ttf");
-    f2.setPixelSize(margin*2);
+    f2.setPixelSize(margin*1.2);
     painter()->setFont(f2);
     painter()->fillText("This is text with custom font", posX, posY);
 
@@ -739,7 +739,7 @@ void GalleryItemPainter::drawTextsFonts() {
 
 void GalleryItemPainter::drawTextsAlignments() {
     float margin = height() * 0.2f;
-    float fontSize = height() * 0.04f;
+    float fontSize = height() * 0.03f;
     float posX = margin/2;
     float posY = margin/2;
 
@@ -856,7 +856,7 @@ void GalleryItemPainter::drawImages() {
         posX += size + 2;
     }
     QNanoFont font(QNanoFont::DEFAULT_FONT_BOLD);
-    font.setPixelSize(QNanoPainter::mmToPx(4));
+    font.setPixelSize(QNanoPainter::mmToPx(3));
     painter()->setTextAlign(QNanoPainter::ALIGN_CENTER);
     painter()->setTextBaseline(QNanoPainter::BASELINE_TOP);
     QString scaling = useNearest ? "NEAREST" : "LINEAR";
