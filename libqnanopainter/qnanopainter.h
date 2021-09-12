@@ -287,6 +287,7 @@ private:
     QNanoPainter::TextBaseline m_textBaseline;
     float m_devicePixelRatio;
     bool m_fontSet;
+    bool m_clippingEnabled = false;
     QNanoPainter::PixelAlign m_pixelAlign;
     QNanoPainter::PixelAlign m_pixelAlignText;
     QSharedPointer<QNanoFont> m_defaultFont;

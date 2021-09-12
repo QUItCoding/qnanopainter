@@ -651,6 +651,8 @@ const QTransform QNanoPainter::currentTransform() const
 
     Sets the current scissor rectangle to (\a x, \a y, \a width, \a height).
     The scissor rectangle is transformed by the current transform.
+    Note: Clipping has some performance cost and it should only be used
+    when needed.
 */
 
 void QNanoPainter::setClipRect(float x, float y, float width, float height)
@@ -658,6 +660,14 @@ void QNanoPainter::setClipRect(float x, float y, float width, float height)
     _checkAlignPixelsAdjust(&x, &y);
     _checkAlignPixels(&width, &height);
     nvgScissor(nvgCtx(), x, y, width, height);
+    // Note: By-design the flag is set whenever clipping is used but
+    // it is never unset. That is because the flag changes the shader
+    // and we don't want multiple of those when some paintings are
+    // clipped and some not.
+    if (!m_clippingEnabled) {
+        m_clippingEnabled = true;
+        m_backend->setFlag(nvgCtx(), NVG_SCISSORING, true);
+    }
 }
 
 /*!
