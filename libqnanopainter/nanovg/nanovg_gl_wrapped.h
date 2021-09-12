@@ -32,6 +32,8 @@ enum NVGcreateFlags {
 	NVG_STENCIL_STROKES	= 1<<1,
 	// Flag indicating that additional debug checks are done.
 	NVG_DEBUG 			= 1<<2,
+	// Flag indicating if scissoring is used.
+	NVG_SCISSORING 			= 1<<2,
 };
 
 #if defined NANOVG_GL2_IMPLEMENTATION
@@ -612,12 +614,14 @@ static int glnvg__renderCreate(void* uptr)
 		"	return min(max(d.x,d.y),0.0) + length(max(d,0.0)) - rad;\n"
 		"}\n"
 		"\n"
+		"#ifdef SCISSORING\n"
 		"// Scissoring\n"
 		"float scissorMask(vec2 p) {\n"
 		"	vec2 sc = (abs((scissorMat * vec3(p,1.0)).xy) - scissorExt);\n"
 		"	sc = vec2(0.5,0.5) - sc * scissorScale;\n"
 		"	return clamp(sc.x,0.0,1.0) * clamp(sc.y,0.0,1.0);\n"
 		"}\n"
+		"#endif\n"
 		"#ifdef EDGE_AA\n"
 		"// Stroke - from [0..1] to clipped pyramid, where the slope is 1px.\n"
 		"float strokeMask() {\n"
@@ -627,12 +631,20 @@ static int glnvg__renderCreate(void* uptr)
 		"\n"
 		"void main(void) {\n"
 		"   vec4 result;\n"
-		"	float scissor = scissorMask(fpos);\n"
 		"#ifdef EDGE_AA\n"
 		"	float strokeAlpha = strokeMask();\n"
+		"#ifdef STENCIL_STROKES\n"
 		"	if (strokeAlpha < strokeThr) discard;\n"
 		"#else\n"
+		"	if (strokeAlpha < strokeThr) result = vec4(0.0);\n"
+		"#endif\n"
+		"#else\n"
 		"	float strokeAlpha = 1.0;\n"
+		"#endif\n"
+		"#ifdef SCISSORING\n"
+		"	float scissor = scissorMask(fpos);\n"
+		"#else\n"
+		"	float scissor = 1.0;\n"
 		"#endif\n"
 		"	if (type == 0) {			// Gradient\n"
 		"		// Calculate gradient color using box gradient\n"
@@ -679,13 +691,18 @@ static int glnvg__renderCreate(void* uptr)
 
 	glnvg__checkError(gl, "init");
 
-	if (gl->flags & NVG_ANTIALIAS) {
-		if (glnvg__createShader(&gl->shader, "shader", shaderHeader, "#define EDGE_AA 1\n", fillVertShader, fillFragShader) == 0)
-			return 0;
-	} else {
-		if (glnvg__createShader(&gl->shader, "shader", shaderHeader, NULL, fillVertShader, fillFragShader) == 0)
-			return 0;
+	char options[256] = "";
+	if (gl->flags & NVG_SCISSORING) {
+		strcat(options, "#define SCISSORING 1\n");
 	}
+	if (gl->flags & NVG_ANTIALIAS) {
+		if (gl->flags & NVG_STENCIL_STROKES)
+			strcat(options, "#define EDGE_AA 1\n#define STENCIL_STROKES 1\n");
+		else
+			strcat(options, "#define EDGE_AA 1\n");
+	}
+	if (glnvg__createShader(&gl->shader, "shader", shaderHeader, options, fillVertShader, fillFragShader) == 0)
+		return 0;
 
 	glnvg__checkError(gl, "uniform locations");
 	glnvg__getUniforms(&gl->shader);
