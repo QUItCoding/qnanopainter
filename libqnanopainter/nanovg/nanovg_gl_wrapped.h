@@ -33,7 +33,7 @@ enum NVGcreateFlags {
 	// Flag indicating that additional debug checks are done.
 	NVG_DEBUG 			= 1<<2,
 	// Flag indicating if scissoring is used.
-	NVG_SCISSORING 			= 1<<2,
+	NVG_SCISSORING 			= 1<<3,
 };
 
 #if defined NANOVG_GL2_IMPLEMENTATION
