@@ -74,7 +74,6 @@
 
 QNanoImage::QNanoImage()
     : m_parentPainter(nullptr)
-    , m_imageData(nullptr)
     , m_flags({})
 {
 }
@@ -89,7 +88,6 @@ QNanoImage::QNanoImage()
 
 QNanoImage::QNanoImage(const QString &filename, ImageFlags flags)
     : m_parentPainter(nullptr)
-    , m_imageData(nullptr)
     , m_filename(filename)
     , m_flags(flags)
 {
@@ -121,8 +119,7 @@ void QNanoImage::setFilename(const QString &filename)
 void QNanoImage::setFrameBuffer(const QOpenGLFramebufferObject *fbo)
 {
     Q_ASSERT(fbo);
-    delete m_imageData;
-    m_imageData = new QNanoDataElement();
+    m_imageData.reset(new QNanoDataElement());
     m_imageData->width = fbo->width();
     m_imageData->height = fbo->height();
     m_textureId = fbo->texture();
@@ -185,7 +182,7 @@ QNanoImage QNanoImage::fromFrameBuffer(const QOpenGLFramebufferObject *fbo, Imag
 {
     Q_ASSERT(fbo);
     QNanoImage image;
-    image.m_imageData = new QNanoDataElement();
+    image.m_imageData.reset(new QNanoDataElement());
     image.m_imageData->width = fbo->width();
     image.m_imageData->height = fbo->height();
     image.m_textureId = fbo->texture();
@@ -220,7 +217,7 @@ int QNanoImage::getID(NVGcontext* nvg)
         {
             qWarning() << "Could not open image file: " << m_filename;
         } else {
-            m_imageData = new QNanoDataElement();
+            m_imageData.reset(new QNanoDataElement());
             QByteArray array = file.readAll();
             int length = array.size();
             unsigned char* data = reinterpret_cast<unsigned char*>(&array.data()[0]);

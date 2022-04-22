@@ -277,7 +277,7 @@ private:
     void _checkAlignPixelsAdjustOne(float *a);
 
     // TODO: Consider implementing QNanoDataCache class with methods instead of this
-    QHash<QString, QNanoDataElement*> m_dataCache;
+    QHash<QString, QSharedPointer<QNanoDataElement>> m_dataCache;
 
     NVGcontext* m_nvgContext;
     QScopedPointer<QNanoBackend> m_backend;

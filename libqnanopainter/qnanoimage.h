@@ -78,7 +78,7 @@ private:
     void updateUniqueKey();
 
     QNanoPainter *m_parentPainter;
-    QNanoDataElement *m_imageData;
+    QSharedPointer<QNanoDataElement> m_imageData;
     QString m_filename;
     GLuint m_textureId = 0;
     QNanoImage::ImageFlags m_flags;
