@@ -27,6 +27,7 @@
 #include <QString>
 #include <QOpenGLFramebufferObject>
 #include <QDebug>
+#include <QImage>
 
 class QNanoPainter;
 
@@ -51,6 +52,9 @@ public:
     // Constructs an image with the filename and flags
     QNanoImage(const QString &filename, ImageFlags flags = {});
 
+    // Constructs an image from QImage with the filename and flags
+    QNanoImage(QImage image, const QString &filename, ImageFlags flags = {});
+
     // Set the filename of the image
     void setFilename(const QString &filename);
 
@@ -64,6 +68,7 @@ public:
     int height() const;
 
     static QNanoImage fromFrameBuffer(const QOpenGLFramebufferObject *fbo, ImageFlags flags = QNanoImage::FLIPY);
+    static QNanoImage fromCache(QNanoPainter *painter, const QString &filename, ImageFlags flags = {});
 
 private:
     friend class QNanoPainter;
@@ -77,11 +82,12 @@ private:
 
     void updateUniqueKey();
 
-    QNanoPainter *m_parentPainter;
+    QNanoPainter *m_parentPainter = nullptr;
     QSharedPointer<QNanoDataElement> m_imageData;
+    std::unique_ptr<QImage> m_image;
     QString m_filename;
     GLuint m_textureId = 0;
-    QNanoImage::ImageFlags m_flags;
+    QNanoImage::ImageFlags m_flags = {};
     QString m_uniqueKey;
 
 };
