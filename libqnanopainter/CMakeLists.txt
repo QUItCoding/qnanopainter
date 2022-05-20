@@ -31,8 +31,6 @@ add_library(qnanopainter
     
     private/qnanobackendgl3.cpp private/qnanobackendgl3.h
     private/qnanobackendgl2.cpp private/qnanobackendgl2.h
-
-    libqnanopainterdata.qrc
     )
 
 

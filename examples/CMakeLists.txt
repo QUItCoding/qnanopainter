@@ -16,6 +16,8 @@ find_package(Qt5Quick CONFIG REQUIRED)
 
 # gallery
 add_executable(gallery 
+    ../libqnanopainter/libqnanopainterdata.qrc
+
     gallery/main.cpp  
     gallery/qml.qrc
 
@@ -34,17 +36,17 @@ add_executable(gallery
 target_link_libraries(gallery qnanopainter nanovg) 
 
 # helloitem TODO fix 
-add_executable(helloitem helloitem/main.cpp  helloitem/helloitem.h helloitem/qml.qrc shared/shareddata.qrc)
+add_executable(helloitem helloitem/main.cpp  helloitem/helloitem.h helloitem/qml.qrc shared/shareddata.qrc ../../libqnanopainter/libqnanopainterdata.qrc)
 target_link_libraries(helloitem qnanopainter nanovg) 
 target_include_directories(helloitem PUBLIC shared)  
 
 #hellowidget
-add_executable(hellowidget hellowidget/main.cpp shared/shareddata.qrc)
+add_executable(hellowidget hellowidget/main.cpp shared/shareddata.qrc  ../../libqnanopainter/libqnanopainterdata.qrc)
 target_link_libraries(hellowidget qnanopainter nanovg) 
 target_include_directories(hellowidget PUBLIC shared)  
 
 # hellowindow
-add_executable(hellowindow hellowindow/main.cpp shared/shareddata.qrc)
+add_executable(hellowindow hellowindow/main.cpp shared/shareddata.qrc ../../libqnanopainter/libqnanopainterdata.qrc)
 target_link_libraries(hellowindow qnanopainter nanovg) 
 target_include_directories(hellowindow PUBLIC shared)  
 
