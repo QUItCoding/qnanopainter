@@ -34,3 +34,5 @@ Makefile*
 
 *.autosave
 /build
+
+_VSC_.bat

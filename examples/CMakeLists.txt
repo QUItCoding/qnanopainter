@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(qnanopainter_examples VERSION 0.1.0)
 
+set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "ON" FORCE) 
+
 set(CMAKE_AUTOGEN_PARALLEL AUTO)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -12,14 +14,29 @@ find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5OpenGL CONFIG REQUIRED)
 find_package(Qt5Quick CONFIG REQUIRED)
 
-#gallery TODO fix
-# add_executable(gallery gallery/main.cpp  gallery/qml.qrc)
-# target_link_libraries(gallery qnanopainter nanovg) 
+# gallery
+add_executable(gallery 
+    gallery/main.cpp  
+    gallery/qml.qrc
+
+    gallery/painting/src/paintingitem.cpp          gallery/painting/src/paintingitem.h
+    gallery/painting/src/paintingitempainter.cpp   gallery/painting/src/paintingitempainter.h
+    gallery/painting/painting.qrc
+
+    gallery/mouse_events/src/eventitem.cpp   gallery/mouse_events/src/eventitem.h
+    gallery/mouse_events/src/eventitempainter.cpp   gallery/mouse_events/src/eventitempainter.h
+    gallery/mouse_events/mouse_events.qrc        
+
+    gallery/qnanopainter_features/src/galleryitem.cpp  gallery/qnanopainter_features/src/galleryitem.h 
+    gallery/qnanopainter_features/src/galleryitempainter.cpp  gallery/qnanopainter_features/src/galleryitempainter.h 
+    gallery/qnanopainter_features/qnanopainter_features.qrc
+)
+target_link_libraries(gallery qnanopainter nanovg) 
 
 # helloitem TODO fix 
-# add_executable(helloitem helloitem/main.cpp  helloitem/qml.qrc)
-# target_link_libraries(helloitem qnanopainter nanovg) 
-# target_include_directories(helloitem PUBLIC shared)  
+add_executable(helloitem helloitem/main.cpp  helloitem/helloitem.h helloitem/qml.qrc shared/shareddata.qrc)
+target_link_libraries(helloitem qnanopainter nanovg) 
+target_include_directories(helloitem PUBLIC shared)  
 
 #hellowidget
 add_executable(hellowidget hellowidget/main.cpp shared/shareddata.qrc)
@@ -30,3 +47,6 @@ target_include_directories(hellowidget PUBLIC shared)
 add_executable(hellowindow hellowindow/main.cpp shared/shareddata.qrc)
 target_link_libraries(hellowindow qnanopainter nanovg) 
 target_include_directories(hellowindow PUBLIC shared)  
+
+add_subdirectory("qnanopainter_vs_qpainter_demo") 
+
