@@ -29,6 +29,7 @@ add_executable(qnanopainter_vs_qpainter_demo
     src/demoqpitem.h
 
     qml.qrc
+    ../../libqnanopainter/libqnanopainterdata.qrc
     
     )
 
