@@ -22,6 +22,7 @@
 #include "qnanopainter.h"
 
 #include "nanovg/nanovg.h"
+#include "nanovg/nanovg_gl.h" // NVG_ANTIALIAS NVG_SCISSORING NVG_STENCIL_STROKES
 #include "private/qnanobackendfactory.h"
 
 #include <QScreen>
