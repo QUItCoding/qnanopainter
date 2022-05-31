@@ -73,9 +73,6 @@
 */
 
 QNanoImage::QNanoImage()
-    : m_parentPainter(nullptr)
-    , m_imageData(nullptr)
-    , m_flags({})
 {
 }
 
@@ -88,8 +85,14 @@ QNanoImage::QNanoImage()
 */
 
 QNanoImage::QNanoImage(const QString &filename, ImageFlags flags)
-    : m_parentPainter(nullptr)
-    , m_imageData(nullptr)
+    : m_filename(filename)
+    , m_flags(flags)
+{
+    updateUniqueKey();
+}
+
+QNanoImage::QNanoImage(QImage image, const QString &filename, ImageFlags flags)
+    : m_image(new QImage(image))
     , m_filename(filename)
     , m_flags(flags)
 {
@@ -121,8 +124,7 @@ void QNanoImage::setFilename(const QString &filename)
 void QNanoImage::setFrameBuffer(const QOpenGLFramebufferObject *fbo)
 {
     Q_ASSERT(fbo);
-    delete m_imageData;
-    m_imageData = new QNanoDataElement();
+    m_imageData.reset(new QNanoDataElement());
     m_imageData->width = fbo->width();
     m_imageData->height = fbo->height();
     m_textureId = fbo->texture();
@@ -185,12 +187,25 @@ QNanoImage QNanoImage::fromFrameBuffer(const QOpenGLFramebufferObject *fbo, Imag
 {
     Q_ASSERT(fbo);
     QNanoImage image;
-    image.m_imageData = new QNanoDataElement();
+    image.m_imageData.reset(new QNanoDataElement());
     image.m_imageData->width = fbo->width();
     image.m_imageData->height = fbo->height();
     image.m_textureId = fbo->texture();
     image.m_flags = flags;
     image.updateUniqueKey();
+    return image;
+}
+
+QNanoImage QNanoImage::fromCache(QNanoPainter *painter, const QString &filename, ImageFlags flags)
+{
+    Q_ASSERT(painter);
+    QNanoImage image;
+    image.m_imageData.reset(new QNanoDataElement());
+    image.m_filename = filename;
+    image.m_flags = flags;
+    image.updateUniqueKey();
+    image.m_parentPainter = painter;
+    image.getID(painter->nvgCtx());
     return image;
 }
 
@@ -203,24 +218,41 @@ QNanoImage QNanoImage::fromFrameBuffer(const QOpenGLFramebufferObject *fbo, Imag
 int QNanoImage::getID(NVGcontext* nvg)
 {
     // Image cache should always exist at this point
+    Q_ASSERT(m_parentPainter);
+    if (!m_parentPainter)
+        return -1;
     auto *dataCache = &m_parentPainter->m_dataCache;
-    Q_ASSERT(dataCache);
     if (dataCache->contains(m_uniqueKey)) {
         // Image is in cache
         m_imageData = dataCache->value(m_uniqueKey);
     } else if (m_imageData && m_textureId > 0) {
-        m_imageData->id = m_parentPainter->m_backend->nvglCreateImageFromHandle(m_parentPainter->nvgCtx(), m_textureId,
+        m_imageData->id = m_parentPainter->m_backend->nvglCreateImageFromHandle(nvg, m_textureId,
                                                                                 m_imageData->width, m_imageData->height,
                                                                                 m_flags);
         dataCache->insert(m_uniqueKey, m_imageData);
+    } else if (m_image) {
+        if (m_image->size().isEmpty()) {
+            qWarning() << "Empty image: " << m_filename;
+        } else {
+            if (m_image->format() != QImage::Format_RGBA8888 && m_image->format() != QImage::Format_RGBA8888_Premultiplied) {
+                qWarning() << "Converting image" << m_filename << "from" << m_image->format() << "to" << QImage::Format_RGBA8888_Premultiplied;
+                m_image->convertTo(QImage::Format_RGBA8888_Premultiplied);
+            }
+            m_imageData.reset(new QNanoDataElement());
+            QNanoImage::ImageFlags flags = m_flags;
+            if (m_image->format() == QImage::Format_RGBA8888_Premultiplied)
+                flags |= QNanoImage::PREMULTIPLIED;
+            else
+                flags &= ~QNanoImage::PREMULTIPLIED;
+            m_imageData->id = nvgCreateImageRGBA(nvg, m_image->width(), m_image->height(), flags, m_image->bits());
+            nvgImageSize(nvg, m_imageData->id, &m_imageData->width, &m_imageData->height);
+            dataCache->insert(m_uniqueKey, m_imageData);
+        }
     } else {
         // Image is not yet in cache, so load and add it
         QFile file(m_filename);
-        if (!file.open(QFile::ReadOnly))
-        {
-            qWarning() << "Could not open image file: " << m_filename;
-        } else {
-            m_imageData = new QNanoDataElement();
+        if (file.open(QFile::ReadOnly)) {
+            m_imageData.reset(new QNanoDataElement());
             QByteArray array = file.readAll();
             int length = array.size();
             unsigned char* data = reinterpret_cast<unsigned char*>(&array.data()[0]);
@@ -229,7 +261,7 @@ int QNanoImage::getID(NVGcontext* nvg)
             dataCache->insert(m_uniqueKey, m_imageData);
         }
     }
-    return m_imageData->id;
+    return m_imageData ? m_imageData->id : -1;
 }
 
 void QNanoImage::setParentPainter(QNanoPainter *parentPainter)

@@ -159,6 +159,39 @@ public:
 };
 ```
 
+### Example how to render QImage
+
+QNanoPainter can render QImage. The principle is that on the first render pass the QImage is loaded and put into cache and on the second pass it will be used from the cache.
+
+QImage is automatically converted to the correct pixel format (Format_RGBA8888_Premultiplied).
+
+Here's how to do it in paint function:
+
+```C++:
+    QImage loadImage(const QString &fileName)
+    {
+        // Load and return QImage
+        return QImage();
+    }
+
+    void paint(QNanoPainter *painter)
+    {
+        QString imageFileName; // Path to your image file
+
+        QNanoImage nanoImage = QNanoImage::fromCache(painter, imageFileName);
+        QSize imageSize(nanoImage.width(), nanoImage.height());
+        if (imageSize.isEmpty()) {
+            QImage image(loadImage(imageFileName));
+            if (image.isNull())
+                return;
+
+            nanoImage = QNanoImage(image, imageFileName);
+            imageSize = image.size();
+        }
+
+        // Render QNanoImage using painter
+    }
+```
 
 ## API Reference
 

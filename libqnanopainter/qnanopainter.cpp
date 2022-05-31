@@ -173,7 +173,7 @@ QNanoPainter::~QNanoPainter()
         m_backend->nvgDelete(m_nvgContext);
     }
 
-    qDeleteAll(m_dataCache);
+    m_dataCache.clear();
 }
 
 /*!
