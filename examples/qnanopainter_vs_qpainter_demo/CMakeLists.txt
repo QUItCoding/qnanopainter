@@ -17,7 +17,7 @@ if(QT_VERSION_MAJOR EQUAL  6)
     set(QNANOPAINTER_QT_LIBS  Qt::Widgets Qt::OpenGL Qt::Quick Qt::OpenGLWidgets)
 else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets OpenGL Quick )
-    set(QNANOPAINTER_QT_LIBS  Qt::Widgets Qt::OpenGL Qt::Quick)
+    set(QNANOPAINTER_QT_LIBS  Qt5::Widgets Qt5::OpenGL Qt5::Quick)
 endif() 
 
 # QT library list for qnanopainter
