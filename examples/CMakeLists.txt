@@ -10,13 +10,24 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
-find_package(Qt5Widgets CONFIG REQUIRED)
-find_package(Qt5OpenGL CONFIG REQUIRED)
-find_package(Qt5Quick CONFIG REQUIRED)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+
+if(QT_VERSION_MAJOR EQUAL  6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL Quick OpenGLWidgets)
+    set(QNANOPAINTER_QT_LIBS  Qt::Widgets Qt::OpenGL Qt::Quick Qt::OpenGLWidgets)
+else()
+    find_package(Qt5 REQUIRED COMPONENTS Widgets OpenGL Quick )
+    set(QNANOPAINTER_QT_LIBS  Qt::Widgets Qt::OpenGL Qt::Quick)
+endif() 
+
+
+#find_package(Qt5Widgets CONFIG REQUIRED)
+#find_package(Qt5OpenGL CONFIG REQUIRED)
+#find_package(Qt5Quick CONFIG REQUIRED)
 
 # gallery
 add_executable(gallery 
-    ../libqnanopainter/libqnanopainterdata.qrc
+    #../libqnanopainter/libqnanopainterdata.qrc
 
     gallery/main.cpp  
     gallery/qml.qrc
@@ -36,17 +47,17 @@ add_executable(gallery
 target_link_libraries(gallery qnanopainter nanovg) 
 
 # helloitem TODO fix 
-add_executable(helloitem helloitem/main.cpp  helloitem/helloitem.h helloitem/qml.qrc shared/shareddata.qrc ../../libqnanopainter/libqnanopainterdata.qrc)
+add_executable(helloitem helloitem/main.cpp  helloitem/helloitem.h helloitem/qml.qrc shared/shareddata.qrc )
 target_link_libraries(helloitem qnanopainter nanovg) 
 target_include_directories(helloitem PUBLIC shared)  
 
 #hellowidget
-add_executable(hellowidget hellowidget/main.cpp shared/shareddata.qrc  ../../libqnanopainter/libqnanopainterdata.qrc)
+add_executable(hellowidget hellowidget/main.cpp shared/shareddata.qrc  )
 target_link_libraries(hellowidget qnanopainter nanovg) 
 target_include_directories(hellowidget PUBLIC shared)  
 
 # hellowindow
-add_executable(hellowindow hellowindow/main.cpp shared/shareddata.qrc ../../libqnanopainter/libqnanopainterdata.qrc)
+add_executable(hellowindow hellowindow/main.cpp shared/shareddata.qrc )
 target_link_libraries(hellowindow qnanopainter nanovg) 
 target_include_directories(hellowindow PUBLIC shared)  
 

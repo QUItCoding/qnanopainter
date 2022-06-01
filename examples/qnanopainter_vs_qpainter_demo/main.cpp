@@ -10,6 +10,8 @@ int g_customFontId = 0;
 
 int main(int argc, char *argv[])
 {
+    // load res from libqnanopainter
+    Q_INIT_RESOURCE(libqnanopainterdata);
 
 #ifdef Q_OS_WIN
     // Select between OpenGL and OpenGL ES (Angle)

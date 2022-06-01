@@ -10,9 +10,18 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
-find_package(Qt5Widgets CONFIG REQUIRED)
-find_package(Qt5OpenGL CONFIG REQUIRED)
-find_package(Qt5Quick CONFIG REQUIRED)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+message(STATUS "DEMO QT VERSION=${QT_VERSION_MAJOR}" )
+if(QT_VERSION_MAJOR EQUAL  6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL Quick OpenGLWidgets)
+    set(QNANOPAINTER_QT_LIBS  Qt::Widgets Qt::OpenGL Qt::Quick Qt::OpenGLWidgets)
+else()
+    find_package(Qt5 REQUIRED COMPONENTS Widgets OpenGL Quick )
+    set(QNANOPAINTER_QT_LIBS  Qt::Widgets Qt::OpenGL Qt::Quick)
+endif() 
+
+# QT library list for qnanopainter
+
 
 
 
@@ -33,4 +42,4 @@ add_executable(qnanopainter_vs_qpainter_demo
     
     )
 
-target_link_libraries(qnanopainter_vs_qpainter_demo qnanopainter nanovg Qt5::Widgets Qt5::Quick) 
+target_link_libraries(qnanopainter_vs_qpainter_demo qnanopainter nanovg ${QNANOPAINTER_QT_LIBS} )
