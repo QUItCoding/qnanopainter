@@ -33,3 +33,6 @@ Makefile*
 # QtCreator
 
 *.autosave
+/build
+
+_VSC_.bat
