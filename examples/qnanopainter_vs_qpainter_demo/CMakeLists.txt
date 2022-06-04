@@ -33,7 +33,6 @@ add_executable(qnanopainter_vs_qpainter_demo
     src/demoqpitem.h
 
     qml.qrc
-#    ../../libqnanopainter/libqnanopainterdata.qrc
- )
+)
 
 target_link_libraries(qnanopainter_vs_qpainter_demo qnanopainter ${QNANOPAINTER_QT_LIBS} )
