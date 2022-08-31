@@ -144,7 +144,7 @@ private:
     int m_textureHeight;
 };
 
-#if QT_VERSION >= 0x051000  // Qt 5.10 and later
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #  define QNANO_QUICKITEM_UPDATE QMetaObject::invokeMethod(this, &QNanoQuickItem::update);
 #else
 #  define QNANO_QUICKITEM_UPDATE QMetaObject::invokeMethod(this, "update");
