@@ -28,9 +28,9 @@
 #include <QOpenGLFunctions>
 #include <QtMath>
 
-#if (QT_VERSION >= 0x060000)         // changes for Qt6
-#include <QQuickOpenGLUtils>         // for QQuickOpenGLUtils::resetOpenGLState()
-#endif /* (QT_VERSION >= 0x060000) */
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QQuickOpenGLUtils> // for QQuickOpenGLUtils::resetOpenGLState()
+#endif
 
 /*!
     \class QNanoQuickItemPainter
@@ -339,11 +339,11 @@ void QNanoQuickItemPainter::render()
     }
     // Reset the GL state for Qt side
     if (m_window) {
-#if (QT_VERSION >= 0x060000)         //API changed for Qt6
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         QQuickOpenGLUtils::resetOpenGLState();
 #else
         m_window->resetOpenGLState();
-#endif /* (QT_VERSION >= 0x060000) */
+#endif
     }
 
 }

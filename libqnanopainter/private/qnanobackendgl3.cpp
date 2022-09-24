@@ -1,7 +1,7 @@
 #include "qnanobackendgl3.h"
 
 #ifdef Q_OS_WIN
-#if (QT_VERSION >= 0x060000)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QOpenGLVersionFunctionsFactory>
 #endif
 #include <QOpenGLFunctions_3_2_Core>
@@ -17,7 +17,7 @@ static QOpenGLFunctions_3_2_Core *glf;
 QNanoBackendGL3::QNanoBackendGL3()
 {
 #ifdef Q_OS_WIN
-#if (QT_VERSION >= 0x060000)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     glf = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_2_Core>(QOpenGLContext::currentContext());
 #else
     glf = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_2_Core>();

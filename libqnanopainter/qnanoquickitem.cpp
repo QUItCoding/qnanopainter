@@ -21,7 +21,7 @@
 
 #include "qnanoquickitem.h"
 #include "qnanoquickitempainter.h"
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+#if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
 #include <QSGSimpleTextureNode>
 #endif
 
@@ -172,7 +172,7 @@ QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
     // Default to antialiased
     setAntialiasing(true);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 #ifndef QNANO_USE_RENDERNODE
     // New API in Qt 5.6 to mirror FBO
     setMirrorVertically(true);
