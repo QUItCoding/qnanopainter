@@ -22,6 +22,7 @@
 #ifndef QNANOQUICKITEMPAINTER_H
 #define QNANOQUICKITEMPAINTER_H
 
+#include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QtOpenGL>          //for Qt>=6.0.0 opengl compatibility module needed (QT += opengl)
 #else                        //for Qt5 -- original code.
