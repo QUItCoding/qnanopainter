@@ -7,6 +7,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+include(GNUInstallDirs)
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 message(STATUS "QNANOPAINTER QT VERSION=${QT_VERSION_MAJOR}")
 if(QT_VERSION_MAJOR EQUAL  6)
@@ -15,9 +17,9 @@ if(QT_VERSION_MAJOR EQUAL  6)
 else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets OpenGL Quick )
     set(QNANOPAINTER_QT_LIBS  Qt5::Widgets Qt5::OpenGL Qt5::Quick)
-endif() 
+endif()
 
-add_library(qnanopainter 
+add_library(qnanopainter
     libqnanopainterdata.qrc
     qnanoboxgradient.cpp qnanoboxgradient.h
     qnanocolor.cpp  qnanocolor.h
@@ -32,28 +34,33 @@ add_library(qnanopainter
     qnanowidget.cpp qnanowidget.h
     qnanowindow.cpp qnanowindow.h
 
-    private/qnanobackendgles2.h 
+    private/qnanobackendgles2.h
     private/qnanobackendgles3.h
-    private/qnanobackendgles2.cpp 
+    private/qnanobackendgles2.cpp
     private/qnanobackendgles3.cpp
     private/qnanodebug.cpp
     private/qnanodebug.h
-    
+
     private/qnanobackendgl3.cpp private/qnanobackendgl3.h
     private/qnanobackendgl2.cpp private/qnanobackendgl2.h
     )
 
+    set_target_properties(qnanopainter PROPERTIES PUBLIC_HEADER
+        "qnanoboxgradient.h;qnanocolor.h;qnanofont.h;qnanoimage.h;qnanoimagepattern.h;qnanolineargradient.h;qnanopainter.h;qnanoquickitem.h;qnanoquickitempainter.h;qnanoradialgradient.h;qnanowidget.h;qnanowindow.h"
+    )
 
-    # add QT Libs 
+    # add QT Libs
     target_link_libraries(qnanopainter ${QNANOPAINTER_QT_LIBS})
-    
-    target_include_directories(qnanopainter PUBLIC .)  
+
+    target_include_directories(qnanopainter PUBLIC .)
     target_compile_definitions(qnanopainter PUBLIC QNANO_QT_GL_INCLUDE)
     target_compile_definitions(qnanopainter PUBLIC QNANO_DEBUG)
     target_compile_definitions(qnanopainter PUBLIC QNANO_BUILD_GL_BACKENDS)
     #target_compile_definitions(qnanopainter PUBLIC QNANO_BUILD_GLES_BACKENDS)
     target_compile_definitions(qnanopainter PUBLIC QNANO_ENABLE_GLES3)
 
-    
-    
 
+install(TARGETS qnanopainter
+    LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBRARY}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qnanopainter
+    )
