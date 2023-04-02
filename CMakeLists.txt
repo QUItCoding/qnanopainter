@@ -7,7 +7,5 @@ else()
     set(CMAKE_EXE_LINKER_FLAGS "-Wl,--copy-dt-needed-entries")
 endif()
 
-
-add_subdirectory("libqnanopainter/nanovg") 
 add_subdirectory("libqnanopainter") 
 add_subdirectory("examples") 

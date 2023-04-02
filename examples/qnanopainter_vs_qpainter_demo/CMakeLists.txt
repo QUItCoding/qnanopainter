@@ -20,11 +20,6 @@ else()
     set(QNANOPAINTER_QT_LIBS  Qt5::Widgets Qt5::OpenGL Qt5::Quick)
 endif() 
 
-# QT library list for qnanopainter
-
-
-
-
 add_executable(qnanopainter_vs_qpainter_demo 
     main.cpp
 
@@ -38,8 +33,6 @@ add_executable(qnanopainter_vs_qpainter_demo
     src/demoqpitem.h
 
     qml.qrc
-    ../../libqnanopainter/libqnanopainterdata.qrc
-    
-    )
+)
 
-target_link_libraries(qnanopainter_vs_qpainter_demo qnanopainter nanovg ${QNANOPAINTER_QT_LIBS} )
+target_link_libraries(qnanopainter_vs_qpainter_demo qnanopainter ${QNANOPAINTER_QT_LIBS} )
