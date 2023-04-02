@@ -44,9 +44,15 @@ public:
 private:
     NVGpaint nvgPaint(NVGcontext* nvg) const Q_DECL_OVERRIDE Q_DECL_FINAL;
 
-    float m_x, m_y, m_width, m_height, m_feather, m_radius;
-    NVGcolor m_icol, m_ocol;
-    mutable bool m_changed;
+    float m_x = 0.0f;
+    float m_y = 0.0f;
+    float m_width = 100.0f;
+    float m_height = 100.0f;
+    float m_feather = 10.0f;
+    float m_radius = 0.0f;
+    NVGcolor m_icol = nvgRGB(255, 255, 255);;
+    NVGcolor m_ocol = nvgRGBA(0, 0, 0, 0);
+    mutable bool m_changed = true;
 
 };
 

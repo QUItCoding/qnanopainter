@@ -134,14 +134,14 @@ private:
 
     QString m_contextName;
     QString m_backendName;
-    QColor m_fillColor;
-    QNanoQuickItem::PixelAlign m_pixelAlign;
-    QNanoQuickItem::PixelAlign m_pixelAlignText;
-    bool m_highQualityRendering;
-    Qt::MouseButtons m_acceptedMouseButtons;
-    bool m_mouseEnabled;
-    int m_textureWidth;
-    int m_textureHeight;
+    QColor m_fillColor = Qt::transparent;
+    QNanoQuickItem::PixelAlign m_pixelAlign = QNanoQuickItem::PixelAlignNone;
+    QNanoQuickItem::PixelAlign m_pixelAlignText = QNanoQuickItem::PixelAlignNone;
+    bool m_highQualityRendering = false;
+    Qt::MouseButtons m_acceptedMouseButtons = Qt::LeftButton;
+    bool m_mouseEnabled = false;
+    int m_textureWidth = -1;
+    int m_textureHeight = -1;
 };
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)

@@ -279,17 +279,17 @@ private:
     // TODO: Consider implementing QNanoDataCache class with methods instead of this
     QHash<QString, QSharedPointer<QNanoDataElement>> m_dataCache;
 
-    NVGcontext* m_nvgContext;
+    NVGcontext* m_nvgContext = nullptr;
     QScopedPointer<QNanoBackend> m_backend;
     QSurfaceFormat m_surfaceFormat;
 
-    QNanoPainter::TextAlign m_textAlign;
-    QNanoPainter::TextBaseline m_textBaseline;
-    float m_devicePixelRatio;
-    bool m_fontSet;
+    QNanoPainter::TextAlign m_textAlign = QNanoPainter::ALIGN_LEFT;
+    QNanoPainter::TextBaseline m_textBaseline = QNanoPainter::BASELINE_ALPHABETIC;
+    float m_devicePixelRatio = 1.0f;
+    bool m_fontSet = false;
     bool m_clippingEnabled = false;
-    QNanoPainter::PixelAlign m_pixelAlign;
-    QNanoPainter::PixelAlign m_pixelAlignText;
+    QNanoPainter::PixelAlign m_pixelAlign = QNanoPainter::PIXEL_ALIGN_NONE;
+    QNanoPainter::PixelAlign m_pixelAlignText = QNanoPainter::PIXEL_ALIGN_NONE;
     QSharedPointer<QNanoFont> m_defaultFont;
     QString m_openglContextName;
 

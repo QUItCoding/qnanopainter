@@ -52,9 +52,14 @@ private:
 
     NVGpaint nvgPaint(NVGcontext* nvg) const Q_DECL_OVERRIDE Q_DECL_FINAL;
 
-    mutable bool m_changed;
-    float m_x, m_y, m_width, m_height, m_angle, m_alpha;
-    QNanoImage *m_image;
+    mutable bool m_changed = true;
+    float m_x = 0.0f;
+    float m_y = 0.0f;
+    float m_width = 100.0f;
+    float m_height = 100.0f;
+    float m_angle = 0.0f;
+    float m_alpha = 1.0f;
+    QNanoImage *m_image = nullptr;
 };
 
 #endif // QNANOIMAGEPATTERN_H

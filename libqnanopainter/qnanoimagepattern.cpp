@@ -42,14 +42,6 @@
 */
 
 QNanoImagePattern::QNanoImagePattern()
-    : m_changed(true)
-    , m_x(0.0f)
-    , m_y(0.0f)
-    , m_width(100.0f)
-    , m_height(100.0f)
-    , m_angle(0.0f)
-    , m_alpha(1.0f)
-    , m_image(nullptr)
 {
 }
 
@@ -64,11 +56,6 @@ QNanoImagePattern::QNanoImagePattern()
 */
 
 QNanoImagePattern::QNanoImagePattern(const QNanoImage &image)
-    : m_changed(true)
-    , m_x(0.0f)
-    , m_y(0.0f)
-    , m_angle(0.0f)
-    , m_alpha(1.0f)
 {
     m_image = const_cast<QNanoImage*>(&image);
     m_width = m_image->width();
@@ -86,8 +73,7 @@ QNanoImagePattern::QNanoImagePattern(const QNanoImage &image)
 */
 
 QNanoImagePattern::QNanoImagePattern(const QNanoImage &image, const QRectF &rect, float angle, float alpha)
-    : m_changed(true)
-    , m_x(static_cast<float>(rect.x()))
+    : m_x(static_cast<float>(rect.x()))
     , m_y(static_cast<float>(rect.y()))
     , m_width(static_cast<float>(rect.width()))
     , m_height(static_cast<float>(rect.height()))
@@ -108,8 +94,7 @@ QNanoImagePattern::QNanoImagePattern(const QNanoImage &image, const QRectF &rect
 */
 
 QNanoImagePattern::QNanoImagePattern(const QNanoImage &image, float x, float y, float width, float height, float angle, float alpha)
-    : m_changed(true)
-    , m_x(x)
+    : m_x(x)
     , m_y(y)
     , m_width(width)
     , m_height(height)
@@ -203,7 +188,7 @@ void QNanoImagePattern::setImage(const QNanoImage &image)
 void QNanoImagePattern::setAlpha(float alpha)
 {
     m_alpha = alpha;
-    m_changed= true;
+    m_changed = true;
 }
 
 /*!
@@ -229,7 +214,7 @@ void QNanoImagePattern::setRotation(float rotation)
 NVGpaint QNanoImagePattern::nvgPaint(NVGcontext* nvg) const
 {
     if (m_changed) {
-        if (m_image == nullptr) {
+        if (!m_image) {
             qWarning() << "No image set for pattern, please use setImage()";
             // When image is missing, use instead solid gradient paint
             m_nvgPaint = nvgLinearGradient(nvg, 0, 0, 100, 100, nvgRGB(0, 0, 0), nvgRGB(0, 0, 0));

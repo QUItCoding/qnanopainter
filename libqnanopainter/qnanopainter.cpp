@@ -131,13 +131,7 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 */
 
 QNanoPainter::QNanoPainter()
-    : m_nvgContext(nullptr)
-    , m_textAlign(QNanoPainter::ALIGN_LEFT)
-    , m_textBaseline(QNanoPainter::BASELINE_ALPHABETIC)
-    , m_devicePixelRatio(1.0f)
-    , m_fontSet(false)
 {
-
     // Request actual OpenGL context version and type
     QOpenGLContext *context = QOpenGLContext::currentContext();
     Q_ASSERT_X(context, "QNanoPainter::QNanoPainter", "No QOpenGL Context available!");

@@ -62,16 +62,6 @@
 */
 
 QNanoFont::QNanoFont()
-    : m_parentPainter(nullptr)
-    , m_id(0)
-    , m_fontData(nullptr)
-    // Note: These should be matching to nanovg nvgReset state
-    , m_size(16.0f)
-    , m_blur(0.0f)
-    , m_spacing(0.0f)
-    , m_lineHeight(1.0f)
-    , m_fontPropertiesChanged(false)
-    , m_fontFilenameChanged(true)
 {
 }
 
@@ -84,17 +74,7 @@ QNanoFont::QNanoFont()
 */
 
 QNanoFont::QNanoFont(const QString &filename)
-    : m_parentPainter(nullptr)
-    , m_filename(filename)
-    , m_id(0)
-    , m_fontData(nullptr)
-    // Note: These should be matching to nanovg nvgReset state
-    , m_size(16.0f)
-    , m_blur(0.0f)
-    , m_spacing(0.0f)
-    , m_lineHeight(1.0f)
-    , m_fontPropertiesChanged(false)
-    , m_fontFilenameChanged(true)
+    : m_filename(filename)
 {
 }
 
@@ -107,15 +87,6 @@ QNanoFont::QNanoFont(const QString &filename)
 */
 
 QNanoFont::QNanoFont(FontId fontId)
-    : m_parentPainter(nullptr)
-    , m_id(0)
-    , m_fontData(nullptr)
-    // Note: These should be matching to nanovg nvgReset state
-    , m_size(16.0f)
-    , m_blur(0.0f)
-    , m_spacing(0.0f)
-    , m_lineHeight(1.0f)
-    , m_fontPropertiesChanged(false)
 {
     setFontId(fontId);
 }
@@ -126,10 +97,6 @@ QNanoFont::QNanoFont(FontId fontId)
 
 QNanoFont::~QNanoFont()
 {
-    if (m_fontData != nullptr) {
-        delete [] m_fontData;
-        m_fontData = nullptr;
-    }
 }
 
 /*!

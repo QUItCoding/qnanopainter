@@ -42,15 +42,6 @@
 
 QNanoBoxGradient::QNanoBoxGradient()
 {
-    m_x = 0.0f;
-    m_y = 0.0f;
-    m_width = 100.0f;
-    m_height = 100.0f;
-    m_feather = 10.0f;
-    m_radius = 0.0f;
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
-    m_changed = true;
 }
 
 /*!
@@ -71,9 +62,6 @@ QNanoBoxGradient::QNanoBoxGradient(float x, float y, float width, float height, 
     m_height = height;
     m_feather = feather;
     m_radius = radius;
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
-    m_changed = true;
 }
 
 /*!
@@ -94,9 +82,6 @@ QNanoBoxGradient::QNanoBoxGradient(const QRectF &rect, float feather, float radi
     m_height = static_cast<float>(rect.height());
     m_feather = feather;
     m_radius = radius;
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
-    m_changed = true;
 }
 
 /*!

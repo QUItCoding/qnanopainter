@@ -156,14 +156,6 @@ QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
 #else
   : QQuickFramebufferObject(parent)
 #endif
-  , m_fillColor(Qt::transparent)
-  , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
-  , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
-  , m_highQualityRendering(false)
-  , m_acceptedMouseButtons(Qt::LeftButton)
-  , m_mouseEnabled(false)
-  , m_textureWidth(-1)
-  , m_textureHeight(-1)
 {
 #ifdef QNANO_USE_RENDERNODE
     setFlag(ItemHasContents, true);

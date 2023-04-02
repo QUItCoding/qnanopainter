@@ -46,18 +46,7 @@
 */
 
 QNanoQuickItemPainter::QNanoQuickItemPainter()
-    : m_window(nullptr)
-    , m_painter(QNanoPainter::getInstance())
-    , m_fillColor(0.0, 0.0, 0.0, 0.0)
-    , m_viewWidth(0)
-    , m_viewHeight(0)
-    , m_textureWidth(-1)
-    , m_textureHeight(-1)
-    , m_antialiasing(true)
-    , m_highQualityRendering(false)
-    , m_pixelAlign(QNanoQuickItem::PixelAlignNone)
-    , m_pixelAlignText(QNanoQuickItem::PixelAlignNone)
-    , m_setupDone(false)
+    : m_painter(QNanoPainter::getInstance())
 {
     // Initialize QOpenGLFunctions for the context
     initializeOpenGLFunctions();

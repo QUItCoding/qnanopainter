@@ -50,26 +50,16 @@ class QNanoQuickItemPainter : public QQuickFramebufferObject::Renderer, protecte
 {
 
     struct ItemData {
-        float x, y, width, height;
-        float devicePixelRatio;
-        float rotation;
-        float scale;
-        float opacity;
-        QQuickItem::TransformOrigin transformOrigin;
-        bool clip;
-        ItemData()
-        {
-            x = 0.0f;
-            y = 0.0f;
-            width = 0.0f;
-            height = 0.0f;
-            devicePixelRatio = 1.0f;
-            rotation = 0.0f;
-            scale = 1.0f;
-            opacity = 1.0f;
-            transformOrigin = QQuickItem::Center;
-            clip = false;
-        }
+        float x = 0.0f;
+        float y = 0.0f;
+        float width = 0.0f;
+        float height = 0.0f;
+        float devicePixelRatio = 1.0f;
+        float rotation = 0.0f;
+        float scale = 1.0f;
+        float opacity = 1.0f;
+        QQuickItem::TransformOrigin transformOrigin = QQuickItem::Center;
+        bool clip = false;
     };
 
 public:
@@ -77,16 +67,13 @@ public:
     virtual ~QNanoQuickItemPainter() Q_DECL_OVERRIDE;
 
     QColor fillColor() const;
-    inline QNanoPainter *painter() const
-    {
+    inline QNanoPainter *painter() const {
         return m_painter;
     }
-    inline float width() const
-    {
+    inline float width() const {
         return m_itemData.width;
     }
-    inline float height() const
-    {
+    inline float height() const {
         return m_itemData.height;
     }
     inline const ItemData itemData() const {
@@ -139,18 +126,20 @@ private:
     void setViewSize(int width, int height);
     QPointF itemTransformOrigin() const;
 
-    QQuickWindow *m_window;
+    QQuickWindow *m_window = nullptr;
 
-    QNanoPainter *m_painter;
-    QColor m_fillColor;
-    int m_viewWidth, m_viewHeight;
-    int m_textureWidth, m_textureHeight;
+    QNanoPainter *m_painter = nullptr;
+    QColor m_fillColor = {0, 0, 0, 0};
+    int m_viewWidth = 0;
+    int m_viewHeight = 0;
+    int m_textureWidth = -1;
+    int m_textureHeight = -1;
     ItemData m_itemData;
-    bool m_antialiasing;
-    bool m_highQualityRendering;
-    QNanoQuickItem::PixelAlign m_pixelAlign;
-    QNanoQuickItem::PixelAlign m_pixelAlignText;
-    bool m_setupDone;
+    bool m_antialiasing = true;
+    bool m_highQualityRendering = false;
+    QNanoQuickItem::PixelAlign m_pixelAlign = QNanoQuickItem::PixelAlignNone;
+    QNanoQuickItem::PixelAlign m_pixelAlignText = QNanoQuickItem::PixelAlignNone;
+    bool m_setupDone = false;
 #ifdef QNANO_DEBUG
     QNanoDebug m_debug;
 #endif

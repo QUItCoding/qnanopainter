@@ -58,9 +58,9 @@ private:
     void prepaint();
     void postpaint();
 
-    QColor m_fillColor;
-    QNanoPainter *m_painter;
-    bool m_setupDone;
+    QColor m_fillColor = {0, 0, 0, 0};
+    QNanoPainter *m_painter = nullptr;
+    bool m_setupDone = false;
 #ifdef QNANO_DEBUG
     QNanoDebug m_debug;
 #endif

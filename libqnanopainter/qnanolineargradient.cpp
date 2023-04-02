@@ -39,15 +39,7 @@
 */
 
 QNanoLinearGradient::QNanoLinearGradient()
-    : m_changed(true)
-    , m_sx(0.0f)
-    , m_sy(0.0f)
-    , m_ex(0.0f)
-    // TODO: Could we have height of QNanoPainter (item) as default?
-    , m_ey(100.0f)
 {
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
 }
 
 /*!
@@ -59,14 +51,11 @@ QNanoLinearGradient::QNanoLinearGradient()
 */
 
 QNanoLinearGradient::QNanoLinearGradient(float startX, float startY, float endX, float endY)
-    : m_changed(true)
-    , m_sx(startX)
+    : m_sx(startX)
     , m_sy(startY)
     , m_ex(endX)
     , m_ey(endY)
 {
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
 }
 
 /*!
@@ -78,14 +67,11 @@ QNanoLinearGradient::QNanoLinearGradient(float startX, float startY, float endX,
 */
 
 QNanoLinearGradient::QNanoLinearGradient(const QPointF &start, const QPointF &end)
-    : m_changed(true)
-    , m_sx(static_cast<float>(start.x()))
+    : m_sx(static_cast<float>(start.x()))
     , m_sy(static_cast<float>(start.y()))
     , m_ex(static_cast<float>(end.x()))
     , m_ey(static_cast<float>(end.y()))
 {
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
 }
 
 /*!
@@ -97,14 +83,13 @@ QNanoLinearGradient::QNanoLinearGradient(const QPointF &start, const QPointF &en
 */
 
 QNanoLinearGradient::QNanoLinearGradient(float startX, float startY, float endX, float endY, const QNanoColor &startColor, const QNanoColor &endColor)
-    : m_changed(true)
-    , m_sx(startX)
+    : m_sx(startX)
     , m_sy(startY)
     , m_ex(endX)
     , m_ey(endY)
+    , m_icol(startColor.nvgColor())
+    , m_ocol(endColor.nvgColor())
 {
-    m_icol = startColor.nvgColor();
-    m_ocol = endColor.nvgColor();
 }
 
 /*!

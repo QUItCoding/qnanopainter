@@ -45,9 +45,13 @@ public:
 private:
     NVGpaint nvgPaint(NVGcontext* nvg) const Q_DECL_OVERRIDE Q_DECL_FINAL;
 
-    mutable bool m_changed;
-    float m_sx, m_sy, m_ex, m_ey;
-    NVGcolor m_icol, m_ocol;
+    mutable bool m_changed = true;
+    float m_sx = 0.0f;
+    float m_sy = 0.0f;
+    float m_ex = 0.0f;
+    float m_ey = 100.0f;
+    NVGcolor m_icol = nvgRGB(255, 255, 255);
+    NVGcolor m_ocol = nvgRGBA(0, 0, 0, 0);
 };
 
 #endif // QNANOLINEARGRADIENT_H

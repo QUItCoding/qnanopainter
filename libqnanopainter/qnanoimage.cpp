@@ -91,8 +91,8 @@ QNanoImage::QNanoImage(const QString &filename, ImageFlags flags)
     updateUniqueKey();
 }
 
-QNanoImage::QNanoImage(QImage image, const QString &filename, ImageFlags flags)
-    : m_image(new QImage(image))
+QNanoImage::QNanoImage(const QImage &image, const QString &filename, ImageFlags flags)
+    : m_image(std::make_unique<QImage>(image))
     , m_filename(filename)
     , m_flags(flags)
 {
@@ -155,7 +155,8 @@ void QNanoImage::setFlags(ImageFlags flags)
 
 int QNanoImage::width() const
 {
-    if (!m_imageData) return 0;
+    if (!m_imageData)
+        return 0;
     return m_imageData->width;
 }
 
@@ -167,7 +168,8 @@ int QNanoImage::width() const
 
 int QNanoImage::height() const
 {
-    if (!m_imageData) return 0;
+    if (!m_imageData)
+        return 0;
     return m_imageData->height;
 }
 

@@ -31,8 +31,8 @@ class QNanoRadialGradient : public QNanoBrush
 {
 public:
     QNanoRadialGradient();
-    QNanoRadialGradient(float centerX, float centerY, float outerRadius, float innerRadius = 0.0);
-    QNanoRadialGradient(const QPointF &center, float outerRadius, float innerRadius = 0.0);
+    QNanoRadialGradient(float centerX, float centerY, float outerRadius, float innerRadius = 0.0f);
+    QNanoRadialGradient(const QPointF &center, float outerRadius, float innerRadius = 0.0f);
 
     void setCenterPosition(float x, float y);
     void setCenterPosition(const QPointF &center);
@@ -44,9 +44,13 @@ public:
 private:
     NVGpaint nvgPaint(NVGcontext* nvg) const Q_DECL_OVERRIDE Q_DECL_FINAL;
 
-    mutable bool m_changed;
-    float m_cx, m_cy, m_or, m_ir;
-    NVGcolor m_icol, m_ocol;
+    mutable bool m_changed = true;
+    float m_cx = 0.0f;
+    float m_cy = 0.0f;
+    float m_or = 100.0f;
+    float m_ir = 0.0f;
+    NVGcolor m_icol = nvgRGB(255, 255, 255);
+    NVGcolor m_ocol = nvgRGBA(0, 0, 0, 0);
 };
 
 #endif // QNANORADIALGRADIENT_H

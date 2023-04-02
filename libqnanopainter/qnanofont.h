@@ -61,16 +61,16 @@ private:
     int getID(NVGcontext* nvg);
     void setParentPainter(QNanoPainter *parentPainter);
 
-    QNanoPainter *m_parentPainter;
+    QNanoPainter *m_parentPainter = nullptr;
     QString m_filename;
-    int m_id;
-    unsigned char* m_fontData;
-    float m_size;
-    float m_blur;
-    float m_spacing;
-    float m_lineHeight;
-    bool m_fontPropertiesChanged;
-    bool m_fontFilenameChanged;
+    int m_id = 0;
+    // Note: These should be matching to nanovg nvgReset state
+    float m_size = 16.0f;
+    float m_blur = 0.0f;
+    float m_spacing = 0.0f;
+    float m_lineHeight = 1.0f;
+    bool m_fontPropertiesChanged = false;
+    bool m_fontFilenameChanged = true;
 };
 
 #endif // QNANOFONT_H

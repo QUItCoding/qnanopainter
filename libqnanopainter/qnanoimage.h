@@ -53,7 +53,7 @@ public:
     QNanoImage(const QString &filename, ImageFlags flags = {});
 
     // Constructs an image from QImage with the filename and flags
-    QNanoImage(QImage image, const QString &filename, ImageFlags flags = {});
+    QNanoImage(const QImage &image, const QString &filename, ImageFlags flags = {});
 
     // Set the filename of the image
     void setFilename(const QString &filename);

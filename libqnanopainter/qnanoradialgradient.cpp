@@ -40,14 +40,7 @@
 */
 
 QNanoRadialGradient::QNanoRadialGradient()
-    : m_changed(true)
-    , m_cx(0.0f)
-    , m_cy(0.0f)
-    , m_or(100.0f)
-    , m_ir(0.0f)
 {
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
 }
 
 /*!
@@ -60,14 +53,11 @@ QNanoRadialGradient::QNanoRadialGradient()
 */
 
 QNanoRadialGradient::QNanoRadialGradient(float centerX, float centerY, float outerRadius, float innerRadius)
-    : m_changed(true)
-    , m_cx(centerX)
+    : m_cx(centerX)
     , m_cy(centerY)
     , m_or(outerRadius)
     , m_ir(innerRadius)
 {
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
 }
 
 /*!
@@ -80,14 +70,11 @@ QNanoRadialGradient::QNanoRadialGradient(float centerX, float centerY, float out
 */
 
 QNanoRadialGradient::QNanoRadialGradient(const QPointF &center, float outerRadius, float innerRadius)
-    : m_changed(true)
-    , m_cx(static_cast<float>(center.x()))
+    : m_cx(static_cast<float>(center.x()))
     , m_cy(static_cast<float>(center.y()))
     , m_or(static_cast<float>(outerRadius))
     , m_ir(static_cast<float>(innerRadius))
 {
-    m_icol = nvgRGB(255, 255, 255);
-    m_ocol = nvgRGBA(0, 0, 0, 0);
 }
 
 /*!

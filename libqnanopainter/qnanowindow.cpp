@@ -24,9 +24,6 @@
 
 QNanoWindow::QNanoWindow(UpdateBehavior updateBehavior, QWindow *parent)
     : QOpenGLWindow(updateBehavior, parent)
-    , m_fillColor(0.0, 0.0, 0.0, 0.0)
-    , m_painter(nullptr)
-    , m_setupDone(false)
 {
     QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
     if (fmt.stencilBufferSize() <= 0) {

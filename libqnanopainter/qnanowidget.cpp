@@ -24,9 +24,6 @@
 
 QNanoWidget::QNanoWidget(QWidget *parent)
     : QOpenGLWidget(parent)
-    , m_fillColor(0.0, 0.0, 0.0, 0.0)
-    , m_painter(nullptr)
-    , m_setupDone(false)
 {
 #ifdef QNANO_ENABLE_TOUCH_SIGNALS
     setAttribute(Qt::WA_AcceptTouchEvents);
