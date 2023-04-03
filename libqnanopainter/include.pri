@@ -25,6 +25,9 @@ DEFINES += QNANO_ENABLE_GLES3
 # Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject
 #DEFINES += QNANO_USE_RENDERNODE
 
+# Suppress fontstash warnings about fopen & strncpy usage
+DEFINES += _CRT_SECURE_NO_WARNINGS
+
 SOURCES +=  \
     $$PWD/qnanopainter.cpp \
     $$PWD/qnanocolor.cpp \

@@ -148,6 +148,11 @@ if (WIN32)
     endif()
 endif()
 
+if(MSVC)
+    # Suppress fontstash warnings about fopen & strncpy usage
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 # add QT Libs 
 target_link_libraries(qnanopainter ${QNANOPAINTER_QT_LIBS} )
 

@@ -44,7 +44,7 @@ void EventItem::mousePressEvent(QMouseEvent *event)
 {
     qDebug() << "LOG: mousePressEvent";
     // Resizing an item?
-    int resizeItem = resizeItemAt(event->pos());
+    int resizeItem = resizeItemAt(event->position());
     if (resizeItem != -1) {
             m_resizing = true;
             int topIndex = m_items.count()-1;
@@ -57,13 +57,13 @@ void EventItem::mousePressEvent(QMouseEvent *event)
 
     // Moving an item?
     if (!m_resizing) {
-        int pressItem = topItemAt(event->pos());
+        int pressItem = topItemAt(event->position());
         if (pressItem != -1) {
             int topIndex = m_items.count()-1;
             m_items.move(pressItem, topIndex);
             m_pressedItem = topIndex;
             m_activeItem = mouseHoverEventsEnabled() ? topIndex : -1;
-            m_pressPos = event->pos() - m_items.last().topLeft();
+            m_pressPos = event->position() - m_items.last().topLeft();
             update();
             setCursor(QCursor(Qt::OpenHandCursor));
         }
@@ -92,7 +92,7 @@ void EventItem::mouseDoubleClickEvent(QMouseEvent *event)
 {
     qDebug() << "LOG: mouseDoubleClickEvent";
     // Remove item
-    int item = topItemAt(event->pos());
+    int item = topItemAt(event->position());
     m_items.removeAt(item);
     m_activeItem = m_pressedItem = m_resizableItem = -1;
     update();
@@ -104,9 +104,9 @@ void EventItem::mouseMoveEvent(QMouseEvent *event)
     if (m_pressedItem != -1) {
         QRectF *item = &m_items[m_pressedItem];
         if (m_resizing) {
-            item->setBottomRight(event->pos());
+            item->setBottomRight(event->position());
         } else {
-            item->moveTo(event->pos() - m_pressPos);
+            item->moveTo(event->position() - m_pressPos);
         }
         update();
     }
@@ -131,12 +131,12 @@ void EventItem::hoverLeaveEvent(QHoverEvent *event)
 void EventItem::hoverMoveEvent(QHoverEvent *event)
 {
     qDebug() << "LOG: hoverMoveEvent";
-    int resizeItem = resizeItemAt(event->pos());
+    int resizeItem = resizeItemAt(event->position());
     if (resizeItem != m_resizableItem) {
         m_resizableItem = resizeItem;
         update();
     }
-    int hoverItem = topItemAt(event->pos());
+    int hoverItem = topItemAt(event->position());
     if (hoverItem != m_activeItem) {
         m_activeItem = hoverItem;
         update();

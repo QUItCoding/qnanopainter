@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
     //QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
     QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 #endif
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QApplication app(argc, argv);
 

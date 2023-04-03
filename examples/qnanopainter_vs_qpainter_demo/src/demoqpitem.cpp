@@ -5,7 +5,7 @@
 #include <QPointF>
 #include <QFontDatabase>
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <qmath.h>
 #include <algorithm>
 
 DemoQPItem::DemoQPItem(QQuickItem *parent)
