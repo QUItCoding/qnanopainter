@@ -80,7 +80,9 @@ Item {
             Connections {
                 // Fixing QNanoPainter issue #22
                 target: listView
-                onContentXChanged: update();
+                function onContentXChanged() {
+                    update();
+                }
             }
         }
     }
