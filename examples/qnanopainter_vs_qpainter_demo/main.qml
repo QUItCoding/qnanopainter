@@ -162,14 +162,9 @@ Window {
         anchors.verticalCenter: fpsItem.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 60 * dp
-        text: renderType === 0 ? "QNanoPainter" : renderType === 1 ?  "QPainter" : "QML Shape"
-        onClicked: {
-            var availableDemos = gEnableShapeDemo ? 3 : 2
-            if (renderType < (availableDemos-1)) {
-                renderType++;
-            } else {
-                renderType = 0;
-            }
+        model: ["QNanoPainter", "QPainter", "QML Shape"]
+        onCurrentIndexChanged: {
+            renderType = currentIndex;
         }
     }
 
