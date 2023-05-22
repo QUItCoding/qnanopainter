@@ -47,8 +47,8 @@ Q_SIGNALS:
     void animationSineChanged();
 
 private:
-    float m_animationTime;
-    float m_animationSine;
+    float m_animationTime {};
+    float m_animationSine {};
 };
 
 #endif // GALLERYITEM_H

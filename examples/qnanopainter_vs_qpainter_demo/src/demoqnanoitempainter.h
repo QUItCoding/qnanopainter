@@ -24,9 +24,9 @@ private:
     float _flowerPos(int i);
 
     QNanoPainter *m_painter;
-    float m_animationTime;
-    int m_enabledTests;
-    int m_testCount;
+    float m_animationTime {};
+    int m_enabledTests {};
+    int m_testCount {};
 
     // Colors
     QNanoColor m_colorWhite, m_colorGray, m_colorBlack,
