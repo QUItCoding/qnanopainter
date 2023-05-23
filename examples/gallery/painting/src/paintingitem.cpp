@@ -3,7 +3,6 @@
 
 PaintingItem::PaintingItem(QQuickItem *parent)
     : QNanoQuickItem(parent)
-    , m_pointsSynced(0)
 {
     setHighQualityRendering(true);
 }

@@ -13,13 +13,13 @@ public:
 
 private:
     QList<QRectF> m_items;
-    int m_activeItem;
-    int m_pressedItem;
-    int m_resizableItem;
-    int m_circleSize;
-    bool m_hoverEnabled;
-    bool m_resizing;
-    bool m_hovered;
+    int m_activeItem = -1;
+    int m_pressedItem = -1;
+    int m_resizableItem = -1;
+    int m_circleSize = 10;
+    bool m_hoverEnabled = true;
+    bool m_resizing = false;
+    bool m_hovered = false;
 };
 
 #endif // EVENTITEMPAINTER_H

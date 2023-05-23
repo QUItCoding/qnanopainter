@@ -24,7 +24,7 @@ protected:
 private:
     friend class PaintingItemPainter;
     QVector<QPoint> m_points;
-    int m_pointsSynced;
+    int m_pointsSynced = 0;
 };
 
 #endif // PAINTINGITEM_H

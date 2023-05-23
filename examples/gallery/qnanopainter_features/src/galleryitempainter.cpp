@@ -5,7 +5,6 @@
 #include <math.h>
 
 GalleryItemPainter::GalleryItemPainter()
-    : m_viewIndex(0)
 {
     m_patternImage = QNanoImage(":/qnanopainter_features/images/pattern1.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
     m_patternImage2 = QNanoImage(":/qnanopainter_features/images/pattern2.png", QNanoImage::REPEATX | QNanoImage::REPEATY);
