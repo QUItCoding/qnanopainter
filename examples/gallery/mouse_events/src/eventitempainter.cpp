@@ -3,13 +3,6 @@
 
 EventItemPainter::EventItemPainter()
 {
-    m_activeItem = -1;
-    m_pressedItem = -1;
-    m_resizableItem = -1;
-    m_circleSize = 10;
-    m_hoverEnabled = true;
-    m_hovered = false;
-    m_resizing = false;
 }
 
 void EventItemPainter::synchronize(QNanoQuickItem *item)

@@ -29,7 +29,7 @@ Q_SIGNALS:
 
 private:
     friend class PaintingItemPainter;
-    float m_opacity;
+    float m_opacity = 1.0f;
     QVector<QPoint> m_points;
     QSequentialAnimationGroup m_hideAnimation;
 };

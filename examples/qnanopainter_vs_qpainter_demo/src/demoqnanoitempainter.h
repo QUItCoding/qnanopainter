@@ -23,10 +23,10 @@ private:
     void drawFlower(float x, float y, float w, float h, float t);
     float _flowerPos(int i);
 
-    QNanoPainter *m_painter;
-    float m_animationTime;
-    int m_enabledTests;
-    int m_testCount;
+    QNanoPainter *m_painter = nullptr;
+    float m_animationTime = 0.0f;
+    int m_enabledTests = 0;
+    int m_testCount = 1;
 
     // Colors
     QNanoColor m_colorWhite, m_colorGray, m_colorBlack,

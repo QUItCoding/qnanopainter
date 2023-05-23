@@ -10,12 +10,6 @@
 EventItem::EventItem(QQuickItem *parent)
     :  QNanoQuickItem(parent)
 {
-    m_activeItem = -1;
-    m_pressedItem = -1;
-    m_resizableItem = -1;
-    m_circleSize = 10;
-    m_hovered = false;
-    m_resizing = false;
 }
 
 QNanoQuickItemPainter* EventItem::createItemPainter() const

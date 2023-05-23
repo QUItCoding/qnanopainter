@@ -52,9 +52,9 @@ private:
     void drawRect(float x, float y, float w, float h);
 
     //QNanoPainter *m_painter;
-    float m_animationTime;
-    float m_animationSine;
-    int m_viewIndex;
+    float m_animationTime = 0.0f;
+    float m_animationSine = 0.0f;
+    int m_viewIndex = 0;
 
     QNanoImage m_testImage;
     QNanoImage m_patternImage;

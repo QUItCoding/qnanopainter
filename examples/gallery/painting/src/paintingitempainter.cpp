@@ -3,7 +3,6 @@
 #include <QPropertyAnimation>
 
 Path::Path()
-    : m_opacity(1)
 {
     // Animate opacity 1->0 after a short delay
     QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");

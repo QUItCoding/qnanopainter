@@ -87,16 +87,16 @@ private:
     void drawFlower(float x, float y, float w, float h, float t);
     float _flowerPos(int i);
 
-    float m_animationTime;
-    int m_enabledTests;
-    int m_testCount;
-    bool m_qpAntialiasing;
-    bool m_qpRenderTargetFBO;
+    float m_animationTime = 0.0f;
+    int m_enabledTests = 0;
+    int m_testCount = 1;
+    bool m_qpAntialiasing = true;
+    bool m_qpRenderTargetFBO = false;
 
     // Colors
     QColor m_colorWhite, m_colorGray, m_colorBlack,
     m_color1, m_color2, m_color3;
-    QPainter *m_painter;
+    QPainter *m_painter = nullptr;
     QImage m_circleImage;
     QFont m_testFont;
 

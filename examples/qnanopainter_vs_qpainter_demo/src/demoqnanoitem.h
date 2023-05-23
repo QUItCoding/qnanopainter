@@ -52,9 +52,9 @@ Q_SIGNALS:
     void testCountChanged();
 
 private:
-    float m_animationTime;
-    int m_enabledTests;
-    int m_testCount;
+    float m_animationTime = 0.0f;
+    int m_enabledTests = 0;
+    int m_testCount = 1;
 };
 
 #endif // DEMOQNANOITEM_H

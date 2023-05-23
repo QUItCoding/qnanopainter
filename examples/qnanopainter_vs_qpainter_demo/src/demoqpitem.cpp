@@ -10,11 +10,6 @@
 
 DemoQPItem::DemoQPItem(QQuickItem *parent)
     : QQuickPaintedItem(parent)
-    , m_animationTime(0.0)
-    , m_enabledTests(0)
-    , m_testCount(1)
-    , m_qpAntialiasing(true)
-    , m_qpRenderTargetFBO(false)
 {
     // Setup colors
     m_colorWhite = QColor(255,255,255,255);

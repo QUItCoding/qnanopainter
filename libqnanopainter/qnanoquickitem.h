@@ -165,6 +165,6 @@ public Q_SLOTS: \
         QNANO_QUICKITEM_UPDATE \
     } \
 private: \
-    type variable;
+    type variable {};
 
 #endif // QNANOQUICKITEM_H

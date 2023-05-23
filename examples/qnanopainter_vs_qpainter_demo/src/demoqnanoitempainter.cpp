@@ -6,9 +6,6 @@
 #include <algorithm>
 
 DemoQNanoItemPainter::DemoQNanoItemPainter()
-    : m_animationTime(0.0)
-    , m_enabledTests(0)
-    , m_testCount(1)
 {
     // Setup colors
     m_colorWhite = QNanoColor(255,255,255,255);
