@@ -25,8 +25,10 @@
 #include <QtQuick/QQuickFramebufferObject>
 #include <QObject>
 #include <QColor>
+#include <QTimer>
 
 class QNanoQuickItemPainter;
+struct NVGdrawDebug;
 
 #ifdef QNANO_USE_RENDERNODE
 class QNanoQuickItem : public QQuickItem
@@ -46,6 +48,7 @@ class QNanoQuickItem : public QQuickFramebufferObject
     Q_PROPERTY(Qt::MouseButtons acceptedButtons READ acceptedButtons WRITE setAcceptedButtons NOTIFY acceptedButtonsChanged)
     Q_PROPERTY(int textureWidth READ textureWidth WRITE setTextureWidth NOTIFY textureWidthChanged)
     Q_PROPERTY(int textureHeight READ textureHeight WRITE setTextureHeight NOTIFY textureHeightChanged)
+    Q_PROPERTY(QVariantMap debug READ debug NOTIFY debugChanged)
     Q_ENUMS(PixelAlign)
 
 public:
@@ -90,6 +93,8 @@ public:
     int textureHeight() const;
     void setTextureHeight(int height);
 
+    QVariantMap debug();
+
 protected:
 
     virtual QNanoQuickItemPainter* createItemPainter() const = 0;
@@ -122,6 +127,7 @@ Q_SIGNALS:
     void mouseHoverEventsEnabledChanged();
     void textureWidthChanged();
     void textureHeightChanged();
+    void debugChanged();
 
     void touchSignal(QTouchEvent *event);
 
@@ -131,6 +137,10 @@ private:
 
     void setContextName(const QString &name);
     void setBackendName(const QString &name);
+#ifdef QNANO_DEBUG_COLLECT
+    void updateDebugData(NVGdrawDebug drawDebug);
+    void updateDebug();
+#endif
 
     QString m_contextName;
     QString m_backendName;
@@ -142,6 +152,11 @@ private:
     bool m_mouseEnabled = false;
     int m_textureWidth = -1;
     int m_textureHeight = -1;
+    QVariantMap m_debug;
+#ifdef QNANO_DEBUG_COLLECT
+    QTimer m_debugUpdateTimer;
+    bool m_debugDataChanged = false;
+#endif
 };
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)

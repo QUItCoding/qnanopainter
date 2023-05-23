@@ -5,8 +5,13 @@ INCLUDEPATH += $$PWD/
 # Use c++11 features
 CONFIG += c++11
 
-# Enable this to get drawing debug information
-#DEFINES += QNANO_DEBUG
+# Enable this to get the drawing debug information
+# This is available in QNanoQuickItem data property.
+#DEFINES += QNANO_DEBUG_COLLECT
+
+# Enable this to show the drawing debug information.
+# This is rendered at the bottom of each item.
+#DEFINES += QNANO_DEBUG_RENDER
 
 # Enable this to let Qt include OpenGL headers
 DEFINES += QNANO_QT_GL_INCLUDE

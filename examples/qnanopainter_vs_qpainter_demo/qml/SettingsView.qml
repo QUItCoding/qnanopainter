@@ -170,6 +170,14 @@ Item {
                 }
             }
             Switch {
+                id: showDebugSwitch
+                text: "Show Debug (QNanoPainter)"
+                checked: mainWindow.settingShowDebug
+                onCheckedChanged: {
+                    mainWindow.settingShowDebug = checked;
+                }
+            }
+            Switch {
                 text: "FBO renderTarget (QPainter)"
                 checked: mainWindow.settingFBORendering
                 onCheckedChanged: {

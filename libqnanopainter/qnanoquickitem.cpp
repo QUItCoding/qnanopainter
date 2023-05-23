@@ -171,6 +171,13 @@ QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
 #endif
 #endif
 
+#ifdef QNANO_DEBUG_COLLECT
+    const int DEBUG_UPDATE_FREQUENCY_MS = 1000;
+    m_debugUpdateTimer.setInterval(DEBUG_UPDATE_FREQUENCY_MS);
+    connect(&m_debugUpdateTimer, &QTimer::timeout, this, &QNanoQuickItem::updateDebug);
+    m_debugUpdateTimer.start();
+#endif
+
 }
 
 /*!
@@ -531,6 +538,46 @@ void QNanoQuickItem::setTextureHeight(int height)
     Q_EMIT textureHeightChanged();
     update();
 }
+
+QVariantMap QNanoQuickItem::debug()
+{
+    if (m_debug.isEmpty()) {
+        // Initialize debug data
+        m_debug.insert("drawCallCount", 0);
+        m_debug.insert("strokeTriCount", 0);
+        m_debug.insert("fillTriCount", 0);
+        m_debug.insert("textTriCount", 0);
+    }
+    return m_debug;
+}
+
+#ifdef QNANO_DEBUG_COLLECT
+/*!
+   \internal
+*/
+
+void QNanoQuickItem::updateDebug()
+{
+    if (m_debugDataChanged) {
+        Q_EMIT debugChanged();
+        m_debugDataChanged = false;
+        update();
+    }
+}
+
+/*!
+   \internal
+*/
+
+void QNanoQuickItem::updateDebugData(NVGdrawDebug drawDebug)
+{
+    m_debug.insert("drawCallCount", drawDebug.drawCallCount);
+    m_debug.insert("strokeTriCount", drawDebug.strokeTriCount);
+    m_debug.insert("fillTriCount", drawDebug.fillTriCount);
+    m_debug.insert("textTriCount", drawDebug.textTriCount);
+    m_debugDataChanged = true;
+}
+#endif
 
 /*!
    \internal

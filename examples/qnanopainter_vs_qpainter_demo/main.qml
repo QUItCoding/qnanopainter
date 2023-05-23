@@ -30,11 +30,23 @@ Window {
     property bool settingFBORendering: false
     property bool settingAnimateSize: false
     property bool settingVendorExtensionsEnabled: true
+    property bool settingShowDebug: false
     property string settingContextName: "(unknown)"
     property string settingQNanoBackendName: "(unknown)"
     property string settingShapeBackendName: "(unknown)"
 
     property real itemHeight: graphContainer.height
+    property var qnItem: null
+
+    function updateDebugItem() {
+        // Debug will be shown for the first item.
+        // Enable QNANO_DEBUG_COLLECT to see this.
+        qnItem = itemRepeater.itemAt(0).children[0];
+    }
+
+    Component.onCompleted: {
+        updateDebugItem();
+    }
 
     width: 375
     height: 667
@@ -61,6 +73,10 @@ Window {
         Repeater {
             id: itemRepeater
             model: mainWindow.itemCount
+            onModelChanged: {
+                if (itemRepeater.count > 0)
+                    updateDebugItem();
+            }
 
             Item {
                 id: sizeAnimatedContainer
@@ -148,6 +164,15 @@ Window {
         onClicked: {
             animationTimeAnimation.paused = !animationTimeAnimation.paused
         }
+    }
+
+    DebugView {
+        id: debugView
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10 * dp
+        anchors.left: parent.left
+        anchors.leftMargin: 10 * dp
+        visible: settingShowDebug
     }
 
     SettingsView {

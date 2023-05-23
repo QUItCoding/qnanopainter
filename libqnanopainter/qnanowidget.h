@@ -26,7 +26,7 @@
 #include <QTouchEvent>
 #include <QColor>
 #include "qnanopainter.h"
-#ifdef QNANO_DEBUG
+#ifdef QNANO_DEBUG_RENDER
 #include "private/qnanodebug.h"
 #endif
 
@@ -63,7 +63,7 @@ private:
     QColor m_fillColor = {0, 0, 0, 0};
     QNanoPainter *m_painter = nullptr;
     bool m_setupDone = false;
-#ifdef QNANO_DEBUG
+#ifdef QNANO_DEBUG_RENDER
     QNanoDebug m_debug;
 #endif
 

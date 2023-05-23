@@ -36,7 +36,7 @@
 #endif
 #include "qnanopainter.h"
 #include "qnanoquickitem.h"
-#ifdef QNANO_DEBUG
+#ifdef QNANO_DEBUG_RENDER
 #include "private/qnanodebug.h"
 #endif
 
@@ -140,7 +140,8 @@ private:
     QNanoQuickItem::PixelAlign m_pixelAlign = QNanoQuickItem::PixelAlignNone;
     QNanoQuickItem::PixelAlign m_pixelAlignText = QNanoQuickItem::PixelAlignNone;
     bool m_setupDone = false;
-#ifdef QNANO_DEBUG
+    NVGdrawDebug m_drawDebug;
+#ifdef QNANO_DEBUG_RENDER
     QNanoDebug m_debug;
 #endif
 };

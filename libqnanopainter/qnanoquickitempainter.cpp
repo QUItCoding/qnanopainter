@@ -230,7 +230,11 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
         realItem->setBackendName(m_painter->m_backend->backendName());
     }
 
-#ifdef QNANO_DEBUG
+#ifdef QNANO_DEBUG_COLLECT
+    if (m_setupDone)
+        realItem->updateDebugData(m_drawDebug);
+#endif
+#ifdef QNANO_DEBUG_RENDER
     m_debug.start();
 #endif
 
@@ -298,7 +302,10 @@ void QNanoQuickItemPainter::prepaint()
 
 void QNanoQuickItemPainter::postpaint()
 {
-#ifdef QNANO_DEBUG
+#ifdef QNANO_DEBUG_COLLECT
+    m_drawDebug = nvgDrawDebug(m_painter->nvgCtx());
+#endif
+#ifdef QNANO_DEBUG_RENDER
     m_debug.paintDrawDebug(m_painter, width(), height());
 #endif
 

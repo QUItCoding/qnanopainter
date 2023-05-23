@@ -83,7 +83,7 @@ void QNanoWidget::paintGL()
     if (!m_painter)
         return;
 
-#ifdef QNANO_DEBUG
+#ifdef QNANO_DEBUG_RENDER
     m_debug.start();
 #endif
 
@@ -123,7 +123,7 @@ void QNanoWidget::prepaint()
 
 void QNanoWidget::postpaint()
 {
-#ifdef QNANO_DEBUG
+#ifdef QNANO_DEBUG_RENDER
     m_debug.paintDrawDebug(m_painter, width(), height());
 #endif
 
