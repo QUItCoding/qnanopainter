@@ -28,6 +28,7 @@
 #include <QOpenGLFramebufferObject>
 #include <QDebug>
 #include <QImage>
+#include <memory>
 
 class QNanoPainter;
 

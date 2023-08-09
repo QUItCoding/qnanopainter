@@ -238,7 +238,11 @@ int QNanoImage::getID(NVGcontext* nvg)
         } else {
             if (m_image->format() != QImage::Format_RGBA8888 && m_image->format() != QImage::Format_RGBA8888_Premultiplied) {
                 qWarning() << "Converting image" << m_filename << "from" << m_image->format() << "to" << QImage::Format_RGBA8888_Premultiplied;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 13, 0)) || defined(QNANO_USE_RENDERNODE)
+                m_image->convertToFormat(QImage::Format_RGBA8888_Premultiplied);
+#else
                 m_image->convertTo(QImage::Format_RGBA8888_Premultiplied);
+#endif
             }
             m_imageData.reset(new QNanoDataElement());
             QNanoImage::ImageFlags flags = m_flags;

@@ -72,19 +72,19 @@ contains(QT, widgets) {
 # Note: Due to Angle, windows might use either OpenGL (desktop) or
 #       OpenGL ES (angle) backend. Newer Qt versions don't automatically
 #       link with OpenGL ES libraries.
-win32 {
-    equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
-        CONFIG += windows_with_gles
-        QT_CONFIG += opengles2 angle
-        CONFIG( debug, debug|release ) {
-            # debug
-            LIBS+= -llibGLESv2d
-        } else {
-            # release
-            LIBS+= -llibGLESV2
-        }
-    }
-}
+#win32 {
+#    equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
+#        CONFIG += windows_with_gles
+#        QT_CONFIG += opengles2 angle
+#        CONFIG( debug, debug|release ) {
+#            # debug
+#            LIBS+= -llibGLESv2d
+#        } else {
+#            # release
+#            LIBS+= -llibGLESV2
+#        }
+#    }
+#}
 
 equals(QT_MAJOR_VERSION, 6) { ## for Qt6 need opengl module
     QT += opengl              ## see https://doc-snapshots.qt.io/qt6-dev/qtopengl-index.html
