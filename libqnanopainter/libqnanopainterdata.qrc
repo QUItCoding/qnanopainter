@@ -8,5 +8,8 @@
         <file>data/Roboto-LightItalic.ttf</file>
         <file>data/Roboto-Thin.ttf</file>
         <file>data/Roboto-ThinItalic.ttf</file>
+        <file>data/fill.frag.qsb</file>
+        <file>data/fill.vert.qsb</file>
+        <file>data/fill_edgeaa.frag.qsb</file>
     </qresource>
 </RCC>

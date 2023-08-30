@@ -264,7 +264,12 @@ private:
     inline NVGcontext* nvgCtx() const {
         return m_nvgContext;
     }
-
+#ifdef QNANO_USE_RHI
+    inline void setNvgCtx(NVGcontext* ctx) {
+        m_nvgContext = ctx;
+    }
+    void ensureContext(QRhi *rhi);
+#endif
     void enableAntialiasing(bool enable);
     void enableHighQualityRendering(bool enable);
 

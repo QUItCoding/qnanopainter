@@ -28,7 +28,7 @@
 #ifndef NVG_NO_STB
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#endif 
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4100)  // unreferenced formal parameter
@@ -45,7 +45,10 @@
 #define NVG_INIT_POINTS_SIZE 128
 #define NVG_INIT_PATHS_SIZE 16
 #define NVG_INIT_VERTS_SIZE 256
+
+#ifndef NVG_MAX_STATES
 #define NVG_MAX_STATES 32
+#endif
 
 #define NVG_KAPPA90 0.5522847493f	// Length proportional to radius of a cubic bezier handle for 90deg arcs.
 
@@ -340,7 +343,7 @@ error:
 
 NVGparams* nvgInternalParams(NVGcontext* ctx)
 {
-    return &ctx->params;
+	return &ctx->params;
 }
 
 void nvgDeleteInternal(NVGcontext* ctx)
@@ -366,6 +369,72 @@ void nvgDeleteInternal(NVGcontext* ctx)
 	free(ctx);
 }
 
+// rhi modifications begin
+#ifdef QNANO_USE_RHI
+void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio)
+{
+	/*	printf("Tris: draws:%d  fill:%d  stroke:%d  text:%d  TOT:%d\n",
+		ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
+		ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/
+
+	if (ctx->fontImageIdx != 0) {
+		int fontImage = ctx->fontImages[ctx->fontImageIdx];
+		ctx->fontImages[ctx->fontImageIdx] = 0;
+		int i, j, iw, ih;
+		// delete images that smaller than current one
+		if (fontImage == 0)
+			return;
+		nvgImageSize(ctx, fontImage, &iw, &ih);
+		for (i = j = 0; i < ctx->fontImageIdx; i++) {
+			if (ctx->fontImages[i] != 0) {
+				int nw, nh;
+				int image = ctx->fontImages[i];
+				ctx->fontImages[i] = 0;
+				nvgImageSize(ctx, image, &nw, &nh);
+				if (nw < iw || nh < ih)
+					nvgDeleteImage(ctx, image);
+				else
+					ctx->fontImages[j++] = image;
+			}
+		}
+		// make current font image to first
+		ctx->fontImages[j] = ctx->fontImages[0];
+		ctx->fontImages[0] = fontImage;
+		ctx->fontImageIdx = 0;
+	}
+
+	ctx->nstates = 0;
+	nvgSave(ctx);
+	nvgReset(ctx);
+
+	nvg__setDevicePixelRatio(ctx, devicePixelRatio);
+
+	ctx->params.renderViewport(ctx->params.userPtr, windowWidth, windowHeight, devicePixelRatio);
+
+	ctx->drawCallCount = 0;
+	ctx->fillTriCount = 0;
+	ctx->strokeTriCount = 0;
+	ctx->textTriCount = 0;
+}
+
+void nvgBeginFrameAt(NVGcontext* ctx, float windowX, float windowY, float windowWidth, float windowHeight, float devicePixelRatio)
+{
+	// TODO: Not implemented for RHI
+	return;
+}
+
+void nvgCancelFrame(NVGcontext* ctx)
+{
+	ctx->params.renderCancel(ctx->params.userPtr);
+}
+
+void nvgEndFrame(NVGcontext *ctx)
+{
+	ctx->params.renderEndPrepare(ctx->params.userPtr);
+}
+
+// rhi modifications end
+#else
 void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio)
 {
 	nvgBeginFrameAt(ctx, 0.0f, 0.0f, windowWidth, windowHeight, devicePixelRatio);
@@ -373,9 +442,9 @@ void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float
 
 void nvgBeginFrameAt(NVGcontext* ctx, float windowX, float windowY, float windowWidth, float windowHeight, float devicePixelRatio)
 {
-/*	printf("Tris: draws:%d  fill:%d  stroke:%d  text:%d  TOT:%d\n",
-		ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
-		ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/
+	/*	 printf("Tris: draws:%d  fill:%d  stroke:%d  text:%d  TOT:%d\n",
+			ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
+			ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/
 
 	ctx->nstates = 0;
 	nvgSave(ctx);
@@ -425,6 +494,7 @@ void nvgEndFrame(NVGcontext* ctx)
 			ctx->fontImages[i] = 0;
 	}
 }
+#endif
 
 NVGdrawDebug nvgDrawDebug(NVGcontext* ctx)
 {
@@ -1200,7 +1270,7 @@ static void nvg__addPoint(NVGcontext* ctx, float x, float y, int flags)
 	if (ctx->cache->npoints+1 > ctx->cache->cpoints) {
 		NVGpoint* points;
 		int cpoints = ctx->cache->npoints+1 + ctx->cache->cpoints/2;
-		points = (NVGpoint*)realloc(ctx->cache->points, sizeof(NVGpoint)*(size_t)cpoints);
+		points = (NVGpoint*)realloc(ctx->cache->points, sizeof(NVGpoint)*cpoints);
 		if (points == NULL) return;
 		ctx->cache->points = points;
 		ctx->cache->cpoints = cpoints;
@@ -2009,13 +2079,13 @@ void nvgBezierTo(NVGcontext* ctx, float c1x, float c1y, float c2x, float c2y, fl
 
 void nvgQuadTo(NVGcontext* ctx, float cx, float cy, float x, float y)
 {
-    float x0 = ctx->commandx;
-    float y0 = ctx->commandy;
-    float vals[] = { NVG_BEZIERTO,
-        x0 + 2.0f/3.0f*(cx - x0), y0 + 2.0f/3.0f*(cy - y0),
-        x + 2.0f/3.0f*(cx - x), y + 2.0f/3.0f*(cy - y),
-        x, y };
-    nvg__appendCommands(ctx, vals, NVG_COUNTOF(vals));
+	float x0 = ctx->commandx;
+	float y0 = ctx->commandy;
+	float vals[] = { NVG_BEZIERTO,
+		x0 + 2.0f/3.0f*(cx - x0), y0 + 2.0f/3.0f*(cy - y0),
+		x + 2.0f/3.0f*(cx - x), y + 2.0f/3.0f*(cy - y),
+		x, y };
+	nvg__appendCommands(ctx, vals, NVG_COUNTOF(vals));
 }
 
 void nvgArcTo(NVGcontext* ctx, float x1, float y1, float x2, float y2, float radius)
@@ -2394,7 +2464,10 @@ void nvgTextAlign(NVGcontext* ctx, int align)
 
 void nvgTextAlignToPixels(NVGcontext* ctx, int enabled)
 {
+#ifndef QNANO_USE_RHI
+	// TODO: Not implemented for RHI
 	fonsSetPixelAlignText(ctx->fs, enabled);
+#endif
 }
 
 void nvgFontFaceId(NVGcontext* ctx, int font)

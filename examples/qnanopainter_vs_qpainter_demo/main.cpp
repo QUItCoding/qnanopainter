@@ -22,7 +22,9 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#ifndef QNANO_USE_RHI
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+#endif
 #endif
 
     g_customFontId = QFontDatabase::addApplicationFont(":/qml/fonts/Roboto-Regular.ttf");

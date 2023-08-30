@@ -35,6 +35,8 @@
 
 #include "nanovg/nanovg.h"
 
+class QRhi;
+
 class QNanoBackend
 {
 public:
@@ -45,7 +47,9 @@ public:
     virtual int nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags) = 0;
     virtual NVGparams *internalParams(NVGcontext* nvgCtx) = 0;
     virtual void setFlag(NVGcontext* nvgCtx, int flag, bool enable) = 0;
-
+#ifdef QNANO_USE_RHI
+    virtual void ensureRhi(QRhi *rhi) = 0;
+#endif
     // Common setFlag implementation
     // Using macro as GLNVGcontext & glnvg__renderCreate aren't known here
     #define QNANOBACKEND_SETFLAG(nvgCtx, flag, enable) {\

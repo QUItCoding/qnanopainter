@@ -48,8 +48,10 @@
 QNanoQuickItemPainter::QNanoQuickItemPainter()
     : m_painter(QNanoPainter::getInstance())
 {
+#ifndef QNANO_USE_RHI
     // Initialize QOpenGLFunctions for the context
     initializeOpenGLFunctions();
+#endif
 }
 
 /*!
@@ -147,7 +149,7 @@ QColor QNanoQuickItemPainter::fillColor() const
    \internal
 */
 
-#ifndef QNANO_USE_RENDERNODE
+#if !defined(QNANO_USE_RENDERNODE) && !defined(QNANO_USE_RHI)
 QOpenGLFramebufferObject *QNanoQuickItemPainter::createFramebufferObject(const QSize &size)
 {
     QOpenGLFramebufferObjectFormat format;
@@ -159,7 +161,9 @@ QOpenGLFramebufferObject *QNanoQuickItemPainter::createFramebufferObject(const Q
 }
 #endif
 
-#ifdef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+void QNanoQuickItemPainter::synchronize(QQuickRhiItem * item)
+#elif QNANO_USE_RENDERNODE
 void QNanoQuickItemPainter::synchronizePainter(QNanoQuickItem * item)
 #else
 void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
@@ -172,6 +176,12 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     QNanoQuickItem *realItem = static_cast<QNanoQuickItem*>(item);
     if (!realItem)
         return;
+
+#ifdef QNANO_USE_RHI
+    // Make sure initialization has been done
+    if (!m_initialized)
+        initialize(nullptr);
+#endif
 
     QPointF origoPoint = realItem->mapToScene(QPointF(0, 0));
     m_itemData.x = static_cast<float>(origoPoint.x());
@@ -195,7 +205,11 @@ void QNanoQuickItemPainter::synchronize(QQuickFramebufferObject * item)
     if ((newTextureWidth != m_textureWidth) || (newTextureHeight != m_textureHeight)) {
         m_textureWidth = newTextureWidth;
         m_textureHeight = newTextureHeight;
+#ifdef QNANO_USE_RHI
+        update();
+#else
         invalidateFramebufferObject();
+#endif
     }
 
     // If size has changed, update
@@ -247,19 +261,25 @@ void QNanoQuickItemPainter::paint(QNanoPainter *painter)
 }
 
 // Initializations to OpenGL and vg context before paint()
+#ifdef QNANO_USE_RHI
+void QNanoQuickItemPainter::prepaint(QRhiCommandBuffer *cb)
+#else
 void QNanoQuickItemPainter::prepaint()
+#endif
 {
-#ifndef QNANO_USE_RENDERNODE
+#if !defined(QNANO_USE_RENDERNODE) && !defined(QNANO_USE_RHI)
     QOpenGLFunctions glF(QOpenGLContext::currentContext());
     glF.glClearColor(GLclampf(m_fillColor.redF()),
                      GLclampf(m_fillColor.greenF()),
                      GLclampf(m_fillColor.blueF()),
                      GLclampf(m_fillColor.alphaF()));
     glF.glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-
 #endif
     // Note: Last parameter can be used to render in lower resolution
-#ifdef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+    m_vg.begin(cb, m_rt, m_itemData.devicePixelRatio);
+    m_painter->setNvgCtx(m_vg.ctx);
+#elif QNANO_USE_RENDERNODE
     nvgBeginFrameAt(m_painter->nvgCtx(), m_itemData.x, m_itemData.y, m_viewWidth, m_viewHeight, m_itemData.devicePixelRatio);
 #else
     nvgBeginFrame(m_painter->nvgCtx(),
@@ -309,10 +329,53 @@ void QNanoQuickItemPainter::postpaint()
     m_debug.paintDrawDebug(m_painter, width(), height());
 #endif
 
+#ifdef QNANO_USE_RHI
+    m_vg.end();
+#else
     nvgEndFrame(m_painter->nvgCtx());
+#endif
 }
 
+#ifdef QNANO_USE_RHI
+void QNanoQuickItemPainter::initialize(QRhiCommandBuffer *cb)
+{
+    if (!m_window)
+        return;
 
+    if (rhi() != m_rhi) {
+        m_rhi = rhi();
+        m_vg.destroy();
+    }
+    if (renderTarget() != m_rt) {
+        m_rt = renderTarget();
+        // in case the QRhiRenderPassDescriptor is incompatible with the new rt
+        m_vg.destroy();
+    }
+    if (!m_vg.isValid()) {
+        m_painter->ensureContext(m_window->rhi());
+        m_vg.create(m_rhi, NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+    }
+    m_initialized = true;
+}
+
+void QNanoQuickItemPainter::render(QRhiCommandBuffer *cb)
+{
+    if (!m_initialized)
+        return;
+
+    if ((m_itemData.width > 0 && m_itemData.height > 0) || m_setupDone) {
+        m_setupDone = true;
+        prepaint(cb);
+        paint(m_painter);
+        postpaint();
+    }
+
+    cb->beginPass(m_rt, m_fillColor, { 1.0f, 0 });
+    m_vg.render();
+    cb->endPass();
+
+}
+#else
 #ifdef QNANO_USE_RENDERNODE
 void QNanoQuickItemPainter::render(const RenderState *)
 #else
@@ -343,6 +406,7 @@ void QNanoQuickItemPainter::render()
     }
 
 }
+#endif // QNANO_USE_RHI
 
 void QNanoQuickItemPainter::setViewSize(int width, int height)
 {

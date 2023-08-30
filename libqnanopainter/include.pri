@@ -16,6 +16,9 @@ CONFIG += c++11
 # Enable this to let Qt include OpenGL headers
 DEFINES += QNANO_QT_GL_INCLUDE
 
+# Enable this to use QRhi (available since Qt 6.7) instead of QQuickFramebufferObject
+DEFINES += QNANO_USE_RHI
+
 # This will enable GLES3 (disable to force GLES2)
 DEFINES += QNANO_ENABLE_GLES3
 
@@ -77,85 +80,104 @@ contains(QT, widgets) {
         $$PWD/qnanowidget.h
 }
 
-# Note: Due to Angle, windows might use either OpenGL (desktop) or
-#       OpenGL ES (angle) backend. Newer Qt versions don't automatically
-#       link with OpenGL ES libraries.
-win32 {
-    equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
-        CONFIG += windows_with_gles
-        QT_CONFIG += opengles2 angle
-        CONFIG( debug, debug|release ) {
-            # debug
-            LIBS+= -llibGLESv2d
-        } else {
-            # release
-            LIBS+= -llibGLESV2
-        }
-    }
+contains(DEFINES, QNANO_USE_RHI) {
+    # Use RHI backend instead of OpenGL (ES) backends.
+    message("Including QNanoPainter RHI backend")
+    DEFINES -= QNANO_BUILD_GL_BACKENDS
+    DEFINES -= QNANO_BUILD_GLES_BACKENDS
+
+    SOURCES +=  \
+        $$PWD/private/qnanobackendrhi.cpp \
+        $$PWD/nanovg/nanovg_rhi.cpp
+
+    HEADERS +=  \
+        $$PWD/private/qnanobackendrhi.h \
+        $$PWD/nanovg/nanovg_rhi.h
 }
 
 equals(QT_MAJOR_VERSION, 6) { ## for Qt6 need opengl module
     QT += opengl              ## see https://doc-snapshots.qt.io/qt6-dev/qtopengl-index.html
 }                             ## NB: "Warning: This module should not be used anymore for new code. Please use the corresponding OpenGL classes in Qt GUI." ( https://doc-snapshots.qt.io/qt6-dev/qtgui-index.html#opengl-and-opengl-es-integration )
 
-# When building for embedded devices you can define manually which
-# backends are supported
-#DEFINES += QNANO_BUILD_GLES_BACKENDS
-#DEFINES += QNANO_BUILD_GL_BACKENDS
+!contains(DEFINES, QNANO_USE_RHI) {
 
-# Alternatively, trying to autodetect suitable backeds based on Qt configuration
-!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
-    equals(QT_ARCH,"wasm") {
-        # WebAssembly uses GLES
-        DEFINES += QNANO_BUILD_GLES_BACKENDS
+    # Note: Due to Angle, windows might use either OpenGL (desktop) or
+    #       OpenGL ES (angle) backend. Newer Qt versions don't automatically
+    #       link with OpenGL ES libraries.
+    win32 {
+        equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 14) {
+            CONFIG += windows_with_gles
+            QT_CONFIG += opengles2 angle
+            CONFIG( debug, debug|release ) {
+                # debug
+                LIBS+= -llibGLESv2d
+            } else {
+                # release
+                LIBS+= -llibGLESV2
+            }
+        }
     }
-}
 
-!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
-    qtConfig(opengles2) | qtConfig(opengles3) {
-        DEFINES += QNANO_BUILD_GLES_BACKENDS
-    } else {
-        DEFINES += QNANO_BUILD_GL_BACKENDS
+    # When building for embedded devices you can define manually which
+    # backends are supported
+    #DEFINES += QNANO_BUILD_GLES_BACKENDS
+    #DEFINES += QNANO_BUILD_GL_BACKENDS
+
+    # Alternatively, trying to autodetect suitable backeds based on Qt configuration
+    !contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+        equals(QT_ARCH,"wasm") {
+            # WebAssembly uses GLES
+            DEFINES += QNANO_BUILD_GLES_BACKENDS
+        }
     }
-    CONFIG(windows_with_gles) {
-        DEFINES += QNANO_BUILD_GLES_BACKENDS
+
+    !contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+        qtConfig(opengles2) | qtConfig(opengles3) {
+            DEFINES += QNANO_BUILD_GLES_BACKENDS
+        } else {
+            DEFINES += QNANO_BUILD_GL_BACKENDS
+        }
+        CONFIG(windows_with_gles) {
+            DEFINES += QNANO_BUILD_GLES_BACKENDS
+        }
     }
-}
 
-# Or finally selecting suitable backeds for different environments.
-!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
-    android | ios | linux-rasp-* | windows:wince | CONFIG(windows_with_gles) {
-        DEFINES += QNANO_BUILD_GLES_BACKENDS
+    # Or finally selecting suitable backeds for different environments.
+    !contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+        android | ios | linux-rasp-* | windows:wince | CONFIG(windows_with_gles) {
+            DEFINES += QNANO_BUILD_GLES_BACKENDS
+        }
+        !contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) | windows:!wince {
+            DEFINES += QNANO_BUILD_GL_BACKENDS
+        }
     }
-    !contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) | windows:!wince {
-        DEFINES += QNANO_BUILD_GL_BACKENDS
+
+    !contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
+        error("No QNanoPainter backends defined. Please modify libqnanopainter/include.pri")
     }
-}
 
-!contains(DEFINES, QNANO_BUILD_GL_BACKENDS) : !contains(DEFINES, QNANO_BUILD_GLES_BACKENDS) {
-    error("No QNanoPainter backends defined. Please modify libqnanopainter/include.pri")
-}
+    contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) {
+        message("Including QNanoPainter OpenGL ES backends")
 
-contains(DEFINES , QNANO_BUILD_GLES_BACKENDS) {
-    message("Including QNanoPainter OpenGL ES backends")
+    HEADERS += \
+        $$PWD/private/qnanobackendgles2.h \
+        $$PWD/private/qnanobackendgles3.h
+    SOURCES +=  \
+        $$PWD/private/qnanobackendgles2.cpp \
+        $$PWD/private/qnanobackendgles3.cpp
+    }
 
-HEADERS += \
-    $$PWD/private/qnanobackendgles2.h \
-    $$PWD/private/qnanobackendgles3.h
-SOURCES +=  \
-    $$PWD/private/qnanobackendgles2.cpp \
-    $$PWD/private/qnanobackendgles3.cpp
-}
+    contains(DEFINES , QNANO_BUILD_GL_BACKENDS) {
+        message("Including QNanoPainter OpenGL backends")
+    HEADERS += \
+        $$PWD/private/qnanobackendgl2.h \
+        $$PWD/private/qnanobackendgl3.h
+    SOURCES +=  \
+        $$PWD/private/qnanobackendgl2.cpp \
+        $$PWD/private/qnanobackendgl3.cpp
+    }
 
-contains(DEFINES , QNANO_BUILD_GL_BACKENDS) {
-    message("Including QNanoPainter OpenGL backends")
-HEADERS += \
-    $$PWD/private/qnanobackendgl2.h \
-    $$PWD/private/qnanobackendgl3.h
-SOURCES +=  \
-    $$PWD/private/qnanobackendgl2.cpp \
-    $$PWD/private/qnanobackendgl3.cpp
-}
+} #QNANO_USE_RHI
 
 ## Include NanoVG
 SOURCES +=  $$PWD/nanovg/nanovg.c

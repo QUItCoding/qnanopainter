@@ -1,5 +1,8 @@
 TEMPLATE = app
 
+# For RHI backend
+QT += gui-private
+
 SOURCES += main.cpp
 
 HEADERS += \

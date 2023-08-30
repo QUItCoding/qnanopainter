@@ -151,13 +151,16 @@
 */
 
 QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
-#ifdef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+  : QQuickRhiItem(parent)
+#elif QNANO_USE_RENDERNODE
   : QQuickItem(parent)
 #else
   : QQuickFramebufferObject(parent)
 #endif
 {
-#ifdef QNANO_USE_RENDERNODE
+
+#if defined(QNANO_USE_RENDERNODE) || defined(QNANO_USE_RHI)
     setFlag(ItemHasContents, true);
     connect(this, SIGNAL(scaleChanged()), this, SLOT(update()));
 #endif
@@ -165,8 +168,9 @@ QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
     setAntialiasing(true);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-#ifndef QNANO_USE_RENDERNODE
+#if !defined(QNANO_USE_RENDERNODE) && !defined(QNANO_USE_RHI)
     // New API in Qt 5.6 to mirror FBO
+    // Note: Not needed for RHI
     setMirrorVertically(true);
 #endif
 #endif
@@ -178,6 +182,10 @@ QNanoQuickItem::QNanoQuickItem(QQuickItem *parent)
     m_debugUpdateTimer.start();
 #endif
 
+#ifdef QNANO_USE_RHI
+    // By default the fillColor is transparent.
+    setAlphaBlending(true);
+#endif
 }
 
 /*!
@@ -368,6 +376,10 @@ void QNanoQuickItem::setFillColor(const QColor &color)
         return;
     m_fillColor = color;
 
+#ifdef QNANO_USE_RHI
+    const bool blend = (m_fillColor.alpha() < 255);
+    setAlphaBlending(blend);
+#endif
     Q_EMIT fillColorChanged();
     update();
 }
@@ -584,7 +596,11 @@ void QNanoQuickItem::updateDebugData(NVGdrawDebug drawDebug)
 */
 
 #ifndef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+QQuickRhiItemRenderer *QNanoQuickItem::createRenderer()
+#else
 QQuickFramebufferObject::Renderer *QNanoQuickItem::createRenderer() const
+#endif
 {
     return createItemPainter();
 }

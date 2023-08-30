@@ -8,4 +8,4 @@ else()
 endif()
 
 add_subdirectory("libqnanopainter") 
-add_subdirectory("examples") 
+add_subdirectory("examples")

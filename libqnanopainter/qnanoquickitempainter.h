@@ -28,7 +28,15 @@
 #else                        //for Qt5 -- original code.
 #include <QtGui/QOpenGLFunctions>
 #endif
+
+#ifdef QNANO_USE_RHI
+#include <QQuickRhiItem>
+#include <QtGui/rhi/qrhi.h>
+#include "nanovg/nanovg_rhi.h"
+#else
 #include <QtQuick/QQuickFramebufferObject>
+#endif
+
 #include <QColor>
 #include <QElapsedTimer>
 #ifdef QNANO_USE_RENDERNODE
@@ -42,7 +50,9 @@
 
 class QQuickWindow;
 
-#ifdef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+class QNanoQuickItemPainter : public QQuickRhiItemRenderer
+#elif QNANO_USE_RENDERNODE
 class QNanoQuickItemPainter : public QSGRenderNode, protected QOpenGLFunctions
 #else
 class QNanoQuickItemPainter : public QQuickFramebufferObject::Renderer, protected QOpenGLFunctions
@@ -99,14 +109,18 @@ private:
 
     // Re-implemented from QQuickFramebufferObject::Renderer
 
-#ifndef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+    virtual void initialize(QRhiCommandBuffer *cb) Q_DECL_OVERRIDE;
+#elif !QNANO_USE_RENDERNODE
     // Creates initial FBO.
     // Gets also called whenever item size changes if textureFollowsItemSize = true
     QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) Q_DECL_OVERRIDE;
 #endif
 
+#ifdef QNANO_USE_RHI
+    void render(QRhiCommandBuffer *cb) Q_DECL_OVERRIDE;
+#elif QNANO_USE_RENDERNODE
     // Gets called when FBO should be rendered into.
-#ifdef QNANO_USE_RENDERNODE
     void render(const RenderState *) Q_DECL_OVERRIDE;
 #else
     void render() Q_DECL_OVERRIDE;
@@ -114,6 +128,8 @@ private:
 
 #ifdef QNANO_USE_RENDERNODE
     void synchronizePainter(QNanoQuickItem * item);
+#elif QNANO_USE_RHI
+    void synchronize(QQuickRhiItem *item) Q_DECL_OVERRIDE;
 #else
     // Gets called as a result of QQuickFramebufferObject::update().
     void synchronize(QQuickFramebufferObject * item) Q_DECL_OVERRIDE;
@@ -121,7 +137,11 @@ private:
 
     // These are internal
     void initialize();
+#ifdef QNANO_USE_RHI
+    void prepaint(QRhiCommandBuffer *cb);
+#else
     void prepaint();
+#endif
     void postpaint();
     void setViewSize(int width, int height);
     QPointF itemTransformOrigin() const;
@@ -143,6 +163,12 @@ private:
     NVGdrawDebug m_drawDebug;
 #ifdef QNANO_DEBUG_RENDER
     QNanoDebug m_debug;
+#endif
+#ifdef QNANO_USE_RHI
+    NanoVG m_vg;
+    QRhi *m_rhi = nullptr;
+    QRhiRenderTarget *m_rt = nullptr;
+    bool m_initialized = false;
 #endif
 };
 

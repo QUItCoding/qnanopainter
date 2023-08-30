@@ -22,7 +22,12 @@
 #ifndef QNANOQUICKITEM_H
 #define QNANOQUICKITEM_H
 
+#ifdef QNANO_USE_RHI
+#include <QQuickRhiItem>
+#else
 #include <QtQuick/QQuickFramebufferObject>
+#endif
+
 #include <QObject>
 #include <QColor>
 #include <QTimer>
@@ -30,7 +35,9 @@
 class QNanoQuickItemPainter;
 struct NVGdrawDebug;
 
-#ifdef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+class QNanoQuickItem : public QQuickRhiItem
+#elif QNANO_USE_RENDERNODE
 class QNanoQuickItem : public QQuickItem
 #else
 class QNanoQuickItem : public QQuickFramebufferObject
@@ -99,10 +106,13 @@ protected:
 
     virtual QNanoQuickItemPainter* createItemPainter() const = 0;
 
-#ifndef QNANO_USE_RENDERNODE
+#ifdef QNANO_USE_RHI
+    QQuickRhiItemRenderer *createRenderer() Q_DECL_OVERRIDE Q_DECL_FINAL;
+#elif !QNANO_USE_RENDERNODE
     // Reimplement from QQuickFramebufferObject
     QQuickFramebufferObject::Renderer *createRenderer() const Q_DECL_OVERRIDE Q_DECL_FINAL;
 #endif
+
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0)) || defined(QNANO_USE_RENDERNODE)
     // Reimplement from QQuickItem
     QSGNode *updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData) Q_DECL_OVERRIDE Q_DECL_FINAL;

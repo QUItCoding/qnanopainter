@@ -136,10 +136,10 @@ struct NVGtextRow {
 typedef struct NVGtextRow NVGtextRow;
 
 struct NVGdrawDebug {
-	int drawCallCount;
-	int fillTriCount;
-	int strokeTriCount;
-	int textTriCount;
+    int drawCallCount;
+    int fillTriCount;
+    int strokeTriCount;
+    int textTriCount;
 };
 typedef struct NVGdrawDebug NVGdrawDebug;
 
@@ -527,7 +527,6 @@ void nvgStroke(NVGcontext* ctx);
 // Set antialiasing amount for painting in pixels. Default is 1.0.
 void nvgSetAntialias(NVGcontext* ctx, float antialias);
 
-
 //
 // Text
 //
@@ -686,10 +685,15 @@ struct NVGparams {
 	int (*renderCreateTexture)(void* uptr, int type, int w, int h, int imageFlags, const unsigned char* data);
 	int (*renderDeleteTexture)(void* uptr, int image);
 	int (*renderUpdateTexture)(void* uptr, int image, int x, int y, int w, int h, const unsigned char* data);
-	int (*renderGetTextureSize)(void* uptr, int image, int* w, int* h);
-        void (*renderViewport)(void* uptr, float x, float y, float width, float height, float devicePixelRatio);
+    int (*renderGetTextureSize)(void* uptr, int image, int* w, int* h);
+#ifdef QNANO_USE_RHI
+    void (*renderViewport)(void* uptr, float width, float height, float devicePixelRatio);
+    void (*renderEndPrepare)(void* uptr); // rhi modification
+#else
+    void (*renderViewport)(void* uptr, float x, float y, float width, float height, float devicePixelRatio);
+    void (*renderFlush)(void* uptr);
+#endif
 	void (*renderCancel)(void* uptr);
-	void (*renderFlush)(void* uptr);
 	void (*renderFill)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, float fringe, const float* bounds, const NVGpath* paths, int npaths);
 	void (*renderStroke)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, float fringe, float strokeWidth, const NVGpath* paths, int npaths);
 	void (*renderTriangles)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, const NVGvertex* verts, int nverts, float fringe);

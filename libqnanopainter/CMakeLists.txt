@@ -12,7 +12,7 @@ option(QNANO_ENABLE_TOUCH_SIGNALS "This will enable signalling touch events
 option(QNANO_ENABLE_PAINT_SIGNALS "This will enable signalling paint events
                                    Can be useful when using view/widget classes directly" OFF)
 option(QNANO_USE_RENDERNODE "Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject" OFF)
-
+option(QNANO_USE_RHI "Enable this to use QRhi (available since Qt 6.7) instead of QQuickFramebufferObject" ON)
 
 option(QNANO_BUILD_GLES_BACKENDS "When building for embedded devices you can define manually which backends are supported" OFF)
 option(QNANO_BUILD_GL_BACKENDS "When building for embedded devices you can define manually which backends are supported" OFF)
@@ -27,8 +27,8 @@ set(CMAKE_AUTOUIC ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
     message(STATUS "QNANOPAINTER QT VERSION=${QT_VERSION_MAJOR}") 
 if(QT_VERSION_MAJOR EQUAL  6)
-    find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL Quick OpenGLWidgets)
-    set(QNANOPAINTER_QT_LIBS  Qt6::Widgets Qt6::OpenGL Qt6::Quick Qt6::OpenGLWidgets)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL Quick OpenGLWidgets Gui)
+    set(QNANOPAINTER_QT_LIBS  Qt6::Widgets Qt6::OpenGL Qt6::Quick Qt6::OpenGLWidgets Qt::GuiPrivate)
 else()
     find_package(Qt5 REQUIRED COMPONENTS Widgets OpenGL Quick )
     set(QNANOPAINTER_QT_LIBS  Qt5::Widgets Qt5::OpenGL Qt5::Quick)
@@ -56,7 +56,6 @@ else()
         set(QNANO_BUILD_GL_BACKENDS ON)
     endif()    
 endif()
-
 
 set(SOURCES 
     qnanopainter.cpp 
@@ -109,6 +108,20 @@ if(IS_WIDGETS_IN_QT)
     )
 endif()
 
+if(QNANO_USE_RHI)
+    # Use RHI backend instead of OpenGL (ES) backends.
+    set(QNANO_BUILD_GLES_BACKENDS OFF)
+    set(QNANO_BUILD_GL_BACKENDS OFF)
+    set(SOURCES ${SOURCES}
+        private/qnanobackendrhi.cpp
+        nanovg/nanovg_rhi.cpp
+    )
+    set(HEADERS ${HEADERS}
+        private/qnanobackendrhi.h
+        nanovg/nanovg_rhi.h
+    )
+endif()
+
 if(QNANO_BUILD_GLES_BACKENDS)
     set(SOURCES ${SOURCES}
         private/qnanobackendgles2.h 
@@ -131,8 +144,6 @@ if(QNANO_BUILD_GL_BACKENDS)
     )    
 endif()
 
-
-
 add_library(qnanopainter 
     ${SOURCES} 
     ${HEADERS}
@@ -140,7 +151,6 @@ add_library(qnanopainter
     nanovg/nanovg.c
     nanovg/nanovg.h
 )
-
 
 if (WIN32)
     if(QNANO_MSYS2)
@@ -185,3 +195,7 @@ if(QNANO_ENABLE_GLES3)
     target_compile_definitions(qnanopainter PUBLIC QNANO_ENABLE_GLES3)
     message(STATUS "QNANO_ENABLE_GLES3=${QNANO_ENABLE_GLES3}")
 endif()    
+if(QNANO_USE_RHI)
+    target_compile_definitions(qnanopainter PUBLIC QNANO_USE_RHI)
+    message(STATUS "QNANO_USE_RHI=${QNANO_USE_RHI}")
+endif()

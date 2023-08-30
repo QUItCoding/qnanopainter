@@ -994,6 +994,8 @@ void GalleryItemPainter::drawFrameBuffers()
     QOpenGLFramebufferObject::bindDefault();
     painter()->beginFrameAt(itemData().x*dp, itemData().y*dp, dpWidth, dpHeight);
     glF.glViewport(0, int(itemData().y*dp), int(dpWidth), int(dpHeight));
+#elif QNANO_USE_RHI
+    // TODO: Not implemented for RHI
 #else
     framebufferObject()->bind();
     painter()->beginFrameAt(0, 0, dpWidth, dpHeight);

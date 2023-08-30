@@ -2,6 +2,9 @@ TEMPLATE = app
 
 QT += qml quick
 
+# For RHI backend
+QT += gui-private
+
 SOURCES += main.cpp
 
 RESOURCES += qml.qrc

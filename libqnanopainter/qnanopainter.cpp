@@ -22,7 +22,12 @@
 #include "qnanopainter.h"
 
 #include "nanovg/nanovg.h"
+#ifdef QNANO_USE_RHI
+#include "nanovg/nanovg_rhi.h"
+#include <QtGui/rhi/qrhi.h>
+#else
 #include "nanovg/nanovg_gl.h" // NVG_ANTIALIAS NVG_SCISSORING NVG_STENCIL_STROKES
+#endif
 #include "private/qnanobackendfactory.h"
 
 #include <QScreen>
@@ -132,6 +137,8 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 
 QNanoPainter::QNanoPainter()
 {
+#ifndef QNANO_USE_RHI
+
     // Request actual OpenGL context version and type
     QOpenGLContext *context = QOpenGLContext::currentContext();
     Q_ASSERT_X(context, "QNanoPainter::QNanoPainter", "No QOpenGL Context available!");
@@ -144,13 +151,15 @@ QNanoPainter::QNanoPainter()
     m_backend.reset(QNanoBackendFactory::createBackend(major, minor, isGLES));
     m_openglContextName = QString("%1 %2.%3").arg(isGLES ? "OpenGL ES" : "OpenGL").arg(major).arg(minor);
 
-    qDebug() << "Using backend:" << m_backend->backendName();
-
     // Initialize NanoVG for correct GL version
     // NOTE: Add also NVG_DEBUG when want to check possible OpenGL errors.
     m_nvgContext = m_backend->nvgCreate(NVG_ANTIALIAS);
-
     Q_ASSERT_X(m_nvgContext, "QNanoPainter::QNanoPainter", "Could not init nanovg!");
+
+#else
+    m_backend.reset(QNanoBackendFactory::createBackend(0, 0, false));
+#endif
+    qDebug() << "Using backend:" << m_backend->backendName();
 
     setPixelAlign(QNanoPainter::PIXEL_ALIGN_NONE);
     setPixelAlignText(QNanoPainter::PIXEL_ALIGN_NONE);
@@ -170,6 +179,17 @@ QNanoPainter::~QNanoPainter()
 
     m_dataCache.clear();
 }
+
+#ifdef QNANO_USE_RHI
+void QNanoPainter::ensureContext(QRhi *rhi) {
+    if (!rhi)
+        return;
+    m_backend->ensureRhi(rhi);
+    if (!m_nvgContext)
+        m_nvgContext = m_backend->nvgCreate(NVG_ANTIALIAS);
+    m_openglContextName = rhi->backendName();
+}
+#endif
 
 /*!
     \fn void QNanoPainter::beginFrame(float width, float height)
@@ -209,8 +229,10 @@ void QNanoPainter::beginFrame(float width, float height)
 void QNanoPainter::beginFrameAt(float x, float y, float width, float height)
 {
     nvgBeginFrameAt(nvgCtx(), x, y, width, height, m_devicePixelRatio);
+#ifndef QNANO_USE_RHI
     QOpenGLFunctions glF(QOpenGLContext::currentContext());
     glF.glViewport(int(x), int(y), int(width), int(height));
+#endif
 }
 
 /*!
