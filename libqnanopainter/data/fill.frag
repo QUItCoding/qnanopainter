@@ -48,7 +48,11 @@ void main()
     float scissor = scissorMask(fpos);
 #ifdef EDGE_AA
     float strokeAlpha = strokeMask();
+#ifdef STENCIL_STROKES
     if (strokeAlpha < strokeThr) discard;
+#else
+    if (strokeAlpha < strokeThr) result = vec4(0.0);
+#endif
 #else
     float strokeAlpha = 1.0;
 #endif

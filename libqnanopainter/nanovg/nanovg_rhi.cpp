@@ -119,6 +119,7 @@ inline bool operator==(const RHINVGsamplerDesc &a, const RHINVGsamplerDesc &b) Q
 struct RHINVGpipelineState
 {
     bool edgeAA = false;
+    bool stencilStrokes = false;
 
     QRhiGraphicsPipeline::Topology topology = QRhiGraphicsPipeline::Triangles;
 
@@ -144,6 +145,7 @@ struct RHINVGpipelineState
 inline bool operator==(const RHINVGpipelineState &a, const RHINVGpipelineState &b) Q_DECL_NOTHROW
 {
     return a.edgeAA == b.edgeAA
+           && a.stencilStrokes == b.stencilStrokes
            && a.topology == b.topology
            && a.cullMode == b.cullMode
            && a.depthTestEnable == b.depthTestEnable
@@ -182,6 +184,7 @@ inline size_t qHash(const RHINVGpipelineState &s, size_t seed) Q_DECL_NOTHROW
 {
     // do not bother with all fields
     return qHash(s.edgeAA, seed)
+           ^ qHash(s.stencilStrokes)
            ^ qHash(s.sampleCount)
            ^ qHash(s.targetBlend.dstColor)
            ^ qHash(s.depthFunc)
@@ -244,8 +247,9 @@ struct RHINVGshaders
         vs = getShader(QLatin1String(":/qnanopainter/data/fill.vert.qsb"));
         fs = getShader(QLatin1String(":/qnanopainter/data/fill.frag.qsb"));
         fsAA = getShader(QLatin1String(":/qnanopainter/data/fill_edgeaa.frag.qsb"));
+        fsAASS = getShader(QLatin1String(":/qnanopainter/data/fill_edgeaass.frag.qsb"));
 
-        if (!vs.isValid() || !fs.isValid() || !fsAA.isValid())
+        if (!vs.isValid() || !fs.isValid() || !fsAA.isValid() || !fsAASS.isValid())
             qFatal("Failed to load shaders!");
 
         vertexInputLayout.setBindings({
@@ -260,6 +264,7 @@ struct RHINVGshaders
     QShader vs;
     QShader fs;
     QShader fsAA; // EDGE_AA enabled
+    QShader fsAASS; // EDGE_AA and STENCIL_STROKES enabled
     QRhiVertexInputLayout vertexInputLayout;
 };
 
@@ -327,9 +332,15 @@ static QRhiGraphicsPipeline *pipeline(RHINVGcontext *rc,
     QRhiGraphicsPipeline *ps = rc->rhi->newGraphicsPipeline();
 
     RHINVGshaders *shaders = rhinvg_shaders();
+    QShader fs = shaders->fs;
+    if (key.state.edgeAA) {
+        if (key.state.stencilStrokes)
+            fs = shaders->fsAASS;
+        fs = shaders->fsAA;
+    }
     ps->setShaderStages({
                          { QRhiShaderStage::Vertex, shaders->vs },
-                         { QRhiShaderStage::Fragment, key.state.edgeAA ? shaders->fsAA : shaders->fs }
+                         { QRhiShaderStage::Fragment, fs }
     });
     ps->setVertexInputLayout(shaders->vertexInputLayout);
     ps->setShaderResourceBindings(srb);
@@ -1099,6 +1110,7 @@ static void renderEndPrepare(void* uptr)
 
             RHINVGpipelineState basePs;
             basePs.edgeAA = (rc->flags & NVG_ANTIALIAS) != 0;
+            basePs.stencilStrokes = (rc->flags & NVG_STENCIL_STROKES) != 0;
             basePs.targetBlend.srcColor = call->blendFunc.srcRGB;
             basePs.targetBlend.dstColor = call->blendFunc.dstRGB;
             basePs.targetBlend.srcAlpha = call->blendFunc.srcAlpha;
