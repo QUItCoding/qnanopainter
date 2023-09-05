@@ -19,6 +19,7 @@ NVGcontext* QNanoBackendRHI::nvgCreate(int flags)
 
 void QNanoBackendRHI::nvgDelete(NVGcontext* nvgCtx)
 {
+    Q_UNUSED(nvgCtx)
     m_vg.destroy();
 }
 

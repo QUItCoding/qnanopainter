@@ -14,9 +14,7 @@ public:
     int nvglCreateImageFromHandle(NVGcontext* ctx, GLuint textureId, int w, int h, int imageFlags) Q_DECL_OVERRIDE;
     NVGparams *internalParams(NVGcontext* nvgCtx) Q_DECL_OVERRIDE;
     void setFlag(NVGcontext* nvgCtx, int flag, bool enable) Q_DECL_OVERRIDE;
-    void ensureRhi(QRhi *rhi) Q_DECL_OVERRIDE {
-        m_rhi = rhi;
-    }
+
     QRhi *m_rhi = nullptr;
     NanoVG m_vg;
 };

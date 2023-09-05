@@ -268,7 +268,7 @@ private:
     inline void setNvgCtx(NVGcontext* ctx) {
         m_nvgContext = ctx;
     }
-    void ensureContext(QRhi *rhi);
+    void updateContextName(QRhi *rhi);
 #endif
     void enableAntialiasing(bool enable);
     void enableHighQualityRendering(bool enable);

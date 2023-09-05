@@ -181,12 +181,9 @@ QNanoPainter::~QNanoPainter()
 }
 
 #ifdef QNANO_USE_RHI
-void QNanoPainter::ensureContext(QRhi *rhi) {
+void QNanoPainter::updateContextName(QRhi *rhi) {
     if (!rhi)
         return;
-    m_backend->ensureRhi(rhi);
-    if (!m_nvgContext)
-        m_nvgContext = m_backend->nvgCreate(NVG_ANTIALIAS);
     m_openglContextName = rhi->backendName();
 }
 #endif
