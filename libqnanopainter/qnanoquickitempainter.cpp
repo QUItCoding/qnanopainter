@@ -353,7 +353,8 @@ void QNanoQuickItemPainter::initialize(QRhiCommandBuffer *cb)
     }
     if (!m_vg.isValid()) {
         // Note: Enable this if rendering requires NVG_STENCIL_STROKES to be correct.
-        //m_vg.create(m_rhi, NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+        // Also add NVG_SCISSORING if scissoring is used.
+        //m_vg.create(m_rhi, NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_SCISSORING);
         m_vg.create(m_rhi, NVG_ANTIALIAS);
         m_painter->updateContextName(m_rhi);
     }

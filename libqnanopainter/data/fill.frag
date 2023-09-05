@@ -30,11 +30,13 @@ float sdroundrect(vec2 pt, vec2 ext, float rad) {
 }
 
 // Scissoring
+#ifdef SCISSORING
 float scissorMask(vec2 p) {
     vec2 sc = (abs((scissorMat * vec3(p,1.0)).xy) - scissorExt);
     sc = vec2(0.5,0.5) - sc * scissorScale;
     return clamp(sc.x,0.0,1.0) * clamp(sc.y,0.0,1.0);
 }
+#endif
 #ifdef EDGE_AA
 // Stroke - from [0..1] to clipped pyramid, where the slope is 1px.
 float strokeMask() {
@@ -45,7 +47,6 @@ float strokeMask() {
 void main()
 {
     vec4 result;
-    float scissor = scissorMask(fpos);
 #ifdef EDGE_AA
     float strokeAlpha = strokeMask();
 #ifdef STENCIL_STROKES
@@ -55,6 +56,11 @@ void main()
 #endif
 #else
     float strokeAlpha = 1.0;
+#endif
+#ifdef SCISSORING
+    float scissor = scissorMask(fpos);
+#else
+    float scissor = 1.0;
 #endif
     if (type == 0) {			// Gradient
         // Calculate gradient color using box gradient

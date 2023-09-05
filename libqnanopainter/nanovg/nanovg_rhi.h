@@ -35,7 +35,7 @@ enum NVGcreateFlags {
     NVG_STENCIL_STROKES	= 1<<1,
     // TODO
     NVG_DEBUG 			= 1<<2,
-    // TODO
+    // Flag indicating if scissoring is used.
     NVG_SCISSORING 		= 1<<3,
 };
 

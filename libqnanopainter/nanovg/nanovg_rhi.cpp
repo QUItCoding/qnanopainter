@@ -120,6 +120,7 @@ struct RHINVGpipelineState
 {
     bool edgeAA = false;
     bool stencilStrokes = false;
+    bool scissoring = false;
 
     QRhiGraphicsPipeline::Topology topology = QRhiGraphicsPipeline::Triangles;
 
@@ -146,6 +147,7 @@ inline bool operator==(const RHINVGpipelineState &a, const RHINVGpipelineState &
 {
     return a.edgeAA == b.edgeAA
            && a.stencilStrokes == b.stencilStrokes
+           && a.scissoring == b.scissoring
            && a.topology == b.topology
            && a.cullMode == b.cullMode
            && a.depthTestEnable == b.depthTestEnable
@@ -185,6 +187,7 @@ inline size_t qHash(const RHINVGpipelineState &s, size_t seed) Q_DECL_NOTHROW
     // do not bother with all fields
     return qHash(s.edgeAA, seed)
            ^ qHash(s.stencilStrokes)
+           ^ qHash(s.scissoring)
            ^ qHash(s.sampleCount)
            ^ qHash(s.targetBlend.dstColor)
            ^ qHash(s.depthFunc)
@@ -246,11 +249,16 @@ struct RHINVGshaders
     RHINVGshaders() {
         vs = getShader(QLatin1String(":/qnanopainter/data/fill.vert.qsb"));
         fs = getShader(QLatin1String(":/qnanopainter/data/fill.frag.qsb"));
-        fsAA = getShader(QLatin1String(":/qnanopainter/data/fill_edgeaa.frag.qsb"));
-        fsAASS = getShader(QLatin1String(":/qnanopainter/data/fill_edgeaass.frag.qsb"));
+        fsSC = getShader(QLatin1String(":/qnanopainter/data/fill_sc.frag.qsb"));
+        fsAA = getShader(QLatin1String(":/qnanopainter/data/fill_aa.frag.qsb"));
+        fsAASS = getShader(QLatin1String(":/qnanopainter/data/fill_aa_ss.frag.qsb"));
+        fsAASC = getShader(QLatin1String(":/qnanopainter/data/fill_aa_sc.frag.qsb"));
+        fsAASSSC = getShader(QLatin1String(":/qnanopainter/data/fill_aa_ss_sc.frag.qsb"));
 
-        if (!vs.isValid() || !fs.isValid() || !fsAA.isValid() || !fsAASS.isValid())
+        if (!vs.isValid() || !fs.isValid() || !fsAA.isValid() || !fsSC.isValid() ||
+            !fsAASS.isValid() || !fsAASC.isValid() || !fsAASSSC.isValid()) {
             qFatal("Failed to load shaders!");
+        }
 
         vertexInputLayout.setBindings({
             { 4 * sizeof(float) }
@@ -264,7 +272,10 @@ struct RHINVGshaders
     QShader vs;
     QShader fs;
     QShader fsAA; // EDGE_AA enabled
+    QShader fsSC; // SCISSORING enabled
     QShader fsAASS; // EDGE_AA and STENCIL_STROKES enabled
+    QShader fsAASC; // EDGE_AA and SCISSORING enabled
+    QShader fsAASSSC; // EDGE_AA, STENCIL_STROKES and SCISSORING enabled
     QRhiVertexInputLayout vertexInputLayout;
 };
 
@@ -334,11 +345,21 @@ static QRhiGraphicsPipeline *pipeline(RHINVGcontext *rc,
     RHINVGshaders *shaders = rhinvg_shaders();
     QShader fs = shaders->fs;
     if (key.state.edgeAA) {
-        if (key.state.stencilStrokes)
-            fs = shaders->fsAASS;
-        else
-            fs = shaders->fsAA;
+        if (key.state.stencilStrokes) {
+            if (key.state.scissoring)
+                fs = shaders->fsAASSSC;
+            else
+                fs = shaders->fsAASS;
+        } else {
+            if (key.state.scissoring)
+                fs = shaders->fsAASC;
+            else
+                fs = shaders->fsAA;
+        }
+    } else if (key.state.scissoring) {
+        fs = shaders->fsSC;
     }
+
     ps->setShaderStages({
                          { QRhiShaderStage::Vertex, shaders->vs },
                          { QRhiShaderStage::Fragment, fs }
@@ -824,19 +845,21 @@ static int convertPaint(RHINVGcontext *rc, RHINVGfragUniforms* frag, NVGpaint* p
     frag->innerCol = premulColor(paint->innerColor);
     frag->outerCol = premulColor(paint->outerColor);
 
-    if (scissor->extent[0] < -0.5f || scissor->extent[1] < -0.5f) {
-        memset(frag->scissorMat, 0, sizeof(frag->scissorMat));
-        frag->scissorExt[0] = 1.0f;
-        frag->scissorExt[1] = 1.0f;
-        frag->scissorScale[0] = 1.0f;
-        frag->scissorScale[1] = 1.0f;
-    } else {
-        nvgTransformInverse(invxform, scissor->xform);
-        xformToMat3x4(frag->scissorMat, invxform);
-        frag->scissorExt[0] = scissor->extent[0];
-        frag->scissorExt[1] = scissor->extent[1];
-        frag->scissorScale[0] = sqrtf(scissor->xform[0]*scissor->xform[0] + scissor->xform[2]*scissor->xform[2]) / fringe;
-        frag->scissorScale[1] = sqrtf(scissor->xform[1]*scissor->xform[1] + scissor->xform[3]*scissor->xform[3]) / fringe;
+    if (rc->flags & NVG_SCISSORING) {
+        if (scissor->extent[0] < -0.5f || scissor->extent[1] < -0.5f) {
+            memset(frag->scissorMat, 0, sizeof(frag->scissorMat));
+            frag->scissorExt[0] = 1.0f;
+            frag->scissorExt[1] = 1.0f;
+            frag->scissorScale[0] = 1.0f;
+            frag->scissorScale[1] = 1.0f;
+        } else {
+            nvgTransformInverse(invxform, scissor->xform);
+            xformToMat3x4(frag->scissorMat, invxform);
+            frag->scissorExt[0] = scissor->extent[0];
+            frag->scissorExt[1] = scissor->extent[1];
+            frag->scissorScale[0] = sqrtf(scissor->xform[0]*scissor->xform[0] + scissor->xform[2]*scissor->xform[2]) / fringe;
+            frag->scissorScale[1] = sqrtf(scissor->xform[1]*scissor->xform[1] + scissor->xform[3]*scissor->xform[3]) / fringe;
+        }
     }
 
     memcpy(frag->extent, paint->extent, sizeof(frag->extent));
@@ -1112,6 +1135,7 @@ static void renderEndPrepare(void* uptr)
             RHINVGpipelineState basePs;
             basePs.edgeAA = (rc->flags & NVG_ANTIALIAS) != 0;
             basePs.stencilStrokes = (rc->flags & NVG_STENCIL_STROKES) != 0;
+            basePs.scissoring = (rc->flags & NVG_SCISSORING) != 0;
             basePs.targetBlend.srcColor = call->blendFunc.srcRGB;
             basePs.targetBlend.dstColor = call->blendFunc.dstRGB;
             basePs.targetBlend.srcAlpha = call->blendFunc.srcAlpha;
