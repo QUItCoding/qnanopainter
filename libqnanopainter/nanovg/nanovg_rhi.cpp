@@ -336,7 +336,8 @@ static QRhiGraphicsPipeline *pipeline(RHINVGcontext *rc,
     if (key.state.edgeAA) {
         if (key.state.stencilStrokes)
             fs = shaders->fsAASS;
-        fs = shaders->fsAA;
+        else
+            fs = shaders->fsAA;
     }
     ps->setShaderStages({
                          { QRhiShaderStage::Vertex, shaders->vs },
