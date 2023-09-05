@@ -17,7 +17,7 @@ CONFIG += c++11
 DEFINES += QNANO_QT_GL_INCLUDE
 
 # Enable this to use QRhi (available since Qt 6.7) instead of QQuickFramebufferObject
-DEFINES += QNANO_USE_RHI
+#DEFINES += QNANO_USE_RHI
 
 # This will enable GLES3 (disable to force GLES2)
 DEFINES += QNANO_ENABLE_GLES3

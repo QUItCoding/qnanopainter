@@ -12,7 +12,7 @@ option(QNANO_ENABLE_TOUCH_SIGNALS "This will enable signalling touch events
 option(QNANO_ENABLE_PAINT_SIGNALS "This will enable signalling paint events
                                    Can be useful when using view/widget classes directly" OFF)
 option(QNANO_USE_RENDERNODE "Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject" OFF)
-option(QNANO_USE_RHI "Enable this to use QRhi (available since Qt 6.7) instead of QQuickFramebufferObject" ON)
+option(QNANO_USE_RHI "Enable this to use QRhi (available since Qt 6.7) instead of QQuickFramebufferObject" OFF)
 
 option(QNANO_BUILD_GLES_BACKENDS "When building for embedded devices you can define manually which backends are supported" OFF)
 option(QNANO_BUILD_GL_BACKENDS "When building for embedded devices you can define manually which backends are supported" OFF)
