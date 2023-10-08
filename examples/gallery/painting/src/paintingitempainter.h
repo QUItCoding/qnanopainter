@@ -34,7 +34,11 @@ private:
     QSequentialAnimationGroup m_hideAnimation;
 };
 
+#ifdef QNANO_USE_RHI
+class PaintingItemPainter: public QNanoQuickItemPainter
+#else
 class PaintingItemPainter: public QObject, public QNanoQuickItemPainter
+#endif
 {
     Q_OBJECT
 public:
