@@ -89,6 +89,9 @@ private:
     GLuint m_textureId = 0;
     QNanoImage::ImageFlags m_flags = {};
     QString m_uniqueKey;
+#ifdef QNANO_USE_RHI
+    QHash<QString, QSharedPointer<QNanoDataElement>> m_localDataCache;
+#endif
 
 };
 

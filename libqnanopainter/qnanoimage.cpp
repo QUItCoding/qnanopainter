@@ -223,7 +223,11 @@ int QNanoImage::getID(NVGcontext* nvg)
     Q_ASSERT(m_parentPainter);
     if (!m_parentPainter)
         return -1;
+#ifdef QNANO_USE_RHI
+    auto *dataCache = &m_localDataCache;
+#else
     auto *dataCache = &m_parentPainter->m_dataCache;
+#endif
     if (dataCache->contains(m_uniqueKey)) {
         // Image is in cache
         m_imageData = dataCache->value(m_uniqueKey);
