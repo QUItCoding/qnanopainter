@@ -40,7 +40,7 @@ if(QT_VERSION_MAJOR EQUAL  5)
     set(IS_QUICK_IN_QT ON)
     set(IS_WIDGETS_IN_QT ON)
     # ????? set(QNANO_BUILD_GLES_BACKENDS ON)
-    set(QNANO_BUILD_GL_BACKENDS ON)
+    #set(QNANO_BUILD_GL_BACKENDS ON)
 else()
     if(QT_FEATURE_quick_canvas) # QT_FEATURE_quick not exists ??
         set(IS_QUICK_IN_QT ON)
@@ -162,6 +162,15 @@ endif()
 if(MSVC)
     # Suppress fontstash warnings about fopen & strncpy usage
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+if (ANDROID)
+    find_library(GLESv3_LIBRARY GLESv3)
+    if (NOT GLESv3_LIBRARY)
+        set(QNANOPAINTER_QT_LIBS ${QNANOPAINTER_QT_LIBS} GLESv2)
+    else()
+        set(QNANOPAINTER_QT_LIBS ${QNANOPAINTER_QT_LIBS} GLESv3)
+    endif()
 endif()
 
 # add QT Libs 
