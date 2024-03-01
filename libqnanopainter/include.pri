@@ -33,6 +33,11 @@ DEFINES += QNANO_ENABLE_GLES3
 # Enable this to use QRenderNode (available since Qt 5.8.0) instead of QQuickFramebufferObject
 #DEFINES += QNANO_USE_RENDERNODE
 
+# This will enable sharing the QNanoPainter instance between QNanoQuickItemPainters
+# Sharing the painter saves memory, but can have issues e.g. when using QNanoPainter
+# from multiple windows (see https://github.com/QUItCoding/qnanopainter/issues/80)
+DEFINES += QNANO_ENABLE_PAINTER_SHARING
+
 # Suppress fontstash warnings about fopen & strncpy usage
 DEFINES += _CRT_SECURE_NO_WARNINGS
 

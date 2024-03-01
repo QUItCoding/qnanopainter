@@ -46,7 +46,11 @@
 */
 
 QNanoQuickItemPainter::QNanoQuickItemPainter()
+#ifdef QNANO_ENABLE_PAINTER_SHARING
     : m_painter(QNanoPainter::getInstance())
+#else
+    : m_painter(new QNanoPainter())
+#endif
 {
 #ifndef QNANO_USE_RHI
     // Initialize QOpenGLFunctions for the context
@@ -60,6 +64,10 @@ QNanoQuickItemPainter::QNanoQuickItemPainter()
 
 QNanoQuickItemPainter::~QNanoQuickItemPainter()
 {
+#ifndef QNANO_ENABLE_PAINTER_SHARING
+    delete m_painter;
+    m_painter = nullptr;
+#endif
 }
 
 /*!
@@ -385,7 +393,9 @@ void QNanoQuickItemPainter::render(const RenderState *)
 void QNanoQuickItemPainter::render()
 #endif
 {
+#ifdef QNANO_ENABLE_PAINTER_SHARING
     m_painter->reset(); // reset context data as painter is shared.
+#endif
 
     m_painter->setPixelAlign(static_cast<QNanoPainter::PixelAlign>(m_pixelAlign));
     m_painter->setPixelAlignText(static_cast<QNanoPainter::PixelAlign>(m_pixelAlignText));
