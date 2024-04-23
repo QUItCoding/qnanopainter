@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(qnanopainter VERSION 0.1.0)
 
-set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "ON" FORCE)
-
 option(QNANO_DEBUG_COLLECT "Enable this to get the drawing debug information" OFF)
 option(QNANO_DEBUG_RENDER "Enable this to render the drawing debug information" OFF)
 option(QNANO_QT_GL_INCLUDE "Enable this to let Qt include OpenGL headers" ON)
