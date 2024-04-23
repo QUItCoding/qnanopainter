@@ -246,6 +246,10 @@ public:
     int textBreakLines(const char* string, const char* end, float breakRowWidth, NVGtextRow* rows, int maxRows);
 */
 
+    inline NVGcontext* nvgCtx() const {
+        return m_nvgContext;
+    }
+
 private:
 
     friend class QNanoDebug;
@@ -261,9 +265,6 @@ private:
 
     static QNanoPainter *getInstance();
 
-    inline NVGcontext* nvgCtx() const {
-        return m_nvgContext;
-    }
 #ifdef QNANO_USE_RHI
     inline void setNvgCtx(NVGcontext* ctx) {
         m_nvgContext = ctx;
