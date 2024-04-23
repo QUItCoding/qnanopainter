@@ -27,6 +27,8 @@
 #include <QTransform>
 #include <QSharedPointer>
 #include <QSurfaceFormat>
+#include <QOpenGLContext>
+#include <QOffscreenSurface>
 #include "qnanocolor.h"
 #include "private/qnanobrush.h"
 #include "private/qnanodataelement.h"
@@ -299,6 +301,10 @@ private:
     QSharedPointer<QNanoFont> m_defaultFont;
     QString m_openglContextName;
 
+#ifndef QNANO_USE_RHI
+    QOpenGLContext m_openglContext;
+    QOffscreenSurface m_openglSurface;
+#endif
 };
 
 #endif // QNANOPAINTER_H

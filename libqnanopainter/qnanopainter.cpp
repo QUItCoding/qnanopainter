@@ -138,6 +138,16 @@ Q_GLOBAL_STATIC(QNanoPainter, instance)
 QNanoPainter::QNanoPainter()
 {
 #ifndef QNANO_USE_RHI
+    // Save current OpenGL context so it can be restored later
+    QOpenGLContext *prevContext = QOpenGLContext::currentContext();
+
+    // Create new OpenGL context that can be owned by this QNanoPainter object
+    Q_ASSERT(QCoreApplication::testAttribute(Qt::AA_ShareOpenGLContexts));
+    m_openglContext.setShareContext(QOpenGLContext::globalShareContext());
+    m_openglContext.create();
+    m_openglSurface.setFormat(m_openglContext.format());
+    m_openglSurface.create();
+    m_openglContext.makeCurrent(&m_openglSurface);
 
     // Request actual OpenGL context version and type
     QOpenGLContext *context = QOpenGLContext::currentContext();
@@ -156,6 +166,10 @@ QNanoPainter::QNanoPainter()
     m_nvgContext = m_backend->nvgCreate(NVG_ANTIALIAS);
     Q_ASSERT_X(m_nvgContext, "QNanoPainter::QNanoPainter", "Could not init nanovg!");
 
+    // Restore previous OpenGL context
+    if (prevContext != nullptr)
+        prevContext->makeCurrent(prevContext->surface());
+
 #else
     m_backend.reset(QNanoBackendFactory::createBackend(0, 0, false));
 #endif
@@ -171,9 +185,12 @@ QNanoPainter::QNanoPainter()
 
 QNanoPainter::~QNanoPainter()
 {
+    if (m_backend && m_nvgContext) {
 
-    if (m_backend && m_nvgContext && QOpenGLContext::currentContext()) {
-        // Do NanoVG side cleanups only if OpenGL context still exists
+#ifndef QNANO_USE_RHI
+        m_openglContext.makeCurrent(&m_openglSurface);
+#endif
+
         m_backend->nvgDelete(m_nvgContext);
     }
 
