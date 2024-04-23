@@ -167,7 +167,9 @@ endif()
 target_link_libraries(qnanopainter ${QNANOPAINTER_QT_LIBS} )
 
 # add to INCLUDE PATH 
-target_include_directories(qnanopainter PUBLIC .)  
+target_include_directories(qnanopainter
+    PUBLIC .
+    PUBLIC nanovg)
 
 # cmake variable ==> c++ #define
 if(QNANO_QT_GL_INCLUDE)
