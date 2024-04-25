@@ -16,6 +16,8 @@ option(QNANO_USE_RHI "Enable this to use QRhi (available since Qt 6.7) instead o
 option(QNANO_BUILD_GLES_BACKENDS "When building for embedded devices you can define manually which backends are supported" OFF)
 option(QNANO_BUILD_GL_BACKENDS "When building for embedded devices you can define manually which backends are supported" OFF)
 
+option(QNANO_USE_FREETYPE "Enable this to use Freetype library instead of stb_truetype" OFF)
+
 # Qt6 from msys2 need extra lib
 option(QNANO_MSYS2 "Enable this to build in MSYS2" OFF)
 
@@ -199,4 +201,11 @@ endif()
 if(QNANO_USE_RHI)
     target_compile_definitions(qnanopainter PUBLIC QNANO_USE_RHI)
     message(STATUS "QNANO_USE_RHI=${QNANO_USE_RHI}")
+endif()
+if(QNANO_USE_FREETYPE)
+    message(STATUS "QNANO_USE_FREETYPE=${QNANO_USE_FREETYPE}")
+    find_package(Freetype REQUIRED)
+    target_compile_definitions(qnanopainter PUBLIC QNANO_USE_FREETYPE)
+    target_compile_definitions(qnanopainter PRIVATE FONS_USE_FREETYPE)
+    target_link_libraries(qnanopainter Freetype::Freetype)
 endif()
